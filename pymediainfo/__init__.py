@@ -4,8 +4,7 @@ from xml.dom import minidom
 
 ENV_DICT = {
     "PATH": "/usr/local/bin/:/usr/bin/",
-    "LD_LIBRARY_PATH": "/usr/local/lib/:/usr/lib/"
-}
+    "LD_LIBRARY_PATH": "/usr/local/lib/:/usr/lib/"}
 
 
 class Track(object):
@@ -37,7 +36,7 @@ class Track(object):
                     try:
                         current = getattr(self, primary)
                         setattr(self, primary, int(v))
-                        getattr(self, o).append(primary)
+                        getattr(self, o).append(current)
                         break
                     except:
                         pass
