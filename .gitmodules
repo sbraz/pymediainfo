@@ -1,0 +1,3 @@
+[submodule "docs/_build/html"]
+	path = docs/_build/html
+	url = git@github.com:paltman/pymediainfo.git
