@@ -47,6 +47,10 @@ class MediaInfoTest(unittest.TestCase):
         mi = MediaInfo(self.xml_data)
         self.assertEqual(4, len(mi.tracks))
 
+    def test_getting_attribute_that_doesnot_exist(self):
+        mi = MediaInfo(self.xml_data)
+        self.assertTrue(mi.tracks[0].does_not_exist is None)
+
 
 if __name__ == '__main__':
     import sys, os

@@ -35,6 +35,30 @@ can call the constructor directly::
  from pymediainfo import MediaInfo
  media_info = MediaInfo(raw_xml_string)
 
+Since the attributes on the `Track` objects are being dynamically added as the
+XML output from MediaInfo is being parsed, there isn't a firm definition of what
+will be available at runtime.  In order to make consuming the objects easier so
+that you can avoid having to use `hasattr` or `try/except` blocks, the
+`__getattribute__` method has been overriden and will just return `None` when
+and if an attribute is referenced but doesn't exist.
+
+This will enable you to write consuming code like::
+
+ from pymediainfo import MediaInfo
+ media_info = MediaInfo.parse('my_video_file.mov')
+ for track in media_info.tracks:
+     if track.bit_rate is not None:
+         print "%s: %s" % (track.track_type, track.bit_rate)
+     else:
+         print "%s tracks do not have bit rate associated with them." % track.track_type
+
+Output::
+
+ General tracks do not have bit rate associated with them.
+ Video: 46033920
+ Audio: 1536000
+ Menu tracks do not have bit rate associated with them.
+
 =======================
 Reporting Issues / Bugs
 =======================
