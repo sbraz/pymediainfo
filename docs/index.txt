@@ -1,0 +1,52 @@
+.. pymediainfo documentation master file, created by
+
+Welcome to pymediainfo's documentation!
+=======================================
+
+============
+Requirements
+============
+
+This is a simple wrapper around the MediaInfo command line interface, which you
+can find at the MediaInfo project site found at http://mediainfo.sourceforge.net/
+
+Beyond that requirement, this simple library should work with the standard
+Python library, as it's only dependancies are `subprocess` and `xml.dom`.
+
+===============
+Using MediaInfo
+===============
+
+There isn't much to this library so instead of a lot of documentation it is
+probably best to just demonstrate how it works::
+
+ from pymediainfo import MediaInfo
+ media_info = MediaInfo.parse('my_video_file.mov')
+ for track in media_info.tracks:
+     if track.track_type == 'Video':
+         print track.bit_rate, track.bit_rate_mode, track.codec
+ 
+ # output: 46033920 CBR DV
+
+If you already have the XML data in a string in memory (e.g. you have previously
+parsed the file or were sent the dump from `mediainfo` from someone else) you
+can call the constructor directly::
+
+ from pymediainfo import MediaInfo
+ media_info = MediaInfo(raw_xml_string)
+
+=======================
+Reporting Issues / Bugs
+=======================
+
+Please use the issue tracker in GitHub at http://github.com/paltman/pymediainfo/issues
+to report all feature requests or bug reports.  Thanks!
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
