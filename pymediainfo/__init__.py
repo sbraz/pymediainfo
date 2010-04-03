@@ -1,5 +1,6 @@
 from subprocess import Popen, PIPE
 from xml.dom import minidom
+import simplejson
 
 
 ENV_DICT = {
@@ -48,6 +49,13 @@ class Track(object):
                     except:
                         pass
 
+    def to_data(self):
+        data = {}
+        for k,v in self.__dict__.iteritems():
+            if k != 'xml_dom_fragment':
+                data[k] = v
+        return data
+
 
 class MediaInfo(object):
 
@@ -75,3 +83,9 @@ class MediaInfo(object):
         if len(self._tracks) == 0:
             self._populate_tracks()
         return self._tracks
+
+    def to_json(self):
+        data = {'tracks': []}
+        for track in self.tracks:
+            data['tracks'].append(track.to_data())
+        return simplejson.dumps(data)
