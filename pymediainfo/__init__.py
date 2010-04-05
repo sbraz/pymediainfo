@@ -84,8 +84,11 @@ class MediaInfo(object):
             self._populate_tracks()
         return self._tracks
 
-    def to_json(self):
+    def to_data(self):
         data = {'tracks': []}
         for track in self.tracks:
             data['tracks'].append(track.to_data())
-        return simplejson.dumps(data)
+        return data
+
+    def to_json(self):
+        return simplejson.dumps(self.to_data())
