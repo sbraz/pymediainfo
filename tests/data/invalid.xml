@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo>
+<File>
+<track type="General">
+
+<Count>260</Count>
+<Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+<Kind_of_stream>General</Kind_of_stream>
+<Kind_of_stream>General</Kind_of_stream>
+<Stream_identifier>0</Stream_identifier>
+<Count_of_video_streams>1</Count_of_video_streams>
+<Count_of_audio_streams>1</Count_of_audio_streams>
+<Count_of_menu_streams>1</Count_of_menu_streams>
+<Video_Format_List>Digital Video</Video_Format_List>
+<Video_Format_WithHint_List>Digital Video</Video_Format_WithHint_List>
+<Codecs_Video>DV</Codecs_Video>
+<Video_Language_List>English</Video_Language_List>
+<Audio_Format_List>PCM</Audio_Format_List>
+<Audio_Format_WithHint_List>PCM</Audio_Format_WithHint_List>
+<Audio_codecs>PCM</Audio_codecs>
+<Audio_Language_List>English</Audio_Language_List>
+<Menu_Format_List>TimeCode</Menu_Format_List>
+<Menu_Format_WithHint_List>TimeCode</Menu_Format_WithHint_List>
+<Menu_Language_List>English</Menu_Language_List>
+<Complete_name>credits.mov</Complete_name>
+<File_name>credits.mov</File_name>
+<File_extension>mov</File_extension>
+<Format>MPEG-4</Format>
+<Format>MPEG-4</Format>
+<Format_Extensions_usually_used>mp4 m4v m4a m4p 3gpp 3gp 3gpp2 3g2 k3g jpm jpx mqv ismv isma f4v</Format_Extensions_usually_used>
+<Format_profile>QuickTime</Format_profile>
+<Codec_ID>qt  </Codec_ID>
+<Codec_ID_Url>http://www.apple.com/quicktime/download/standalone.html</Codec_ID_Url>
+<Codec>MPEG-4</Codec>
+<Codec>MPEG-4</Codec>
+<Codec_Extensions_usually_used>mp4 m4v m4a m4p 3gpp 3gp 3gpp2 3g2 k3g jpm jpx mqv ismv isma f4v</Codec_Extensions_usually_used>
+<File_size>712816548</File_size>
+<File_size>680 MiB</File_size>
+<File_size>680 MiB</File_size>
+<File_size>680 MiB</File_size>
+<File_size>680 MiB</File_size>
+<File_size>679.8 MiB</File_size>
+<Duration>593474</Duration>
+<Duration>9mn 53s</Duration>
+<Duration>9mn 53s 474ms</Duration>
+<Duration>9mn 53s</Duration>
+<Duration>00:09:53.474</Duration>
+<Overall_bit_rate>9608731</Overall_bit_rate>
+<Overall_bit_rate>9 609 Kbps</Overall_bit_rate>
+<Stream_size>194196</Stream_size>
+<Stream_size>190 KiB (0%)</Stream_size>
+<Stream_size>190 KiB</Stream_size>
+<Stream_size>190 KiB</Stream_size>
+<Stream_size>190 KiB</Stream_size>
+<Stream_size>189.6 KiB</Stream_size>
+<Stream_size>190 KiB (0%)</Stream_size>
+<Proportion_of_this_stream>0.00027</Proportion_of_this_stream>
+<Encoded_date>UTC 2010-04-12 14:58:21</Encoded_date>
+<Tagged_date>UTC 2010-04-12 15:00:37</Tagged_date>
+<File_last_modification_date>UTC 2010-04-15 14:40:32</File_last_modification_date>
+<File_last_modification_date__local_>2010-04-15 09:40:32</File_last_modification_date__local_>
+<Writing_library>Apple QuickTime</Writing_library>
+<Writing_library>Apple QuickTime</Writing_library>
+<Writing_library_Name>Apple QuickTime</Writing_library_Name>
+<>00;05;34;23</>
+</track>
+
+<track type="Video">
+
+<Count>148</Count>
+<Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+<Kind_of_stream>Video</Kind_of_stream>
+<Kind_of_stream>Video</Kind_of_stream>
+<Stream_identifier>0</Stream_identifier>
+<ID>1</ID>
+<ID>1</ID>
+<Format>Digital Video</Format>
+<Codec_ID>dvc </Codec_ID>
+<Codec_ID_Url>http://www.apple.com/quicktime/download/standalone.html</Codec_ID_Url>
+<Codec>DV</Codec>
+<Codec>DV</Codec>
+<Codec_Family>DV</Codec_Family>
+<Codec_Info>Apple QuickTime DV (DVCPRO NTSC)</Codec_Info>
+<Codec_Url>http://www.apple.com/quicktime/download/standalone.html</Codec_Url>
+<Codec_CC>dvc </Codec_CC>
+<Duration>258558</Duration>
+<Duration>4mn 18s</Duration>
+<Duration>4mn 18s 558ms</Duration>
+<Duration>4mn 18s</Duration>
+<Duration>00:04:18.558</Duration>
+<Bit_rate_mode>CBR</Bit_rate_mode>
+<Bit_rate_mode>Constant</Bit_rate_mode>
+<Bit_rate>20874240</Bit_rate>
+<Bit_rate>20.9 Mbps</Bit_rate>
+<Width>720</Width>
+<Width>720 pixels</Width>
+<Height>480</Height>
+<Height>480 pixels</Height>
+<Pixel_aspect_ratio>0.909</Pixel_aspect_ratio>
+<Original_pixel_aspect_ratio>0.889</Original_pixel_aspect_ratio>
+<Display_aspect_ratio>1.363</Display_aspect_ratio>
+<Display_aspect_ratio>4:3</Display_aspect_ratio>
+<Original_display_aspect_ratio>1.333</Original_display_aspect_ratio>
+<Original_display_aspect_ratio>4:3</Original_display_aspect_ratio>
+<Rotation>0.000</Rotation>
+<Frame_rate_mode>VFR</Frame_rate_mode>
+<Frame_rate_mode>Variable</Frame_rate_mode>
+<Frame_rate>21.744</Frame_rate>
+<Frame_rate>21.744 fps</Frame_rate>
+<Minimum_frame_rate>0.111</Minimum_frame_rate>
+<Minimum_frame_rate>0.111 fps</Minimum_frame_rate>
+<Maximum_frame_rate>29.970</Maximum_frame_rate>
+<Maximum_frame_rate>29.970 fps</Maximum_frame_rate>
+<Original_frame_rate>29.970</Original_frame_rate>
+<Original_frame_rate>29.970 fps</Original_frame_rate>
+<Frame_count>5622</Frame_count>
+<Standard>NTSC</Standard>
+<Colorimetry>4:1:1</Colorimetry>
+<Scan_type>Interlaced</Scan_type>
+<Scan_type>Interlaced</Scan_type>
+<Interlacement>Interlaced</Interlacement>
+<Interlacement>Interlaced</Interlacement>
+<Bits__Pixel_Frame_>2.778</Bits__Pixel_Frame_>
+<Delay>334768</Delay>
+<Delay>5mn 34s</Delay>
+<Delay>5mn 34s 768ms</Delay>
+<Delay>5mn 34s</Delay>
+<Delay>00:05:34.768</Delay>
+<Delay_Settings>DropFrame=Yes / 24HourMax=No / IsVisual=No</Delay_Settings>
+<Delay_Original>0</Delay_Original>
+<Stream_size>674640000</Stream_size>
+<Stream_size>643 MiB (95%)</Stream_size>
+<Stream_size>643 MiB</Stream_size>
+<Stream_size>643 MiB</Stream_size>
+<Stream_size>643 MiB</Stream_size>
+<Stream_size>643.4 MiB</Stream_size>
+<Stream_size>643 MiB (95%)</Stream_size>
+<Proportion_of_this_stream>0.94644</Proportion_of_this_stream>
+<Language>en</Language>
+<Language>English</Language>
+<Encoded_date>UTC 2010-04-12 14:58:21</Encoded_date>
+<Tagged_date>UTC 2010-04-12 15:00:37</Tagged_date>
+</track>
+
+<track type="Audio">
+
+<Count>129</Count>
+<Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+<Kind_of_stream>Audio</Kind_of_stream>
+<Kind_of_stream>Audio</Kind_of_stream>
+<Stream_identifier>0</Stream_identifier>
+<ID>2</ID>
+<ID>2</ID>
+<Format>PCM</Format>
+<Format_settings>Little / Signed</Format_settings>
+<Format_settings__Endianness>Little</Format_settings__Endianness>
+<Format_settings__Sign>Signed</Format_settings__Sign>
+<Codec_ID>sowt</Codec_ID>
+<Codec_ID_Url>http://www.apple.com/quicktime/download/standalone.html</Codec_ID_Url>
+<Codec>PCM</Codec>
+<Codec>PCM</Codec>
+<Codec_Family>PCM</Codec_Family>
+<Codec_Url>http://www.apple.com/quicktime/download/standalone.html</Codec_Url>
+<Codec_CC>sowt</Codec_CC>
+<Codec_settings>Little / Signed</Codec_settings>
+<Codec_settings__Endianness>Little</Codec_settings__Endianness>
+<Codec_settings__Sign>Signed</Codec_settings__Sign>
+<Duration>593474</Duration>
+<Duration>9mn 53s</Duration>
+<Duration>9mn 53s 474ms</Duration>
+<Duration>9mn 53s</Duration>
+<Duration>00:09:53.474</Duration>
+<Bit_rate_mode>CBR</Bit_rate_mode>
+<Bit_rate_mode>Constant</Bit_rate_mode>
+<Bit_rate>512000</Bit_rate>
+<Bit_rate>512 Kbps</Bit_rate>
+<Channel_s_>1</Channel_s_>
+<Channel_s_>1 channel</Channel_s_>
+<Sampling_rate>32000</Sampling_rate>
+<Sampling_rate>32.0 KHz</Sampling_rate>
+<SamplingCount>18991168</SamplingCount>
+<Resolution>16</Resolution>
+<Resolution>16 bits</Resolution>
+<Stream_size>37982352</Stream_size>
+<Stream_size>36.2 MiB (5%)</Stream_size>
+<Stream_size>36 MiB</Stream_size>
+<Stream_size>36 MiB</Stream_size>
+<Stream_size>36.2 MiB</Stream_size>
+<Stream_size>36.22 MiB</Stream_size>
+<Stream_size>36.2 MiB (5%)</Stream_size>
+<Proportion_of_this_stream>0.05328</Proportion_of_this_stream>
+<Language>en</Language>
+<Language>English</Language>
+<Encoded_date>UTC 2010-04-12 14:58:21</Encoded_date>
+<Tagged_date>UTC 2010-04-12 15:00:37</Tagged_date>
+</track>
+
+<track type="Menu">
+
+<Count>51</Count>
+<Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+<Kind_of_stream>Menu</Kind_of_stream>
+<Kind_of_stream>Menu</Kind_of_stream>
+<Stream_identifier>0</Stream_identifier>
+<ID>3</ID>
+<ID>3</ID>
+<Format>TimeCode</Format>
+<Language>en</Language>
+<Language>English</Language>
+<Encoded_date>UTC 2010-04-12 15:00:37</Encoded_date>
+<Tagged_date>UTC 2010-04-12 15:00:37</Tagged_date>
+</track>
+
+</File>
+</Mediainfo>
+

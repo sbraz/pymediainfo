@@ -52,6 +52,16 @@ class MediaInfoTest(unittest.TestCase):
         self.assertTrue(mi.tracks[0].does_not_exist is None)
 
 
+class MediaInfoInvalidXMLTest(unittest.TestCase):
+
+    def setUp(self):
+        self.xml_data = open(os.path.join(os.path.dirname(__file__), 'data/invalid.xml'), 'rb').read()
+
+    def test_parse_invalid_xml(self):
+        mi = MediaInfo(MediaInfo.parse_xml_data_into_dom(self.xml_data))
+        self.assertEqual(len(mi.tracks), 0)
+
+
 if __name__ == '__main__':
     import sys, os
     os.chdir(os.path.dirname(__file__))

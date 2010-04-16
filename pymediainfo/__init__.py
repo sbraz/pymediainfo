@@ -53,7 +53,7 @@ class Track(object):
 
     def to_data(self):
         data = {}
-        for k,v in self.__dict__.iteritems():
+        for k, v in self.__dict__.iteritems():
             if k != 'xml_dom_fragment':
                 data[k] = v
         return data
@@ -64,7 +64,16 @@ class MediaInfo(object):
     def __init__(self, xml):
         self.xml_dom = xml
         if isinstance(xml, (str, unicode)):
-            self.xml_dom = minidom.parseString(xml)
+            self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
+
+    @staticmethod
+    def parse_xml_data_into_dom(xml_data):
+        dom = None
+        try:
+            dom = minidom.parseString(xml_data)
+        except:
+            pass
+        return dom
 
     @staticmethod
     def parse(filename, environment=ENV_DICT):
@@ -76,12 +85,15 @@ class MediaInfo(object):
         p = Popen(command.split(), stdout=fp_out, stderr=fp_err, env=environment)
         p.wait()
         fp_out.seek(0)
-        xml = minidom.parseString(fp_out.read())
+
+        xml_dom = MediaInfo.parse_xml_data_into_dom(fp_out.read())
         fp_out.close()
         fp_err.close()
-        return MediaInfo(xml)
+        return MediaInfo(xml_dom)
 
     def _populate_tracks(self):
+        if self.xml_dom is None:
+            return
         for xml_track in self.xml_dom.getElementsByTagName("track"):
             self._tracks.append(Track(xml_track))
 
