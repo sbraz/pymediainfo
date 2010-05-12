@@ -4,7 +4,7 @@ import simplejson
 import os
 from tempfile import mkstemp
 
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 
 ENV_DICT = {
     "PATH": "/usr/local/bin/:/usr/bin/",

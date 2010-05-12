@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
-import pymediainfo
-
 setup(
     name='pymediainfo',
-    version = pymediainfo.__version__,
+    version = '1.3.2',
     author='Patrick Altman',
     author_email='paltman@gmail.com',
     url='git@github.com/paltman/pymediainfo.git',
