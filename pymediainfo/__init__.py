@@ -78,12 +78,12 @@ class MediaInfo(object):
 
     @staticmethod
     def parse(filename, environment=ENV_DICT):
-        command = "mediainfo -f --Output=XML %s" % filename
+        command = ["mediainfo", "-f", "--Output=XML", filename]
         fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
         fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
         fp_out = os.fdopen(fileno_out, 'r+b')
         fp_err = os.fdopen(fileno_err, 'r+b')
-        p = Popen(command.split(), stdout=fp_out, stderr=fp_err, env=environment)
+        p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
         p.wait()
         fp_out.seek(0)
 
