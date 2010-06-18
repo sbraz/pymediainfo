@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pymediainfo',
-    version = '1.3.2',
+    version = '1.3.3',
     author='Patrick Altman',
     author_email='paltman@gmail.com',
     url='git@github.com/paltman/pymediainfo.git',
