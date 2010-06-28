@@ -12,5 +12,5 @@ setup(
     include_package_data = True,
     zip_safe=False,
     license='MIT',
-    install_requires=['simplejson',]
+    install_requires=['simplejson>=2.0.9',]
 )
