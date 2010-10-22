@@ -1,5 +1,6 @@
 import os
 import unittest
+
 from xml.dom import minidom
 
 from pymediainfo import MediaInfo
@@ -52,6 +53,41 @@ class MediaInfoTest(unittest.TestCase):
         self.assertTrue(mi.tracks[0].does_not_exist is None)
 
 
+class MediaInfoInvalidXML2Test(unittest.TestCase):
+
+    def setUp(self):
+        self.xml_data = open(os.path.join(os.path.dirname(__file__), 'data/sample2.xml'), 'rb').read()
+
+    def test_populate_tracks(self):
+        mi = MediaInfo(self.xml_data)
+        self.assertEqual(3, len(mi.tracks))
+
+    def test_valid_video_track(self):
+        mi = MediaInfo(self.xml_data)
+        for track in mi.tracks:
+            if track.track_type == 'Video':
+                self.assertEqual('AVC', track.codec)
+                break
+
+    def test_track_integer_attributes(self):
+        mi = MediaInfo(self.xml_data)
+        for track in mi.tracks:
+            if track.track_type == 'Audio':
+                self.assertTrue(isinstance(track.duration, int))
+                self.assertTrue(isinstance(track.bit_rate, int))
+                self.assertTrue(isinstance(track.sampling_rate, int))
+                break
+
+    def test_load_mediainfo_from_string(self):
+        mi = MediaInfo(self.xml_data)
+        self.assertEqual(3, len(mi.tracks))
+
+    def test_getting_attribute_that_doesnot_exist(self):
+        mi = MediaInfo(self.xml_data)
+        self.assertTrue(mi.tracks[0].does_not_exist is None)
+
+
+
 class MediaInfoInvalidXMLTest(unittest.TestCase):
 
     def setUp(self):
@@ -63,7 +99,7 @@ class MediaInfoInvalidXMLTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys, os
+    import sys
     os.chdir(os.path.dirname(__file__))
 
     try:
