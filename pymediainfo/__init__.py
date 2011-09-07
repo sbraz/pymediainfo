@@ -1,9 +1,15 @@
 from subprocess import Popen
 from xml.dom import minidom
-import simplejson
-import os
+import os, sys
 from xml.parsers.expat import ExpatError
 from tempfile import mkstemp
+
+# simplejson doesn't work on py3 yet
+if sys.version_info >= (3,0):
+    py3 = True
+    import json as simplejson
+else:
+    py3 = False
 
 __version__ = '1.3.2'
 
@@ -65,7 +71,12 @@ class MediaInfo(object):
 
     def __init__(self, xml):
         self.xml_dom = xml
-        if isinstance(xml, (str, unicode)):
+        if py3:
+            # no unicode type in python3
+            xml_types = (str,)
+        else:
+            xml_types = (str, unicode)
+        if isinstance(xml, xml_types):
             self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
 
     @staticmethod
