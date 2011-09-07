@@ -1,4 +1,9 @@
 from setuptools import setup, find_packages
+import sys
+if sys.version_info >= (3,0):
+    prereqs = []
+else:
+    prereqs = ['simplejson>=2.0.9',]
 
 setup(
     name='pymediainfo',
@@ -12,5 +17,5 @@ setup(
     include_package_data = True,
     zip_safe=False,
     license='MIT',
-    install_requires=['simplejson>=2.0.9',]
+    install_requires=prereqs,
 )
