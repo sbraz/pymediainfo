@@ -1,2 +1,3 @@
+*.komodo*
 *.pyc
 doctrees
