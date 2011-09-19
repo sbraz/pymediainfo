@@ -6,7 +6,8 @@ from tempfile import mkstemp
 
 _py3 = sys.version_info >= (3,)
 
-# check if system has simplejson installed, otherwise fall back to json
+# check if system has simplejson installed, otherwise
+# fall back to json (included in stdlib in 2.6+)
 try: 
 	import simplejson as json
 except ImportError:
