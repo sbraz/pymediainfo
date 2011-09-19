@@ -1,10 +1,8 @@
 from subprocess import Popen
-from tempfile import mkstemp
 from xml.dom import minidom
+import os, sys
 from xml.parsers.expat import ExpatError
-import os
-import sys
-import re
+from tempfile import mkstemp
 
 _py3 = sys.version_info >= (3,)
 
@@ -87,7 +85,7 @@ class MediaInfo(object):
 	def parse_xml_data_into_dom(xml_data):
 		dom = None
 		try:
-			dom = minidom.parseString(re.sub('<->[\s\d\w]+</->', '', xml_data))
+			dom = minidom.parseString(xml_data)
 		except ExpatError:
 			try:
 				dom = minidom.parseString(xml_data.replace("<>00:00:00:00</>", ""))
