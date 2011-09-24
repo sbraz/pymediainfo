@@ -2,6 +2,7 @@ from subprocess import Popen
 from xml.dom import minidom
 import simplejson
 import os
+import re
 from xml.parsers.expat import ExpatError
 from tempfile import mkstemp
 
@@ -72,7 +73,7 @@ class MediaInfo(object):
     def parse_xml_data_into_dom(xml_data):
         dom = None
         try:
-            dom = minidom.parseString(xml_data)
+            dom = minidom.parseString(re.sub('<->[\s\d\w]+</->', '', xml_data))
         except ExpatError:
             try:
                 dom = minidom.parseString(xml_data.replace("<>00:00:00:00</>", ""))
