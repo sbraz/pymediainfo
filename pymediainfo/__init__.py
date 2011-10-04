@@ -1,9 +1,17 @@
 from subprocess import Popen
 from xml.dom import minidom
-import simplejson
-import os
+import os, sys
 from xml.parsers.expat import ExpatError
 from tempfile import mkstemp
+
+_py3 = sys.version_info >= (3,)
+
+# check if system has simplejson installed, otherwise
+# fall back to json (included in stdlib in 2.6+)
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 __version__ = '1.3.2'
 
@@ -53,6 +61,9 @@ class Track(object):
                     except:
                         pass
 
+    def __repr__(self):
+        return("<Track track_id='{0}', track_type='{1}'>".format(self.track_id, self.track_type))
+
     def to_data(self):
         data = {}
         for k, v in self.__dict__.iteritems():
@@ -65,7 +76,10 @@ class MediaInfo(object):
 
     def __init__(self, xml):
         self.xml_dom = xml
-        if isinstance(xml, (str, unicode)):
+        if _py3: xml_types = (str,)     # no unicode type in python3
+        else: xml_types = (str, unicode)
+
+        if isinstance(xml, xml_types):
             self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
 
     @staticmethod
@@ -119,4 +133,4 @@ class MediaInfo(object):
         return data
 
     def to_json(self):
-        return simplejson.dumps(self.to_data())
+        return json.dumps(self.to_data())
