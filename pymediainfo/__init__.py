@@ -1,5 +1,5 @@
 from subprocess import Popen
-from xml.dom import minidom
+from bs4 import BeautifulSoup, NavigableString
 import os, sys
 from xml.parsers.expat import ExpatError
 from tempfile import mkstemp
@@ -13,11 +13,9 @@ try:
 except ImportError:
     import json
 
-__version__ = '1.3.2'
+__version__ = '1.3.6'
 
-ENV_DICT = {
-    "PATH": "/usr/local/bin/:/usr/bin/",
-    "LD_LIBRARY_PATH": "/usr/local/lib/:/usr/lib/"}
+ENV_DICT = os.environ
 
 
 class Track(object):
@@ -31,13 +29,13 @@ class Track(object):
 
     def __init__(self, xml_dom_fragment):
         self.xml_dom_fragment = xml_dom_fragment
-        self.track_type = self.xml_dom_fragment.attributes['type'].value
-        for el in self.xml_dom_fragment.childNodes:
-            if el.nodeType == 1:
-                node_name = el.nodeName.lower().strip().strip('_')
+        self.track_type = xml_dom_fragment.attrs['type']
+        for el in self.xml_dom_fragment.children:
+            if not isinstance(el, NavigableString):
+                node_name = el.name.lower().strip().strip('_')
                 if node_name == 'id':
                     node_name = 'track_id'
-                node_value = el.firstChild.nodeValue
+                node_value = el.string
                 other_node_name = "other_%s" % node_name
                 if getattr(self, node_name) is None:
                     setattr(self, node_name, node_value)
@@ -84,17 +82,7 @@ class MediaInfo(object):
 
     @staticmethod
     def parse_xml_data_into_dom(xml_data):
-        dom = None
-        try:
-            dom = minidom.parseString(xml_data)
-        except ExpatError:
-            try:
-                dom = minidom.parseString(xml_data.replace("<>00:00:00:00</>", ""))
-            except:
-                pass
-        except:
-            pass
-        return dom
+        return BeautifulSoup(xml_data, "xml")
 
     @staticmethod
     def parse(filename, environment=ENV_DICT):
@@ -115,7 +103,7 @@ class MediaInfo(object):
     def _populate_tracks(self):
         if self.xml_dom is None:
             return
-        for xml_track in self.xml_dom.getElementsByTagName("track"):
+        for xml_track in self.xml_dom.Mediainfo.File.find_all("track"):
             self._tracks.append(Track(xml_track))
 
     @property
