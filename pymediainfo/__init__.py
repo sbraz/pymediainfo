@@ -13,7 +13,7 @@ try:
 except ImportError:
     import json
 
-__version__ = '1.3.2'
+__version__ = '1.3.5'
 
 ENV_DICT = {
     "PATH": "/usr/local/bin/:/usr/bin/",
@@ -103,7 +103,7 @@ class MediaInfo(object):
         fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
         fp_out = os.fdopen(fileno_out, 'r+b')
         fp_err = os.fdopen(fileno_err, 'r+b')
-        p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
+        p = Popen(command, stdout=fp_out, stderr=fp_err)
         p.wait()
         fp_out.seek(0)
 
