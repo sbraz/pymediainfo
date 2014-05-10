@@ -5,11 +5,11 @@ import sys
 if sys.version_info >= (3,):
     prereqs = []
 else:
-    prereqs = ['simplejson>=2.0.9', 'beautifulsoup4>=4.0.0', ]
+    prereqs = ['beautifulsoup4>=4.0.0', ]
 
 setup(
     name='pymediainfo',
-    version='1.3.6',
+    version='1.4.0',
     author='Patrick Altman',
     author_email='paltman@gmail.com',
     url='git@github.com/paltman/pymediainfo.git',

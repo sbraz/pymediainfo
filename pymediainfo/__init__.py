@@ -1,19 +1,15 @@
+import json
+import os
+import sys
+
 from subprocess import Popen
-from bs4 import BeautifulSoup, NavigableString
-import os, sys
-from xml.parsers.expat import ExpatError
 from tempfile import mkstemp
+
+from bs4 import BeautifulSoup, NavigableString
 
 _py3 = sys.version_info >= (3,)
 
-# check if system has simplejson installed, otherwise
-# fall back to json (included in stdlib in 2.6+)
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
-__version__ = '1.3.6'
+__version__ = '1.4.0'
 
 ENV_DICT = os.environ
 
