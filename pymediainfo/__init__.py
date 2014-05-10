@@ -98,6 +98,8 @@ class MediaInfo(object):
         xml_dom = MediaInfo.parse_xml_data_into_dom(fp_out.read())
         fp_out.close()
         fp_err.close()
+        os.unlink(fname_out)
+        os.unlink(fname_err)
         return MediaInfo(xml_dom)
 
     def _populate_tracks(self):
