@@ -3,7 +3,7 @@ import os
 import sys
 
 from subprocess import Popen
-from tempfile import mkstemp
+from tempfile import TemporaryFile
 
 from bs4 import BeautifulSoup, NavigableString
 
@@ -83,19 +83,12 @@ class MediaInfo(object):
     @staticmethod
     def parse(filename, environment=ENV_DICT):
         command = ["mediainfo", "-f", "--Output=XML", filename]
-        fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
-        fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
-        fp_out = os.fdopen(fileno_out, 'rb')
-        fp_err = os.fdopen(fileno_err, 'rb')
+        fp_out = TemporaryFile(suffix=".xml", prefix="media-")
+        fp_err = TemporaryFile(suffix=".err", prefix="media-")
         p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
         p.wait()
         fp_out.seek(0)
-
         xml_dom = MediaInfo.parse_xml_data_into_dom(fp_out.read())
-        fp_out.close()
-        fp_err.close()
-        os.unlink(fname_out)
-        os.unlink(fname_err)
         return MediaInfo(xml_dom)
 
     def _populate_tracks(self):
