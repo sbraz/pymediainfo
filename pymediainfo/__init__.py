@@ -85,8 +85,8 @@ class MediaInfo(object):
         command = ["mediainfo", "-f", "--Output=XML", filename]
         fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
         fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
-        fp_out = os.fdopen(fileno_out, 'r+b')
-        fp_err = os.fdopen(fileno_err, 'r+b')
+        fp_out = os.fdopen(fileno_out, 'rb')
+        fp_err = os.fdopen(fileno_err, 'rb')
         p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
         p.wait()
         fp_out.seek(0)
