@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from xml.dom import minidom
+from bs4 import BeautifulSoup
 
 from pymediainfo import MediaInfo
 
@@ -9,16 +9,16 @@ from pymediainfo import MediaInfo
 class MediaInfoTest(unittest.TestCase):
 
     def setUp(self):
-        self.xml_data = open(os.path.join(os.path.dirname(__file__), 'data/sample.xml'), 'rb').read()
+        self.xml_data = open(os.path.join(os.path.dirname(__file__),
+                                          'data/sample.xml'), 'rb').read()
+        self.xml_dom = BeautifulSoup(self.xml_data, "xml")
 
     def test_populate_tracks(self):
-        xml = minidom.parseString(self.xml_data)
-        mi = MediaInfo(xml)
+        mi = MediaInfo(self.xml_dom)
         self.assertEqual(4, len(mi.tracks))
 
     def test_valid_video_track(self):
-        xml = minidom.parseString(self.xml_data)
-        mi = MediaInfo(xml)
+        mi = MediaInfo(self.xml_dom)
         for track in mi.tracks:
             if track.track_type == 'Video':
                 self.assertEqual('DV', track.codec)
@@ -26,8 +26,7 @@ class MediaInfoTest(unittest.TestCase):
                 break
 
     def test_track_integer_attributes(self):
-        xml = minidom.parseString(self.xml_data)
-        mi = MediaInfo(xml)
+        mi = MediaInfo(self.xml_dom)
         for track in mi.tracks:
             if track.track_type == 'Audio':
                 self.assertTrue(isinstance(track.duration, int))
@@ -36,8 +35,7 @@ class MediaInfoTest(unittest.TestCase):
                 break
 
     def test_track_other_attributes(self):
-        xml = minidom.parseString(self.xml_data)
-        mi = MediaInfo(xml)
+        mi = MediaInfo(self.xml_dom)
         for track in mi.tracks:
             if track.track_type == 'General':
                 self.assertEqual(5, len(track.other_file_size))
@@ -56,7 +54,8 @@ class MediaInfoTest(unittest.TestCase):
 class MediaInfoInvalidXML2Test(unittest.TestCase):
 
     def setUp(self):
-        self.xml_data = open(os.path.join(os.path.dirname(__file__), 'data/sample2.xml'), 'rb').read()
+        self.xml_data = open(os.path.join(os.path.dirname(__file__),
+                                          'data/sample2.xml'), 'rb').read()
 
     def test_populate_tracks(self):
         mi = MediaInfo(self.xml_data)
@@ -87,11 +86,11 @@ class MediaInfoInvalidXML2Test(unittest.TestCase):
         self.assertTrue(mi.tracks[0].does_not_exist is None)
 
 
-
 class MediaInfoInvalidXMLTest(unittest.TestCase):
 
     def setUp(self):
-        self.xml_data = open(os.path.join(os.path.dirname(__file__), 'data/invalid.xml'), 'rb').read()
+        self.xml_data = open(os.path.join(os.path.dirname(__file__),
+                                          'data/invalid.xml'), 'rb').read()
 
     def test_parse_invalid_xml(self):
         mi = MediaInfo(MediaInfo.parse_xml_data_into_dom(self.xml_data))
