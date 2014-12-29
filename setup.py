@@ -1,15 +1,16 @@
 from setuptools import setup, find_packages
 import sys
+import pymediainfo
 
 # simplejson isn't compatible with python3
 if sys.version_info >= (3,):
     prereqs = []
 else:
-    prereqs = ['beautifulsoup4>=4.0.0', ]
+    prereqs = ['beautifulsoup4>=4.0.0', 'six==1.8.0']
 
 setup(
     name='pymediainfo',
-    version='1.4.0',
+    version=pymediainfo.__version__,
     author='Patrick Altman',
     author_email='paltman@gmail.com',
     url='git@github.com/paltman/pymediainfo.git',
