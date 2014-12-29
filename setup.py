@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 import sys
-import pymediainfo
 
 # simplejson isn't compatible with python3
 if sys.version_info >= (3,):
