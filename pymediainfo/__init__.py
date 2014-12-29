@@ -1,15 +1,12 @@
 import json
 import os
-import sys
-
 from subprocess import Popen
 from tempfile import mkstemp
 
+import six
 from bs4 import BeautifulSoup, NavigableString
 
-_py3 = sys.version_info >= (3,)
-
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 
 ENV_DICT = os.environ
 
@@ -60,7 +57,7 @@ class Track(object):
 
     def to_data(self):
         data = {}
-        for k, v in self.__dict__.iteritems():
+        for k, v in six.iteritems(self.__dict__):
             if k != 'xml_dom_fragment':
                 data[k] = v
         return data
@@ -70,8 +67,10 @@ class MediaInfo(object):
 
     def __init__(self, xml):
         self.xml_dom = xml
-        if _py3: xml_types = (str,)     # no unicode type in python3
-        else: xml_types = (str, unicode)
+        if six.PY3:
+            xml_types = (str,)     # no unicode type in python3
+        else:
+            xml_types = (str, unicode)
 
         if isinstance(xml, xml_types):
             self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
