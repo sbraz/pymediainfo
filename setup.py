@@ -10,7 +10,7 @@ else:
 
 setup(
     name='pymediainfo',
-    version=pymediainfo.__version__,
+    version='1.4.1',
     author='Patrick Altman',
     author_email='paltman@gmail.com',
     url='git@github.com/paltman/pymediainfo.git',
