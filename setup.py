@@ -1,11 +1,5 @@
 from setuptools import setup, find_packages
-import sys
 
-# simplejson isn't compatible with python3
-if sys.version_info >= (3,):
-    prereqs = []
-else:
-    prereqs = ['beautifulsoup4>=4.0.0', 'six==1.8.0']
 
 setup(
     name='pymediainfo',
@@ -19,5 +13,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MIT',
-    install_requires=prereqs,
+    install_requires=[
+        'beautifulsoup4>=4.0.0',
+        'six==1.8.0',
+    ],
 )
