@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Mediainfo>
 <File>
+<></Invalid tag>
 <track type="General">
 
 <Count>260</Count>
@@ -62,7 +63,6 @@
 <Writing_library>Apple QuickTime</Writing_library>
 <Writing_library>Apple QuickTime</Writing_library>
 <Writing_library_Name>Apple QuickTime</Writing_library_Name>
-<>00;05;34;23</>
 </track>
 
 <track type="Video">
