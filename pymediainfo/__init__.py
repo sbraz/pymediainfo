@@ -1,14 +1,11 @@
 import json
 import os
-from subprocess import Popen
-from tempfile import mkstemp
+from ctypes import *
 
 import six
 from bs4 import BeautifulSoup, NavigableString
 
 __version__ = '1.4.1'
-
-ENV_DICT = os.environ
 
 
 class Track(object):
@@ -80,27 +77,29 @@ class MediaInfo(object):
         return BeautifulSoup(xml_data, "xml")
 
     @staticmethod
-    def parse(filename, environment=ENV_DICT):
-        command = ["mediainfo", "-f", "--Output=XML", filename]
-        fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
-        fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
-        fp_out = os.fdopen(fileno_out, 'r+b')
-        fp_err = os.fdopen(fileno_err, 'r+b')
-        p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
-        p.wait()
-        fp_out.seek(0)
-
-        xml_dom = MediaInfo.parse_xml_data_into_dom(fp_out.read())
-        fp_out.close()
-        fp_err.close()
-        os.unlink(fname_out)
-        os.unlink(fname_err)
+    def parse(filename):
+        if os.name in ("nt", "dos", "os2", "ce"):
+            lib = windll.MediaInfo 
+        else:
+            lib = CDLL("libmediainfo.so.0")
+        # Create a MediaInfo handle
+        handle = lib.MediaInfo_New()
+        lib.MediaInfoA_Option(handle, b"CharSet", b"UTF-8")
+        lib.MediaInfoA_Option(None, b"Inform", b"XML")
+        lib.MediaInfoA_Option(None, b"Complete", b"1")
+        lib.MediaInfoA_Open(handle, filename.encode("utf8"), 0)
+        lib.MediaInfo_Inform.restype = c_wchar_p
+        xml = lib.MediaInfo_Inform(handle, 0)
+        xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
+        # Delete the handle
+        lib.MediaInfo_Close(handle)
+        lib.MediaInfo_Delete(handle)
         return MediaInfo(xml_dom)
 
     def _populate_tracks(self):
         if self.xml_dom is None:
             return
-        for xml_track in self.xml_dom.Mediainfo.File.find_all("track"):
+        for xml_track in self.xml_dom.File.find_all("track"):
             self._tracks.append(Track(xml_track))
 
     @property
