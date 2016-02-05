@@ -14,8 +14,6 @@ setup(
     zip_safe=False,
     license='MIT',
     install_requires=[
-        'beautifulsoup4>=4.0.0',
         'six>=1.8.0',
-        'lxml>=3.4.1',
     ],
 )

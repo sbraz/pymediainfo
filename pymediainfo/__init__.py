@@ -1,12 +1,11 @@
 import json
 import os
+import xml.etree.ElementTree as ET
 from ctypes import *
 
 import six
-from bs4 import BeautifulSoup, NavigableString
 
 __version__ = '1.4.1'
-
 
 class Track(object):
 
@@ -19,21 +18,20 @@ class Track(object):
 
     def __init__(self, xml_dom_fragment):
         self.xml_dom_fragment = xml_dom_fragment
-        self.track_type = xml_dom_fragment.attrs['type']
-        for el in self.xml_dom_fragment.children:
-            if not isinstance(el, NavigableString):
-                node_name = el.name.lower().strip().strip('_')
-                if node_name == 'id':
-                    node_name = 'track_id'
-                node_value = el.string
-                other_node_name = "other_%s" % node_name
-                if getattr(self, node_name) is None:
-                    setattr(self, node_name, node_value)
+        self.track_type = xml_dom_fragment.attrib['type']
+        for el in self.xml_dom_fragment:
+            node_name = el.tag.lower().strip().strip('_')
+            if node_name == 'id':
+                node_name = 'track_id'
+            node_value = el.text
+            other_node_name = "other_%s" % node_name
+            if getattr(self, node_name) is None:
+                setattr(self, node_name, node_value)
+            else:
+                if getattr(self, other_node_name) is None:
+                    setattr(self, other_node_name, [node_value, ])
                 else:
-                    if getattr(self, other_node_name) is None:
-                        setattr(self, other_node_name, [node_value, ])
-                    else:
-                        getattr(self, other_node_name).append(node_value)
+                    getattr(self, other_node_name).append(node_value)
 
         for o in [d for d in self.__dict__.keys() if d.startswith('other_')]:
             try:
@@ -74,7 +72,10 @@ class MediaInfo(object):
 
     @staticmethod
     def parse_xml_data_into_dom(xml_data):
-        return BeautifulSoup(xml_data, "xml")
+        try:
+            return ET.fromstring(xml_data)
+        except:
+            return None
 
     @staticmethod
     def parse(filename):
@@ -99,7 +100,7 @@ class MediaInfo(object):
     def _populate_tracks(self):
         if self.xml_dom is None:
             return
-        for xml_track in self.xml_dom.File.find_all("track"):
+        for xml_track in self.xml_dom.iter("track"):
             self._tracks.append(Track(xml_track))
 
     @property
