@@ -7,11 +7,8 @@ Welcome to pymediainfo's documentation!
 Requirements
 ============
 
-This is a simple wrapper around the MediaInfo command line interface, which you
-can find at the MediaInfo project site found at http://mediainfo.sourceforge.net/
-
-Beyond that requirement, this simple library should work with the standard
-Python library, as it's only dependancies are `subprocess` and `xml.dom`.
+This is a simple wrapper around the MediaInfo library, which you can find
+at the MediaInfo project site found at http://mediainfo.sourceforge.net/
 
 ===============
 Using MediaInfo
@@ -63,7 +60,7 @@ Output::
 Reporting Issues / Bugs
 =======================
 
-Please use the issue tracker in GitHub at http://github.com/paltman/pymediainfo/issues
+Please use the issue tracker in GitHub at https://github.com/sbraz/pymediainfo/issues
 to report all feature requests or bug reports.  Thanks!
 
 
