@@ -8,7 +8,7 @@ Requirements
 ============
 
 This is a simple wrapper around the MediaInfo library, which you can find
-at the MediaInfo project site found at http://mediainfo.sourceforge.net/
+at https://mediaarea.net/en/MediaInfo
 
 ===============
 Using MediaInfo
