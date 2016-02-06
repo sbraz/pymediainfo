@@ -4,12 +4,11 @@ import xml.etree.ElementTree as ET
 
 from pymediainfo import MediaInfo
 
-dir_name = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 class MediaInfoTest(unittest.TestCase):
-
     def setUp(self):
-        with open(os.path.join(dir_name, 'data/sample.xml'), 'r') as f:
+        with open(os.path.join(data_dir, 'sample.xml'), 'r') as f:
             self.xml_data = f.read()
 
     def test_populate_tracks(self):
@@ -55,11 +54,24 @@ class MediaInfoTest(unittest.TestCase):
 
 
 class MediaInfoInvalidXMLTest(unittest.TestCase):
-
     def setUp(self):
-        with open(os.path.join(dir_name, 'data/invalid.xml'), 'r') as f:
+        with open(os.path.join(data_dir, 'invalid.xml'), 'r') as f:
             self.xml_data = f.read()
 
     def test_parse_invalid_xml(self):
         mi = MediaInfo(MediaInfo.parse_xml_data_into_dom(self.xml_data))
         self.assertEqual(len(mi.tracks), 0)
+
+class MediaInfoLibraryTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"))
+    def test_track_count(self):
+        self.assertEqual(len(self.mi.tracks), 3)
+    def test_track_types(self):
+        self.assertEqual(self.mi.tracks[1].track_type, "Video")
+        self.assertEqual(self.mi.tracks[2].track_type, "Audio")
+    def test_track_details(self):
+        self.assertEqual(self.mi.tracks[1].codec, "AVC")
+        self.assertEqual(self.mi.tracks[2].codec, "AAC LC")
+        self.assertEqual(self.mi.tracks[1].duration, 958)
+        self.assertEqual(self.mi.tracks[2].duration, 980)
