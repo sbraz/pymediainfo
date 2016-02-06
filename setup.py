@@ -12,9 +12,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MIT',
-    install_requires=[
-        'six>=1.8.0',
-    ],
+    install_requires=['six>=1.8.0'],
     tests_require=["nose"],
     test_suite="nose.collector"
 )

@@ -1,11 +1,12 @@
 import json
 import os
+from pkg_resources import get_distribution
 import xml.etree.ElementTree as ET
 from ctypes import *
 
 import six
 
-__version__ = '1.4.1'
+__version__ = get_distribution("pymediainfo").version
 
 class Track(object):
 
