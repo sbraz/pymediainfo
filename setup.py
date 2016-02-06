@@ -16,4 +16,6 @@ setup(
     install_requires=[
         'six>=1.8.0',
     ],
+    tests_require=["nose"],
+    test_suite="nose.collector"
 )
