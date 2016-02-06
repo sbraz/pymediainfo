@@ -1,11 +1,10 @@
 from setuptools import setup, find_packages
 
-
 setup(
     name='pymediainfo',
     version='1.4.1',
-    author='Patrick Altman',
-    author_email='paltman@gmail.com',
+    author='Louis Sautier',
+    author_email='sautier.louis@gmail.com',
     url='https://github.com/sbraz/pymediainfo',
     description="""A Python wrapper for the mediainfo library.""",
     packages=find_packages(),
