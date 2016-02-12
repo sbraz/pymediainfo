@@ -4,19 +4,15 @@ from pkg_resources import get_distribution
 import xml.etree.ElementTree as ET
 from ctypes import *
 
-import six
-
 __version__ = get_distribution("pymediainfo").version
 
 class Track(object):
-
     def __getattribute__(self, name):
         try:
             return object.__getattribute__(self, name)
         except:
             pass
         return None
-
     def __init__(self, xml_dom_fragment):
         self.xml_dom_fragment = xml_dom_fragment
         self.track_type = xml_dom_fragment.attrib['type']
@@ -47,29 +43,19 @@ class Track(object):
                         break
                     except:
                         pass
-
     def __repr__(self):
         return("<Track track_id='{0}', track_type='{1}'>".format(self.track_id, self.track_type))
-
     def to_data(self):
         data = {}
-        for k, v in six.iteritems(self.__dict__):
+        for k, v in self.__dict__.items():
             if k != 'xml_dom_fragment':
                 data[k] = v
         return data
 
 
 class MediaInfo(object):
-
     def __init__(self, xml):
-        self.xml_dom = xml
-        if six.PY3:
-            xml_types = (str,)     # no unicode type in python3
-        else:
-            xml_types = (str, unicode)
-
-        if isinstance(xml, xml_types):
-            self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
+        self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
 
     @staticmethod
     def parse_xml_data_into_dom(xml_data):
@@ -77,7 +63,6 @@ class MediaInfo(object):
             return ET.fromstring(xml_data)
         except:
             return None
-
     @staticmethod
     def parse(filename):
         if os.name in ("nt", "dos", "os2", "ce"):
@@ -92,18 +77,15 @@ class MediaInfo(object):
         lib.MediaInfoA_Open(handle, filename.encode("utf8"), 0)
         lib.MediaInfo_Inform.restype = c_wchar_p
         xml = lib.MediaInfo_Inform(handle, 0)
-        xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
         # Delete the handle
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
-        return MediaInfo(xml_dom)
-
+        return MediaInfo(xml)
     def _populate_tracks(self):
         if self.xml_dom is None:
             return
         for xml_track in self.xml_dom.iter("track"):
             self._tracks.append(Track(xml_track))
-
     @property
     def tracks(self):
         if not hasattr(self, "_tracks"):
@@ -111,12 +93,10 @@ class MediaInfo(object):
         if len(self._tracks) == 0:
             self._populate_tracks()
         return self._tracks
-
     def to_data(self):
         data = {'tracks': []}
         for track in self.tracks:
             data['tracks'].append(track.to_data())
         return data
-
     def to_json(self):
         return json.dumps(self.to_data())
