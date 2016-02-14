@@ -67,6 +67,8 @@ class MediaInfo(object):
     def parse(filename):
         if os.name in ("nt", "dos", "os2", "ce"):
             lib = windll.MediaInfo 
+        elif sys.platform == "darwin":
+            lib = CDLL("libmediainfo.0.dylib")
         else:
             lib = CDLL("libmediainfo.so.0")
         # Create a MediaInfo handle
