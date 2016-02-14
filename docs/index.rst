@@ -15,7 +15,9 @@ Using MediaInfo
 ===============
 
 There isn't much to this library so instead of a lot of documentation it is
-probably best to just demonstrate how it works::
+probably best to just demonstrate how it works:
+
+.. code-block:: python
 
  from pymediainfo import MediaInfo
  media_info = MediaInfo.parse('my_video_file.mov')
@@ -27,7 +29,9 @@ probably best to just demonstrate how it works::
 
 If you already have the XML data in a string in memory (e.g. you have previously
 parsed the file or were sent the dump from `mediainfo` from someone else) you
-can call the constructor directly::
+can call the constructor directly:
+
+.. code-block:: python
 
  from pymediainfo import MediaInfo
  media_info = MediaInfo(raw_xml_string)
@@ -39,7 +43,9 @@ that you can avoid having to use `hasattr` or `try/except` blocks, the
 `__getattribute__` method has been overriden and will just return `None` when
 and if an attribute is referenced but doesn't exist.
 
-This will enable you to write consuming code like::
+This will enable you to write consuming code like:
+
+.. code-block:: python
 
  from pymediainfo import MediaInfo
  media_info = MediaInfo.parse('my_video_file.mov')
@@ -47,7 +53,8 @@ This will enable you to write consuming code like::
      if track.bit_rate is not None:
          print "%s: %s" % (track.track_type, track.bit_rate)
      else:
-         print "%s tracks do not have bit rate associated with them." % track.track_type
+         print """%s tracks do not have bit rate
+                  associated with them.""" % track.track_type
 
 Output::
 
