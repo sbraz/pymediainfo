@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from pkg_resources import get_distribution
 import xml.etree.ElementTree as ET
 from ctypes import *
