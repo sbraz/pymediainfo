@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import os
 import unittest
 
@@ -65,7 +66,7 @@ class MediaInfoUnicodeXMLTest(unittest.TestCase):
     def test_parse_file_with_unicode_tags(self):
         self.assertEqual(
             self.mi.tracks[0].title,
-            u"Dès Noël où un zéphyr haï me vêt de glaçons "
-            u"würmiens je dîne d’exquis rôtis de bœuf au kir à "
-            u"l’aÿ d’âge mûr & cætera !"
+            "Dès Noël où un zéphyr haï me vêt de glaçons "
+            "würmiens je dîne d’exquis rôtis de bœuf au kir à "
+            "l’aÿ d’âge mûr & cætera !"
         )
