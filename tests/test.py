@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import unittest
 
@@ -57,3 +58,14 @@ class MediaInfoLibraryTest(unittest.TestCase):
         self.assertEqual(self.mi.tracks[2].codec, "AAC LC")
         self.assertEqual(self.mi.tracks[1].duration, 958)
         self.assertEqual(self.mi.tracks[2].duration, 980)
+
+class MediaInfoUnicodeXMLTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mkv"))
+    def test_parse_file_with_unicode_tags(self):
+        self.assertEqual(
+            self.mi.tracks[0].title,
+            u"Dès Noël où un zéphyr haï me vêt de glaçons "
+            u"würmiens je dîne d’exquis rôtis de bœuf au kir à "
+            u"l’aÿ d’âge mûr & cætera !"
+        )
