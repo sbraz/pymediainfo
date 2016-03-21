@@ -61,7 +61,7 @@ class MediaInfo(object):
     @staticmethod
     def parse_xml_data_into_dom(xml_data):
         try:
-            return ET.fromstring(xml_data)
+            return ET.fromstring(xml_data.encode("utf-8"))
         except:
             return None
     @staticmethod
