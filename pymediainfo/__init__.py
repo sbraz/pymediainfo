@@ -77,7 +77,7 @@ class MediaInfo(object):
         lib.MediaInfoA_Option(handle, b"CharSet", b"UTF-8")
         lib.MediaInfoA_Option(None, b"Inform", b"XML")
         lib.MediaInfoA_Option(None, b"Complete", b"1")
-        lib.MediaInfoA_Open(handle, filename.encode("utf8"), 0)
+        lib.MediaInfoA_Open(handle, filename.encode("utf8"))
         lib.MediaInfo_Inform.restype = c_wchar_p
         xml = lib.MediaInfo_Inform(handle, 0)
         # Delete the handle
