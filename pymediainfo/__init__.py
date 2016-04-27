@@ -72,13 +72,28 @@ class MediaInfo(object):
             lib = CDLL("libmediainfo.0.dylib")
         else:
             lib = CDLL("libmediainfo.so.0")
+        # Define arguments and return types
+        lib.MediaInfo_Inform.restype = c_wchar_p
+        lib.MediaInfo_New.argtypes = []
+        lib.MediaInfo_New.restype  = c_void_p
+        lib.MediaInfo_Option.argtypes = [c_void_p, c_wchar_p, c_wchar_p]
+        lib.MediaInfo_Option.restype = c_wchar_p
+        lib.MediaInfoA_Option.argtypes = [c_void_p, c_char_p, c_char_p]
+        lib.MediaInfoA_Option.restype = c_char_p
+        lib.MediaInfo_Inform.argtypes = [c_void_p, c_size_t]
+        lib.MediaInfo_Inform.restype = c_wchar_p
+        lib.MediaInfoA_Open.argtypes = [c_void_p, c_char_p]
+        lib.MediaInfoA_Open.restype = c_size_t
+        lib.MediaInfo_Delete.argtypes = [c_void_p]
+        lib.MediaInfo_Delete.restype  = None
+        lib.MediaInfo_Close.argtypes = [c_void_p]
+        lib.MediaInfo_Close.restype = None
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
-        lib.MediaInfoA_Option(handle, b"CharSet", b"UTF-8")
+        lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
         lib.MediaInfoA_Option(None, b"Inform", b"XML")
         lib.MediaInfoA_Option(None, b"Complete", b"1")
         lib.MediaInfoA_Open(handle, filename.encode("utf8"))
-        lib.MediaInfo_Inform.restype = c_wchar_p
         xml = lib.MediaInfo_Inform(handle, 0)
         # Delete the handle
         lib.MediaInfo_Close(handle)
