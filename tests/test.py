@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
+import sys
 import unittest
 
 from pymediainfo import MediaInfo
@@ -70,3 +71,11 @@ class MediaInfoUnicodeXMLTest(unittest.TestCase):
             "würmiens je dîne d’exquis rôtis de bœuf au kir à "
             "l’aÿ d’âge mûr & cætera !"
         )
+
+@unittest.skipIf(sys.version_info.major < 3, "Currently broken "
+        "see https://github.com/sbraz/pymediainfo/issues/22")
+class MediaInfoUnicodeFileNameTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(os.path.join(data_dir, "accentué"))
+    def test_parse_unicode_file(self):
+        self.assertEqual(len(self.mi.tracks), 1)
