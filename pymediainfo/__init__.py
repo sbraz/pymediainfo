@@ -69,7 +69,10 @@ class MediaInfo(object):
         if os.name in ("nt", "dos", "os2", "ce"):
             lib = windll.MediaInfo 
         elif sys.platform == "darwin":
-            lib = CDLL("libmediainfo.0.dylib")
+            try:
+                lib = CDLL("libmediainfo.0.dylib")
+            except OSError:
+                lib = CDLL("libmediainfo.dylib")
         else:
             lib = CDLL("libmediainfo.so.0")
         # Define arguments and return types
