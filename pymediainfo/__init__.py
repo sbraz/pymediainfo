@@ -81,12 +81,10 @@ class MediaInfo(object):
         lib.MediaInfo_New.restype  = c_void_p
         lib.MediaInfo_Option.argtypes = [c_void_p, c_wchar_p, c_wchar_p]
         lib.MediaInfo_Option.restype = c_wchar_p
-        lib.MediaInfoA_Option.argtypes = [c_void_p, c_char_p, c_char_p]
-        lib.MediaInfoA_Option.restype = c_char_p
         lib.MediaInfo_Inform.argtypes = [c_void_p, c_size_t]
         lib.MediaInfo_Inform.restype = c_wchar_p
-        lib.MediaInfoA_Open.argtypes = [c_void_p, c_char_p]
-        lib.MediaInfoA_Open.restype = c_size_t
+        lib.MediaInfo_Open.argtypes = [c_void_p, c_wchar_p]
+        lib.MediaInfo_Open.restype = c_size_t
         lib.MediaInfo_Delete.argtypes = [c_void_p]
         lib.MediaInfo_Delete.restype  = None
         lib.MediaInfo_Close.argtypes = [c_void_p]
@@ -94,9 +92,9 @@ class MediaInfo(object):
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
-        lib.MediaInfoA_Option(None, b"Inform", b"XML")
-        lib.MediaInfoA_Option(None, b"Complete", b"1")
-        lib.MediaInfoA_Open(handle, filename.encode("utf8"))
+        lib.MediaInfo_Option(None, "Inform", "XML")
+        lib.MediaInfo_Option(None, "Complete", "1")
+        lib.MediaInfo_Open(handle, filename)
         xml = lib.MediaInfo_Inform(handle, 0)
         # Delete the handle
         lib.MediaInfo_Close(handle)
