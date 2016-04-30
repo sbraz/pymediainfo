@@ -76,6 +76,6 @@ class MediaInfoUnicodeXMLTest(unittest.TestCase):
         "see https://github.com/sbraz/pymediainfo/issues/22")
 class MediaInfoUnicodeFileNameTest(unittest.TestCase):
     def setUp(self):
-        self.mi = MediaInfo.parse(os.path.join(data_dir, "accentué"))
+        self.mi = MediaInfo.parse(os.path.join(data_dir, "accentué.txt"))
     def test_parse_unicode_file(self):
         self.assertEqual(len(self.mi.tracks), 1)
