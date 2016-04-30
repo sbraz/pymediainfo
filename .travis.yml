@@ -7,4 +7,4 @@ addons:
   apt:
     packages:
       - libmediainfo
-script: nosetests
+script: python setup.py test
