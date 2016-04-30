@@ -3,6 +3,10 @@ python:
   - 2.7
   - 3.4
   - 3.5
+addons:
+  apt:
+    packages:
+      - libmms0
 before_script:
   - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.85/libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
   - wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
