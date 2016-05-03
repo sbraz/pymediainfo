@@ -1,5 +1,6 @@
-import json
 import os
+import locale
+import json
 import sys
 from pkg_resources import get_distribution
 import xml.etree.ElementTree as ET
@@ -92,6 +93,13 @@ class MediaInfo(object):
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
+        # Fix for https://github.com/sbraz/pymediainfo/issues/22
+        # Python 2 does not change LC_CTYPE
+        # at startup: https://bugs.python.org/issue6203
+        if (sys.version_info.major < 3 and os.name == "posix"
+                and not sys.platform == "darwin"
+                and locale.getlocale() == (None, None)):
+            locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
         lib.MediaInfo_Option(None, "Inform", "XML")
         lib.MediaInfo_Option(None, "Complete", "1")
         lib.MediaInfo_Open(handle, filename)

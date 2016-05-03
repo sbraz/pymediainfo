@@ -72,8 +72,6 @@ class MediaInfoUnicodeXMLTest(unittest.TestCase):
             "l’aÿ d’âge mûr & cætera !"
         )
 
-@unittest.skipIf(sys.version_info.major < 3, "Currently broken "
-        "see https://github.com/sbraz/pymediainfo/issues/22")
 class MediaInfoUnicodeFileNameTest(unittest.TestCase):
     def setUp(self):
         self.mi = MediaInfo.parse(os.path.join(data_dir, "accentué.txt"))
