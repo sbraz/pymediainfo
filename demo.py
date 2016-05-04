@@ -37,5 +37,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("Usage: {} <media_file>".format(sys.argv[0]))
         sys.exit(0)
-    # else
-    process(sys.argv[1])
+    if sys.version_info.major < 3:
+        process(sys.argv[1].decode(sys.getfilesystemencoding()))
+    else:
+        process(sys.argv[1])
