@@ -1,4 +1,8 @@
 *.*project
 *.komodo*
 *.pyc
-doctrees
+*.dll
+*.egg-info
+build
+dist
+docs/_build
