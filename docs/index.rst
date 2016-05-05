@@ -3,6 +3,11 @@
 Welcome to pymediainfo's documentation!
 =======================================
 
+.. toctree::
+  :maxdepth: 1
+
+  pymediainfo
+
 ============
 Requirements
 ============
