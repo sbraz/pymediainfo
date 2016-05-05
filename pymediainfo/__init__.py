@@ -97,7 +97,6 @@ class MediaInfo(object):
         # Python 2 does not change LC_CTYPE
         # at startup: https://bugs.python.org/issue6203
         if (sys.version_info.major < 3 and os.name == "posix"
-                and not sys.platform == "darwin"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
         lib.MediaInfo_Option(None, "Inform", "XML")
