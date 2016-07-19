@@ -96,8 +96,8 @@ class MediaInfo(object):
         # Fix for https://github.com/sbraz/pymediainfo/issues/22
         # Python 2 does not change LC_CTYPE
         # at startup: https://bugs.python.org/issue6203
-        version_major = sys.version_info[0] if type(sys.version_info) is tuple
-        else sys.version_info.major
+        version_major = sys.version_info[0] if type(sys.version_info) is tuple \
+                                            else sys.version_info.major
         if (version_major < 3 and os.name == "posix"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
