@@ -76,6 +76,10 @@ class MediaInfo(object):
                 lib = CDLL("libmediainfo.dylib")
         else:
             lib = CDLL("libmediainfo.so.0")
+
+        # Test file is readable
+        with open(filename, "rb"):
+            pass
         # Define arguments and return types
         lib.MediaInfo_Inform.restype = c_wchar_p
         lib.MediaInfo_New.argtypes = []
