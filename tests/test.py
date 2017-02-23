@@ -50,6 +50,8 @@ class MediaInfoInvalidXMLTest(unittest.TestCase):
 class MediaInfoLibraryTest(unittest.TestCase):
     def setUp(self):
         self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"))
+    def test_can_parse_true(self):
+        self.assertTrue(MediaInfo.can_parse())
     def test_track_count(self):
         self.assertEqual(len(self.mi.tracks), 3)
     def test_track_types(self):
