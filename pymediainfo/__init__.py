@@ -6,6 +6,11 @@ from pkg_resources import get_distribution
 import xml.etree.ElementTree as ET
 from ctypes import *
 
+if sys.version_info < (3,):
+    import urlparse
+else:
+    import urllib.parse as urlparse
+
 __version__ = get_distribution("pymediainfo").version
 
 class Track(object):
@@ -86,9 +91,12 @@ class MediaInfo(object):
     @classmethod
     def parse(cls, filename):
         lib = cls._get_library()
-        # Test file is readable
-        with open(filename, "rb"):
-            pass
+        url = urlparse.urlparse(filename)
+        # Test whether the filename is actually a URL
+        if url.scheme is None:
+            # Test file is readable
+            with open(filename, "rb"):
+                pass
         # Define arguments and return types
         lib.MediaInfo_Inform.restype = c_wchar_p
         lib.MediaInfo_New.argtypes = []
