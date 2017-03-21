@@ -79,3 +79,9 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
         self.mi = MediaInfo.parse(os.path.join(data_dir, "accentué.txt"))
     def test_parse_unicode_file(self):
         self.assertEqual(len(self.mi.tracks), 1)
+
+class MediaInfoURLTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse("https://github.com/sbraz/pymediainfo/blob/master/tests/data/sample.mkv?raw=true")
+    def test_parse_url(self):
+        self.assertEqual(len(self.mi.tracks), 2)
