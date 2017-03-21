@@ -1,2 +1,4 @@
 exclude .* MANIFEST.in
-include tests/data/*
+graft tests
+global-exclude __pycache__
+global-exclude *.py[co]
