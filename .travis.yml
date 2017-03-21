@@ -1,22 +1,30 @@
 language: python
 python:
-  - 2.6
-  - 2.7
-  - 3.4
-  - 3.5
+- 2.6
+- 2.7
+- 3.4
+- 3.5
 addons:
   apt:
     packages:
-      - libmms0
+    - libmms0
 before_script:
-  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.85/libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
-  - wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
-  - ar x libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
-  - tar xf data.tar.gz
-  - ar x libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
-  - tar xf data.tar.gz
+- wget http://mediaarea.net/download/binary/libmediainfo0/0.7.85/libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
+- wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
+- ar x libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
+- tar xf data.tar.gz
+- ar x libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
+- tar xf data.tar.gz
 script: LD_LIBRARY_PATH=usr/lib/x86_64-linux-gnu/ python setup.py test
 notifications:
   email:
     on_success: change
     on_failure: change
+deploy:
+  skip_upload_docs: true
+  provider: pypi
+  user: sbraz
+  password:
+    secure: PPuAhhXw9Ccs0ydbCSaEwocIzIDN6YrT0pWA9HHIBD2NVSFcgr0TBS/D0g2xUOCJtrXt4VlMYmgNop8vA/JjgiRWze6t1SPAKawbHqmVtCUORqqxWOWxXSh330LgWZyXnpsGpAyWSozG7cwJ3AGNsGfmxs8las4qgSWG5o9v/mA=
+  on:
+    tags: true
