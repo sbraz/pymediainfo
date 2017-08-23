@@ -4,6 +4,8 @@ import os
 import sys
 import unittest
 
+import pytest
+
 from pymediainfo import MediaInfo
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -85,3 +87,11 @@ class MediaInfoURLTest(unittest.TestCase):
         self.mi = MediaInfo.parse("https://github.com/sbraz/pymediainfo/blob/master/tests/data/sample.mkv?raw=true")
     def test_parse_url(self):
         self.assertEqual(len(self.mi.tracks), 2)
+
+class MediaInfoPathlibTest(unittest.TestCase):
+    def setUp(self):
+        pathlib = pytest.importorskip("pathlib")
+        self.path = pathlib.Path(data_dir) / "sample.mp4"
+    def test_parse_pathlib_path(self):
+        mi = MediaInfo.parse(self.path)
+        self.assertEqual(len(mi.tracks), 3)

@@ -6,6 +6,11 @@ from pkg_resources import get_distribution
 import xml.etree.ElementTree as ET
 from ctypes import *
 
+try:
+    import pathlib
+except ImportError:
+    pathlib = None
+
 if sys.version_info < (3,):
     import urlparse
 else:
@@ -91,12 +96,15 @@ class MediaInfo(object):
     @classmethod
     def parse(cls, filename):
         lib = cls._get_library()
-        url = urlparse.urlparse(filename)
-        # Test whether the filename is actually a URL
-        if url.scheme is None:
-            # Test file is readable
-            with open(filename, "rb"):
-                pass
+        if pathlib is not None and isinstance(filename, pathlib.PurePath):
+            filename = str(filename)
+        else:
+            url = urlparse.urlparse(filename)
+            # Test whether the filename is actually a URL
+            if url.scheme is None:
+                # Test whether the file is readable
+                with open(filename, "rb"):
+                    pass
         # Define arguments and return types
         lib.MediaInfo_Inform.restype = c_wchar_p
         lib.MediaInfo_New.argtypes = []
