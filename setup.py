@@ -12,8 +12,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MIT',
-    tests_require=["pytest"],
-    test_suite="nose.collector",
+    tests_require=["pytest", "pytest-runner"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python :: 2.6",

@@ -16,6 +16,7 @@ before_script:
 - tar xf data.tar.gz
 - ar x libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
 - tar xf data.tar.gz
+- pip install pytest-runner
 script: LD_LIBRARY_PATH=usr/lib/x86_64-linux-gnu/ python setup.py test
 notifications:
   email:
