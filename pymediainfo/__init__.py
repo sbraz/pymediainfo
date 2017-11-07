@@ -1,4 +1,5 @@
 import os
+import re
 import locale
 import json
 import sys
@@ -119,6 +120,14 @@ class MediaInfo(object):
         lib.MediaInfo_Delete.restype  = None
         lib.MediaInfo_Close.argtypes = [c_void_p]
         lib.MediaInfo_Close.restype = None
+        # Obtain the library version
+        lib_version = lib.MediaInfo_Option(None, "Info_Version", "")
+        lib_version = [int(_) for _ in re.search("^MediaInfoLib - v(\S+)", lib_version).group(1).split(".")]
+        # The XML option was renamed starting with version 17.10
+        if lib_version >= [17, 10]:
+            xml_option = "OLDXML"
+        else:
+            xml_option = "XML"
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
@@ -128,7 +137,7 @@ class MediaInfo(object):
         if (sys.version_info < (3,) and os.name == "posix"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
-        lib.MediaInfo_Option(None, "Inform", "XML")
+        lib.MediaInfo_Option(None, "Inform", xml_option)
         lib.MediaInfo_Option(None, "Complete", "1")
         lib.MediaInfo_Open(handle, filename)
         xml = lib.MediaInfo_Inform(handle, 0)
