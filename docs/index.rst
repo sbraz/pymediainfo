@@ -73,7 +73,7 @@ Reporting Issues / Bugs
 =======================
 
 Please use the issue tracker in GitHub at https://github.com/sbraz/pymediainfo/issues
-to report all feature requests or bug reports.  Thanks!
+to report all feature requests or bug reports. Thanks!
 
 
 Indices and tables
