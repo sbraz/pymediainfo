@@ -77,9 +77,12 @@ class MediaInfo(object):
         except:
             return None
     @staticmethod
-    def _get_library():
-        if os.name in ("nt", "dos", "os2", "ce"):
-            return windll.MediaInfo
+    def _get_library(library_file=None):
+        if library_file is not None:
+            return CDLL(library_file)
+        elif os.name in ("nt", "dos", "os2", "ce"):
+            if library_file is None:
+                return windll.MediaInfo
         elif sys.platform == "darwin":
             try:
                 return CDLL("libmediainfo.0.dylib")
@@ -88,15 +91,22 @@ class MediaInfo(object):
         else:
             return CDLL("libmediainfo.so.0")
     @classmethod
-    def can_parse(cls):
+    def can_parse(cls, library_file=None):
         try:
-            cls._get_library()
+            cls._get_library(library_file)
             return True
         except:
             return False
     @classmethod
-    def parse(cls, filename):
-        lib = cls._get_library()
+    def parse(cls, filename, library_file=None):
+        """
+        Analyze a media file using libmediainfo.
+
+        :param filename: path to the media file.
+        :param str library_file: path to the libmediainfo library, this should only be used if the library cannot auto-detected.
+        :type filename: str or pathlib.Path
+        """
+        lib = cls._get_library(library_file)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             filename = str(filename)
         else:
