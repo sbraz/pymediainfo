@@ -12,12 +12,12 @@ addons:
     packages:
     - libmms0
 before_script:
-- wget http://mediaarea.net/download/binary/libmediainfo0/0.7.85/libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
-- wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
-- ar x libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
-- tar xf data.tar.gz
-- ar x libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
-- tar xf data.tar.gz
+- wget https://mediaarea.net/download/binary/libzen0/0.4.37/libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb
+- wget https://mediaarea.net/download/binary/libmediainfo0/17.10/libmediainfo0_17.10-1_amd64.xUbuntu_14.04.deb
+- ar x libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb
+- tar xf data.tar.xz
+- ar x libmediainfo0_17.10-1_amd64.xUbuntu_14.04.deb
+- tar xf data.tar.xz
 - pip install pytest-runner
 script: LD_LIBRARY_PATH=usr/lib/x86_64-linux-gnu/ python setup.py test
 notifications:
