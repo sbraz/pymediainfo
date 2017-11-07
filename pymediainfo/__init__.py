@@ -68,10 +68,10 @@ class Track(object):
 
 class MediaInfo(object):
     def __init__(self, xml):
-        self.xml_dom = MediaInfo.parse_xml_data_into_dom(xml)
+        self.xml_dom = MediaInfo._parse_xml_data_into_dom(xml)
 
     @staticmethod
-    def parse_xml_data_into_dom(xml_data):
+    def _parse_xml_data_into_dom(xml_data):
         try:
             return ET.fromstring(xml_data.encode("utf-8"))
         except:

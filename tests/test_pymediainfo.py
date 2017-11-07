@@ -46,7 +46,7 @@ class MediaInfoInvalidXMLTest(unittest.TestCase):
         with open(os.path.join(data_dir, 'invalid.xml'), 'r') as f:
             self.xml_data = f.read()
     def test_parse_invalid_xml(self):
-        mi = MediaInfo(MediaInfo.parse_xml_data_into_dom(self.xml_data))
+        mi = MediaInfo(MediaInfo._parse_xml_data_into_dom(self.xml_data))
         self.assertEqual(len(mi.tracks), 0)
 
 class MediaInfoLibraryTest(unittest.TestCase):
