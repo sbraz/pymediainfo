@@ -13,6 +13,9 @@ pymediainfo
 .. image:: https://api.travis-ci.org/sbraz/pymediainfo.svg?branch=master
   :target: https://travis-ci.org/sbraz/pymediainfo
 
+.. image:: https://ci.appveyor.com/api/projects/status/g15a2daem1oub57n/branch/master?svg=true
+  :target: https://ci.appveyor.com/project/sbraz/pymediainfo
+
 
 This small package is a wrapper around the MediaInfo library. It works on
 Linux, Mac OS X and Windows.

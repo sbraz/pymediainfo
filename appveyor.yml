@@ -1,0 +1,23 @@
+environment:
+  matrix:
+    - PYTHON: "C:/Python27"
+    - PYTHON: "C:/Python34"
+    - PYTHON: "C:/Python35"
+    - PYTHON: "C:/Python36"
+    - PYTHON: "C:/Python27-x64"
+    - PYTHON: "C:/Python34-x64"
+    - PYTHON: "C:/Python35-x64"
+    - PYTHON: "C:/Python36-x64"
+install:
+    - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
+    - "python --version"
+    - "if %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
+    - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/17.12/MediaInfo_CLI_17.12_Windows_${Env:ARCH}.zip"
+    - ps: "unzip -o MediaInfo_CLI_17.12_Windows_${Env:ARCH}.zip"
+    - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/17.12/MediaInfo_DLL_17.12_Windows_${Env:ARCH}_WithoutInstaller.7z"
+    - ps: "7z -y x MediaInfo_DLL_17.12_Windows_${Env:ARCH}_WithoutInstaller.7z"
+    - "pip install pytest pytest-runner"
+build_script:
+  - "python setup.py build"
+test_script:
+  - "python setup.py test"
