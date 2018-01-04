@@ -1,4 +1,8 @@
+#!/usr/bin/env python
 from setuptools import setup, find_packages
+
+with open("README.rst") as f:
+    long_description = f.read()
 
 setup(
     name='pymediainfo',
@@ -7,6 +11,7 @@ setup(
     author_email='sautier.louis@gmail.com',
     url='https://github.com/sbraz/pymediainfo',
     description="""A Python wrapper for the mediainfo library.""",
+    long_description=long_description,
     packages=find_packages(),
     namespace_packages=[],
     include_package_data=True,
