@@ -60,4 +60,6 @@ deploy:
   password:
     secure: PPuAhhXw9Ccs0ydbCSaEwocIzIDN6YrT0pWA9HHIBD2NVSFcgr0TBS/D0g2xUOCJtrXt4VlMYmgNop8vA/JjgiRWze6t1SPAKawbHqmVtCUORqqxWOWxXSh330LgWZyXnpsGpAyWSozG7cwJ3AGNsGfmxs8las4qgSWG5o9v/mA=
   on:
+    branch: master
     tags: true
+    python: 3.6
