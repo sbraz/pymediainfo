@@ -135,11 +135,14 @@ class MediaInfo(object):
             return None
     @staticmethod
     def _get_library(library_file=None):
+        os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         if library_file is not None:
-            return CDLL(library_file)
-        elif os.name in ("nt", "dos", "os2", "ce"):
-            if library_file is None:
-                return windll.MediaInfo
+            if os_is_nt:
+                return WinDLL(library_file)
+            else:
+                return CDLL(library_file)
+        elif os_is_nt:
+            return windll.MediaInfo
         elif sys.platform == "darwin":
             try:
                 return CDLL("libmediainfo.0.dylib")
