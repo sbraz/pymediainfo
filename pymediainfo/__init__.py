@@ -3,7 +3,7 @@ import re
 import locale
 import json
 import sys
-from pkg_resources import get_distribution
+from pkg_resources import get_distribution, DistributionNotFound
 import xml.etree.ElementTree as ET
 from ctypes import *
 
@@ -17,7 +17,10 @@ if sys.version_info < (3,):
 else:
     import urllib.parse as urlparse
 
-__version__ = get_distribution("pymediainfo").version
+try:
+    __version__ = get_distribution("pymediainfo").version
+except DistributionNotFound:
+    pass
 
 class Track(object):
     """
