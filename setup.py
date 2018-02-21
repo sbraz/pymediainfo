@@ -6,7 +6,7 @@ with open("README.rst") as f:
 
 setup(
     name='pymediainfo',
-    version='2.2.0',
+    version='2.2.1',
     author='Louis Sautier',
     author_email='sautier.louis@gmail.com',
     url='https://github.com/sbraz/pymediainfo',
