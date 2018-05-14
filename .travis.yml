@@ -32,14 +32,14 @@ before_install: |
     rm terryfy/test_travisparse.py
     source terryfy/travis_tools.sh
     get_python_environment macpython $PYTHON_VERSION venv
-    wget https://mediaarea.net/download/binary/libmediainfo0/17.12/MediaInfo_DLL_17.12_Mac_i386+x86_64.tar.bz2
-    tar xf MediaInfo_DLL_17.12_Mac_i386+x86_64.tar.bz2
+    wget https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2
+    tar xf MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2
   else
     wget https://mediaarea.net/download/binary/libzen0/0.4.37/libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb
-    wget https://mediaarea.net/download/binary/libmediainfo0/17.10/libmediainfo0_17.10-1_amd64.xUbuntu_14.04.deb
+    wget https://mediaarea.net/download/binary/libmediainfo0/18.05/libmediainfo0_18.05-1_amd64.xUbuntu_14.04.deb
     ar x libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb
     tar xf data.tar.xz
-    ar x libmediainfo0_17.10-1_amd64.xUbuntu_14.04.deb
+    ar x libmediainfo0_18.05-1_amd64.xUbuntu_14.04.deb
     tar xf data.tar.xz
   fi
   pip install pytest pytest-runner setuptools_scm
