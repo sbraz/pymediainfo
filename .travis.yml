@@ -42,7 +42,7 @@ before_install: |
     ar x libmediainfo0_17.10-1_amd64.xUbuntu_14.04.deb
     tar xf data.tar.xz
   fi
-  pip install pytest pytest-runner
+  pip install pytest pytest-runner setuptools_scm
 script: |
   if [ $TRAVIS_OS_NAME == osx ]; then
     LD_LIBRARY_PATH=MediaInfoLib/ python setup.py test

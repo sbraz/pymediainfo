@@ -6,7 +6,6 @@ with open("README.rst") as f:
 
 setup(
     name='pymediainfo',
-    version='2.2.1',
     author='Louis Sautier',
     author_email='sautier.louis@gmail.com',
     url='https://github.com/sbraz/pymediainfo',
@@ -17,6 +16,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MIT',
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     install_requires=["setuptools"],
     tests_require=["pytest", "pytest-runner"],
     classifiers=[
