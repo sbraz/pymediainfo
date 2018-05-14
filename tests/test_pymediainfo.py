@@ -95,3 +95,16 @@ class MediaInfoPathlibTest(unittest.TestCase):
     def test_parse_pathlib_path(self):
         mi = MediaInfo.parse(self.path)
         self.assertEqual(len(mi.tracks), 3)
+
+class MediaInfoCoverDataTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(
+                os.path.join(data_dir, "sample_with_cover.mp3"),
+                cover_data=True
+        )
+    def test_parse_cover_data(self):
+        self.assertEqual(
+                self.mi.tracks[0].cover_data,
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
+                "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
+        )

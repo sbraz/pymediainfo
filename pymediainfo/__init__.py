@@ -166,7 +166,7 @@ class MediaInfo(object):
         except:
             return False
     @classmethod
-    def parse(cls, filename, library_file=None):
+    def parse(cls, filename, library_file=None, cover_data=False):
         """
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
@@ -176,6 +176,7 @@ class MediaInfo(object):
 
         :param filename: path to the media file which will be analyzed.
         :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
+        :param bool cover_data: whether to retrieve cover data as base64.
         :type filename: str or pathlib.Path
         :rtype: MediaInfo
         """
@@ -205,12 +206,16 @@ class MediaInfo(object):
         lib.MediaInfo_Close.restype = None
         # Obtain the library version
         lib_version = lib.MediaInfo_Option(None, "Info_Version", "")
-        lib_version = [int(_) for _ in re.search("^MediaInfoLib - v(\S+)", lib_version).group(1).split(".")]
+        lib_version = tuple(int(_) for _ in re.search("^MediaInfoLib - v(\S+)", lib_version).group(1).split("."))
         # The XML option was renamed starting with version 17.10
-        if lib_version >= [17, 10]:
+        if lib_version >= (17, 10):
             xml_option = "OLDXML"
         else:
             xml_option = "XML"
+        # Cover_Data is not extracted by default since version 18.03
+        # See https://github.com/MediaArea/MediaInfoLib/commit/d8fd88a1c282d1c09388c55ee0b46029e7330690
+        if cover_data and lib_version >= (18, 3):
+            lib.MediaInfo_Option(None, "Cover_Data", "base64")
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
