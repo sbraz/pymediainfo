@@ -17,6 +17,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MIT',
+    install_requires=["setuptools"],
     tests_require=["pytest", "pytest-runner"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
