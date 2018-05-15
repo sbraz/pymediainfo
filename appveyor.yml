@@ -16,10 +16,7 @@ install:
     - ps: "unzip -o MediaInfo_CLI_18.05_Windows_${Env:ARCH}.zip"
     - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z"
     - ps: "7z -y x MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z"
-    - "pip install pytest"
-    # see https://phabricator.wikimedia.org/T186991
-    # and https://github.com/wikimedia/pywikibot/commit/c503a9bb225933066f2b9f40b061b0279c7f6ad3
-    - "IF %PYTHON:~0,11% == C:/Python34 (pip install pytest-runner==3.0) ELSE (pip install pytest-runner)"
+    - "pip install --upgrade setuptools pytest pytest-runner"
 build_script:
   - "python setup.py build"
 test_script:
