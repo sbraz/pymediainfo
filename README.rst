@@ -7,6 +7,9 @@ pymediainfo
 .. image:: https://img.shields.io/pypi/pyversions/pymediainfo.svg
   :target: https://pypi.org/project/pymediainfo
 
+.. image:: https://repology.org/badge/tiny-repos/python:pymediainfo.svg
+  :target: https://repology.org/metapackage/python:pymediainfo
+
 .. image:: https://img.shields.io/pypi/implementation/pymediainfo.svg
   :target: https://pypi.org/project/pymediainfo
 
