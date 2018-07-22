@@ -14,24 +14,38 @@ addons:
     - libmms0
 matrix:
   include:
-  - os: osx
-    language: generic
-    env: PYTHON_VERSION=2.7
-  - os: osx
-    language: generic
-    env: PYTHON_VERSION=3.4
-  - os: osx
-    language: generic
-    env: PYTHON_VERSION=3.5
-  - os: osx
-    language: generic
-    env: PYTHON_VERSION=3.6
+    - python: 3.7
+      dist: xenial
+      # TODO: remove this hack once it's not required any more
+      sudo: true
+    - os: osx
+      # Not required but makes Travis' output prettier
+      python: 2.7
+      language: generic
+      env: MB_PYTHON_VERSION=2.7
+    - os: osx
+      python: 3.4
+      language: generic
+      env: MB_PYTHON_VERSION=3.4
+    - os: osx
+      python: 3.5
+      language: generic
+      env: MB_PYTHON_VERSION=3.5
+    - os: osx
+      python: 3.6
+      language: generic
+      env: MB_PYTHON_VERSION=3.6
+    - os: osx
+      python: 3.7
+      language: generic
+      env: MB_PYTHON_VERSION=3.7
 before_install: |
   if [ $TRAVIS_OS_NAME == osx ]; then
-    git clone https://github.com/MacPython/terryfy
-    rm terryfy/test_travisparse.py
-    source terryfy/travis_tools.sh
-    get_python_environment macpython $PYTHON_VERSION venv
+    git clone https://github.com/matthew-brett/multibuild
+    touch config.sh # required by the multibuild project
+    source multibuild/common_utils.sh
+    source multibuild/travis_steps.sh
+    before_install
     wget https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2
     tar xf MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2
   else
