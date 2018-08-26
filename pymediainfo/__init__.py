@@ -135,7 +135,7 @@ class MediaInfo(object):
 
     @staticmethod
     def _parse_xml_data_into_dom(xml_data):
-        return ET.fromstring(xml_data.encode("utf-8"))
+        return ET.fromstring(xml_data.encode("utf-8", "replace"))
     @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
@@ -238,7 +238,8 @@ class MediaInfo(object):
             return
         iterator = "getiterator" if sys.version_info < (2, 7) else "iter"
         for xml_track in getattr(self.xml_dom, iterator)("track"):
-            self._tracks.append(Track(xml_track))
+            if 'type' in xml_track.attrib:
+                self._tracks.append(Track(xml_track))
     @property
     def tracks(self):
         """
