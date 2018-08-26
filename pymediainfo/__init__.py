@@ -1,3 +1,4 @@
+# vim: set fileencoding=utf-8 :
 import os
 import re
 import locale
@@ -126,16 +127,15 @@ class MediaInfo(object):
     ...     mi = pymediainfo.MediaInfo(f.read())
 
     :param str xml: XML output obtained from MediaInfo
+    :raises xml.etree.ElementTree.ParseError: if passed invalid XML (Python ≥ 2.7)
+    :raises xml.parsers.expat.ExpatError: if passed invalid XML (Python 2.6)
     """
     def __init__(self, xml):
         self.xml_dom = MediaInfo._parse_xml_data_into_dom(xml)
 
     @staticmethod
     def _parse_xml_data_into_dom(xml_data):
-        try:
-            return ET.fromstring(xml_data.encode("utf-8"))
-        except:
-            return None
+        return ET.fromstring(xml_data.encode("utf-8"))
     @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
