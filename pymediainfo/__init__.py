@@ -234,8 +234,8 @@ class MediaInfo(object):
         lib.MediaInfo_Delete(handle)
         return cls(xml)
     def _populate_tracks(self):
-        iterator = "getiterator" if sys.version_info < (2, 7) else "iter"
-        for xml_track in getattr(self.xml_dom, iterator)("track"):
+        iterator = "findall" if sys.version_info < (2, 7) else "iterfind"
+        for xml_track in getattr(self.xml_dom, iterator)("File/track"):
             self._tracks.append(Track(xml_track))
     @property
     def tracks(self):

@@ -112,3 +112,8 @@ class MediaInfoCoverDataTest(unittest.TestCase):
                 "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
                 "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
+
+class MediaInfoTrackParsingTest(unittest.TestCase):
+    def test_track_parsing(self):
+        mi = MediaInfo.parse(os.path.join(data_dir, "issue55.flv"))
+        self.assertEqual(len(mi.tracks), 2)
