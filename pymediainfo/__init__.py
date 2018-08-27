@@ -118,24 +118,25 @@ class MediaInfo(object):
     >>> pymediainfo.MediaInfo.parse("/path/to/file.mp4")
 
     Alternatively, objects may be created from MediaInfo's XML output.
-    XML output can be obtained using the `XML` output format on versions older than v17.10
-    and the `OLDXML` format on newer versions.
+    Such output can be obtained using the ``XML`` output format on versions older than v17.10
+    and the ``OLDXML`` format on newer versions.
 
     Using such an XML file, we can create a :class:`MediaInfo` object:
 
     >>> with open("output.xml") as f:
     ...     mi = pymediainfo.MediaInfo(f.read())
 
-    :param str xml: XML output obtained from MediaInfo
-    :raises xml.etree.ElementTree.ParseError: if passed invalid XML (Python ≥ 2.7)
-    :raises xml.parsers.expat.ExpatError: if passed invalid XML (Python 2.6)
+    :param str xml: XML output obtained from MediaInfo.
+    :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
+        parameter before parsing `xml`.
+    :raises xml.etree.ElementTree.ParseError: if passed invalid XML (Python ≥ 2.7).
+    :raises xml.parsers.expat.ExpatError: if passed invalid XML (Python 2.6).
     """
-    def __init__(self, xml):
-        self.xml_dom = MediaInfo._parse_xml_data_into_dom(xml)
-
+    def __init__(self, xml, encoding_errors="strict"):
+        self.xml_dom = MediaInfo._parse_xml_data_into_dom(xml, encoding_errors)
     @staticmethod
-    def _parse_xml_data_into_dom(xml_data):
-        return ET.fromstring(xml_data.encode("utf-8"))
+    def _parse_xml_data_into_dom(xml_data, encoding_errors="strict"):
+        return ET.fromstring(xml_data.encode("utf-8", encoding_errors))
     @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
@@ -166,7 +167,8 @@ class MediaInfo(object):
         except:
             return False
     @classmethod
-    def parse(cls, filename, library_file=None, cover_data=False):
+    def parse(cls, filename, library_file=None, cover_data=False,
+            encoding_errors="strict"):
         """
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
@@ -177,6 +179,8 @@ class MediaInfo(object):
         :param filename: path to the media file which will be analyzed.
         :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
         :param bool cover_data: whether to retrieve cover data as base64.
+        :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
+            parameter before parsing MediaInfo's XML output.
         :type filename: str or pathlib.Path
         :rtype: MediaInfo
         """
@@ -232,7 +236,7 @@ class MediaInfo(object):
         # Delete the handle
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
-        return cls(xml)
+        return cls(xml, encoding_errors)
     def _populate_tracks(self):
         iterator = "findall" if sys.version_info < (2, 7) else "iterfind"
         for xml_track in getattr(self.xml_dom, iterator)("File/track"):
