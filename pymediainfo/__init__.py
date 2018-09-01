@@ -177,23 +177,31 @@ class MediaInfo(object):
         ...     library_file="/path/to/libmediainfo.dylib")
 
         :param filename: path to the media file which will be analyzed.
+            A URL can also be used if libmediainfo was compiled
+            with CURL support.
         :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
         :param bool cover_data: whether to retrieve cover data as base64.
         :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
             parameter before parsing MediaInfo's XML output.
         :type filename: str or pathlib.Path
         :rtype: MediaInfo
+        :raises FileNotFoundError: if passed a non-existent file
+            (Python ≥ 3.3), does not work on Windows.
+        :raises IOError: if passed a non-existent file (Python < 3.3),
+            does not work on Windows.
         """
         lib = cls._get_library(library_file)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             filename = str(filename)
+            url = False
         else:
             url = urlparse.urlparse(filename)
-            # Test whether the filename is actually a URL
-            if url.scheme is None:
-                # Test whether the file is readable
-                with open(filename, "rb"):
-                    pass
+        # Try to open the file (if it's not a URL)
+        # Doesn't work on Windows because paths are URLs
+        if not (url and url.scheme):
+            # Test whether the file is readable
+            with open(filename, "rb"):
+                pass
         # Define arguments and return types
         lib.MediaInfo_Inform.restype = c_wchar_p
         lib.MediaInfo_New.argtypes = []

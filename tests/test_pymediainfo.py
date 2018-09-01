@@ -9,6 +9,11 @@ import pytest
 
 from pymediainfo import MediaInfo
 
+os_is_nt = os.name in ("nt", "dos", "os2", "ce")
+
+if sys.version_info < (3, 3):
+    FileNotFoundError = IOError
+
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 class MediaInfoTest(unittest.TestCase):
@@ -94,11 +99,21 @@ class MediaInfoURLTest(unittest.TestCase):
 
 class MediaInfoPathlibTest(unittest.TestCase):
     def setUp(self):
-        pathlib = pytest.importorskip("pathlib")
-        self.path = pathlib.Path(data_dir) / "sample.mp4"
+        self.pathlib = pytest.importorskip("pathlib")
     def test_parse_pathlib_path(self):
-        mi = MediaInfo.parse(self.path)
+        path = self.pathlib.Path(data_dir) / "sample.mp4"
+        mi = MediaInfo.parse(path)
         self.assertEqual(len(mi.tracks), 3)
+    @pytest.mark.skipif(os_is_nt, reason="Windows paths are URLs")
+    def test_parse_non_existent_path_pathlib(self):
+        path = self.pathlib.Path(data_dir) / "this file does not exist"
+        self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
+
+class MediaInfoTestParseNonExistentFile(unittest.TestCase):
+    @pytest.mark.skipif(os_is_nt, reason="Windows paths are URLs")
+    def test_parse_non_existent_path(self):
+        path = os.path.join(data_dir, "this file does not exist")
+        self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
 
 class MediaInfoCoverDataTest(unittest.TestCase):
     def setUp(self):
