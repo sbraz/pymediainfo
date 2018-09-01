@@ -286,7 +286,7 @@ class MediaInfo(object):
         return data
     def to_json(self):
         """
-        Returns a json representation of the object's :py:class:`Tracks <Track>`.
+        Returns a JSON representation of the object's :py:class:`Tracks <Track>`.
 
         :rtype: str
         """
