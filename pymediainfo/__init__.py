@@ -239,7 +239,14 @@ class MediaInfo(object):
         return cls(xml, encoding_errors)
     def _populate_tracks(self):
         iterator = "findall" if sys.version_info < (2, 7) else "iterfind"
-        for xml_track in getattr(self.xml_dom, iterator)("File/track"):
+        # This is the case for libmediainfo < 18.03
+        # https://github.com/sbraz/pymediainfo/issues/57
+        # https://github.com/MediaArea/MediaInfoLib/commit/575a9a32e6960ea34adb3bc982c64edfa06e95eb
+        if self.xml_dom.tag == "File":
+            xpath = "track"
+        else:
+            xpath = "File/track"
+        for xml_track in getattr(self.xml_dom, iterator)(xpath):
             self._tracks.append(Track(xml_track))
     @property
     def tracks(self):
