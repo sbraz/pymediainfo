@@ -189,6 +189,8 @@ class MediaInfo(object):
             (Python ≥ 3.3), does not work on Windows.
         :raises IOError: if passed a non-existent file (Python < 3.3),
             does not work on Windows.
+        :raises RuntimeError: if parsing fails, this should not
+            happen unless libmediainfo itself fails.
         """
         lib = cls._get_library(library_file)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
@@ -239,13 +241,16 @@ class MediaInfo(object):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
         lib.MediaInfo_Option(None, "Inform", xml_option)
         lib.MediaInfo_Option(None, "Complete", "1")
-        lib.MediaInfo_Open(handle, filename)
+        if lib.MediaInfo_Open(handle, filename) == 0:
+            raise RuntimeError("An eror occured while opening {0}"
+                    " with libmediainfo".format(filename))
         xml = lib.MediaInfo_Inform(handle, 0)
         # Delete the handle
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
         return cls(xml, encoding_errors)
     def _populate_tracks(self):
+        self._tracks = []
         iterator = "findall" if sys.version_info < (2, 7) else "iterfind"
         # This is the case for libmediainfo < 18.03
         # https://github.com/sbraz/pymediainfo/issues/57
@@ -270,8 +275,6 @@ class MediaInfo(object):
         <Track track_id='1', track_type='Text'>
         """
         if not hasattr(self, "_tracks"):
-            self._tracks = []
-        if len(self._tracks) == 0:
             self._populate_tracks()
         return self._tracks
     def to_data(self):
