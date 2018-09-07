@@ -69,8 +69,8 @@ class MediaInfoLibraryTest(unittest.TestCase):
         self.assertEqual(self.mi.tracks[1].track_type, "Video")
         self.assertEqual(self.mi.tracks[2].track_type, "Audio")
     def test_track_details(self):
-        self.assertEqual(self.mi.tracks[1].codec, "AVC")
-        self.assertEqual(self.mi.tracks[2].codec, "AAC LC")
+        self.assertEqual(self.mi.tracks[1].format, "AVC")
+        self.assertEqual(self.mi.tracks[2].format, "AAC")
         self.assertEqual(self.mi.tracks[1].duration, 958)
         self.assertEqual(self.mi.tracks[2].duration, 980)
 
