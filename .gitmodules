@@ -1,3 +1,9 @@
 [submodule "docs/_build/html"]
 	path = docs/_build/html
 	url = git@github.com:paltman/pymediainfo.git
+[submodule "Shared"]
+	path = Shared
+	url = https://github.com/MediaArea/MediaInfoLib.git
+[submodule "ZenLib"]
+	path = ZenLib
+	url = https://github.com/MediaArea/ZenLib.git
