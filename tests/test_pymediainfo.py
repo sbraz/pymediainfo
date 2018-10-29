@@ -91,12 +91,6 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
     def test_parse_unicode_file(self):
         self.assertEqual(len(self.mi.tracks), 1)
 
-class MediaInfoURLTest(unittest.TestCase):
-    def setUp(self):
-        self.mi = MediaInfo.parse("https://github.com/sbraz/pymediainfo/blob/master/tests/data/sample.mkv?raw=true")
-    def test_parse_url(self):
-        self.assertEqual(len(self.mi.tracks), 2)
-
 class MediaInfoPathlibTest(unittest.TestCase):
     def setUp(self):
         self.pathlib = pytest.importorskip("pathlib")

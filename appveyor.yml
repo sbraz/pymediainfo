@@ -13,13 +13,12 @@ environment:
 install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
-    - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
-    - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/18.05/MediaInfo_CLI_18.05_Windows_${Env:ARCH}.zip"
-    - ps: "unzip -o MediaInfo_CLI_18.05_Windows_${Env:ARCH}.zip"
-    - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z"
-    - ps: "7z -y x MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z"
+    - "IF %PYTHON:~-4% == -x64 (SET BITS=64) ELSE (SET BITS=32)"
+    - "git submodule init"
+    - "git submodule update"
     - "pip install --upgrade setuptools pytest pytest-runner"
 build_script:
+  - "SET MEDIAINFO_BUNDLE=MSVC2015"
   - "python setup.py build"
 test_script:
   - "python setup.py test"

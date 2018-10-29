@@ -140,20 +140,29 @@ class MediaInfo(object):
     @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
-        if library_file is not None:
+        tryother = None
+        if library_file is None:
+            lib_dir = 'lib'
             if os_is_nt:
-                return WinDLL(library_file)
+                lib_dir = '.'
+                dll = 'MediaInfo.dll'
+            elif sys.platform == "darwin":
+                dll = 'libmediainfo.0.dylib'
+                tryother = 'libmediainfo.dylib'
             else:
-                return CDLL(library_file)
-        elif os_is_nt:
-            return windll.MediaInfo
-        elif sys.platform == "darwin":
-            try:
-                return CDLL("libmediainfo.0.dylib")
-            except OSError:
-                return CDLL("libmediainfo.dylib")
-        else:
-            return CDLL("libmediainfo.so.0")
+                dll = 'libmediainfo.so.0'
+            here = os.path.dirname(__file__)
+            library_file = os.path.join(here, lib_dir, dll)
+            if not os.path.exists(library_file):
+                library_file = dll
+        if os_is_nt:
+            return WinDLL(library_file)
+        try:
+            return CDLL(library_file)
+        except OSError:
+            if tryother is not None:
+                return CDLL(tryother)
+            raise
     @classmethod
     def can_parse(cls, library_file=None):
         """
@@ -179,6 +188,7 @@ class MediaInfo(object):
         :param filename: path to the media file which will be analyzed.
             A URL can also be used if libmediainfo was compiled
             with CURL support.
+            The published platform wheel's library does not have CURL.
         :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
         :param bool cover_data: whether to retrieve cover data as base64.
         :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
