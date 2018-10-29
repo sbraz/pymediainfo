@@ -7,3 +7,6 @@
 [submodule "ZenLib"]
 	path = ZenLib
 	url = https://github.com/MediaArea/ZenLib.git
+[submodule "zlib"]
+	path = zlib
+	url = https://github.com/madler/zlib.git
