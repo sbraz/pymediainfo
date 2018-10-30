@@ -1,8 +1,18 @@
 #!/usr/bin/env python
+import os
 from setuptools import setup, find_packages
 
 with open("README.rst") as f:
     long_description = f.read()
+
+bin_license = 'docs/License.html'
+if os.path.exists(bin_license):
+    data_files = [('docs', [bin_license])]
+    bin_files = ['MediaInfo.dll', 'libmediainfo.*']
+    # TODO set PEP425 tag
+else:
+    data_files = []
+    bin_files = []
 
 setup(
     name='pymediainfo',
@@ -16,10 +26,12 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MIT',
+    data_files=data_files,
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
     install_requires=["setuptools"],
     tests_require=["pytest", "pytest-runner"],
+    package_data={'pymediainfo': bin_files},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python :: 2.6",
