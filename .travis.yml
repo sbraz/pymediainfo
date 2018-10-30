@@ -11,7 +11,7 @@ python:
 addons:
   apt:
     packages:
-    - libmms0
+    - libmediainfo-dev
 matrix:
   include:
     - python: 3.7
@@ -46,23 +46,12 @@ before_install: |
     source multibuild/common_utils.sh
     source multibuild/travis_steps.sh
     before_install
-    wget https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2
-    tar xf MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2
-  else
-    wget https://mediaarea.net/download/binary/libzen0/0.4.37/libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb
-    wget https://mediaarea.net/download/binary/libmediainfo0/18.05/libmediainfo0_18.05-1_amd64.xUbuntu_14.04.deb
-    ar x libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb
-    tar xf data.tar.xz
-    ar x libmediainfo0_18.05-1_amd64.xUbuntu_14.04.deb
-    tar xf data.tar.xz
+    curl https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
+    mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
+    mv MediaInfoLib/License.html docs
   fi
   pip install pytest pytest-runner setuptools_scm
-script: |
-  if [ $TRAVIS_OS_NAME == osx ]; then
-    LD_LIBRARY_PATH=MediaInfoLib/ python setup.py test
-  else
-    LD_LIBRARY_PATH=usr/lib/x86_64-linux-gnu/ python setup.py test
-  fi
+script: "python setup.py test"
 notifications:
   email:
     on_success: change
