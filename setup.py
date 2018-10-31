@@ -17,11 +17,9 @@ if os.path.exists(bin_license):
         from wheel.bdist_wheel import bdist_wheel
 
         class platform_bdist_wheel(bdist_wheel):
-
             def finalize_options(self):
                 bdist_wheel.finalize_options(self)
                 self.root_is_pure = False
-
             def get_tag(self):
                 python, abi, plat = bdist_wheel.get_tag(self)
                 return 'py2.py3', 'none', plat
