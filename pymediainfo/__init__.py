@@ -220,7 +220,7 @@ class MediaInfo(object):
         lib.MediaInfo_Close.restype = None
         # Obtain the library version
         lib_version = lib.MediaInfo_Option(None, "Info_Version", "")
-        lib_version = tuple(int(_) for _ in re.search("^MediaInfoLib - v(\S+)", lib_version).group(1).split("."))
+        lib_version = tuple(int(_) for _ in re.search("^MediaInfoLib - v(\\S+)", lib_version).group(1).split("."))
         # The XML option was renamed starting with version 17.10
         if lib_version >= (17, 10):
             xml_option = "OLDXML"
