@@ -56,13 +56,14 @@ notifications:
   email:
     on_success: change
     on_failure: change
-deploy:
-  skip_upload_docs: true
-  provider: pypi
-  user: sbraz
-  password:
-    secure: PPuAhhXw9Ccs0ydbCSaEwocIzIDN6YrT0pWA9HHIBD2NVSFcgr0TBS/D0g2xUOCJtrXt4VlMYmgNop8vA/JjgiRWze6t1SPAKawbHqmVtCUORqqxWOWxXSh330LgWZyXnpsGpAyWSozG7cwJ3AGNsGfmxs8las4qgSWG5o9v/mA=
-  on:
-    branch: master
-    tags: true
-    python: 3.6
+after_success: |
+  if [[ $TRAVIS_OS_NAME == osx && $TRAVIS_TAG && $MB_PYTHON_VERSION == 3.7 ]]; then
+    python setup.py sdist
+    python setup.py bdist_wheel
+    pip install twine
+    twine upload --skip-existing -u sbraz dist/*
+  fi
+env:
+  global:
+    # TWINE_PASSWORD
+    secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="

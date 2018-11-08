@@ -1,4 +1,6 @@
 environment:
+  TWINE_PASSWORD:
+    secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
   matrix:
     - PYTHON: "C:/Python27"
     - PYTHON: "C:/Python34"
@@ -20,8 +22,10 @@ install:
     - ps: "7z -y x MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z MediaInfo.dll Developers/License.html"
     - "move MediaInfo.dll pymediainfo"
     - "move Developers\\License.html docs"
-    - "pip install --upgrade setuptools pytest pytest-runner"
+    - "pip install --upgrade setuptools pytest pytest-runner twine wheel"
 build_script:
-  - "python setup.py build"
+  - "python setup.py bdist_wheel"
 test_script:
   - "python setup.py test"
+deploy_script:
+  - ps: If ($env:APPVEYOR_REPO_TAG -eq "true") { Invoke-Expression "twine upload --skip-existing -u sbraz dist/*" }
