@@ -12,8 +12,11 @@ Welcome to pymediainfo's documentation!
 Requirements
 ============
 
-This is a simple wrapper around the MediaInfo library, which you can find
-at https://mediaarea.net/en/MediaInfo
+This is a simple wrapper around the MediaInfo library, which means you need to install it in first place.
+
+You can find it at https://mediaarea.net/en/MediaInfo
+
+(For Windows you need only DLLs)
 
 ===============
 Using MediaInfo
