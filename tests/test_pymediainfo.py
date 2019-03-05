@@ -139,3 +139,12 @@ class MediaInfoRuntimeErrorTest(unittest.TestCase):
         # since non-existent files return a different exception
         self.assertRaises(RuntimeError, MediaInfo.parse,
                 "unsupportedscheme://")
+
+class MediaInfoSlowParseTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(
+                os.path.join(data_dir, "vbr_requires_parsespeed_1.mp4"),
+                parse_speed=1
+        )
+    def test_slow_parse_speed(self):
+        self.assertEqual(self.mi.tracks[2].stream_size, "3353 / 45")

@@ -182,7 +182,7 @@ class MediaInfo(object):
             return False
     @classmethod
     def parse(cls, filename, library_file=None, cover_data=False,
-            encoding_errors="strict"):
+            encoding_errors="strict", parse_speed=0.5):
         """
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
@@ -197,6 +197,10 @@ class MediaInfo(object):
         :param bool cover_data: whether to retrieve cover data as base64.
         :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
             parameter before parsing MediaInfo's XML output.
+        :param float parse_speed: passed to the library as `ParseSpeed`,
+            this option takes values between 0 and 1.
+            A higher value will yield more precise results in some cases
+            but will also increase parsing time.
         :type filename: str or pathlib.Path
         :rtype: MediaInfo
         :raises FileNotFoundError: if passed a non-existent file
@@ -255,6 +259,7 @@ class MediaInfo(object):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
         lib.MediaInfo_Option(None, "Inform", xml_option)
         lib.MediaInfo_Option(None, "Complete", "1")
+        lib.MediaInfo_Option(None, "ParseSpeed", str(parse_speed))
         if lib.MediaInfo_Open(handle, filename) == 0:
             raise RuntimeError("An eror occured while opening {0}"
                     " with libmediainfo".format(filename))
