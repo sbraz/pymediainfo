@@ -133,7 +133,7 @@ class MediaInfoTrackParsingTest(unittest.TestCase):
         mi = MediaInfo.parse(os.path.join(data_dir, "issue55.flv"))
         self.assertEqual(len(mi.tracks), 2)
 
-class MediainfoRuntimeErrorTest(unittest.TestCase):
+class MediaInfoRuntimeErrorTest(unittest.TestCase):
     def test_parse_invalid_url(self):
         # This is the easiest way to cause a parsing error
         # since non-existent files return a different exception
