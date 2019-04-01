@@ -15,6 +15,10 @@ Requirements
 This is a simple wrapper around the MediaInfo library, which you can find
 at https://mediaarea.net/en/MediaInfo
 
+Binary wheels containing the library are provided for Windows and Mac OS X.
+
+Packages are available for `several Linux distributions <https://repology.org/metapackage/python:pymediainfo>`_.
+
 ===============
 Using MediaInfo
 ===============
