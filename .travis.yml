@@ -58,13 +58,15 @@ after_success: |
   if [[ $TRAVIS_TAG ]]; then
     if [[ $TRAVIS_OS_NAME == osx && $MB_PYTHON_VERSION == 3.7 ]]; then
       python setup.py bdist_wheel
+      pip install twine
+      twine upload --skip-existing -u sbraz dist/*
     elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == 3.7 ]]; then
       # sdists generated on OSX have a problem with the accented test file
       # https://github.com/sbraz/pymediainfo/issues/67
       python setup.py sdist
+      pip install twine
+      twine upload --skip-existing -u sbraz dist/*
     fi
-    pip install twine
-    twine upload --skip-existing -u sbraz dist/*
   fi
 env:
   global:
