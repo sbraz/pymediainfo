@@ -1,4 +1,5 @@
 environment:
+  MEDIAINFO_VERSION: 18.12
   TWINE_PASSWORD:
     secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
   matrix:
@@ -16,10 +17,10 @@ install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
     - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
-    - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/18.05/MediaInfo_CLI_18.05_Windows_${Env:ARCH}.zip"
-    - ps: "unzip -o MediaInfo_CLI_18.05_Windows_${Env:ARCH}.zip LIBCURL.DLL"
-    - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z"
-    - ps: "7z -y x MediaInfo_DLL_18.05_Windows_${Env:ARCH}_WithoutInstaller.7z MediaInfo.dll Developers/License.html"
+    - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/${Env:MEDIAINFO_VERSION}/MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip"
+    - ps: "unzip -o MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip LIBCURL.DLL"
+    - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/${Env:MEDIAINFO_VERSION}/MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z"
+    - ps: "7z -y x MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z MediaInfo.dll Developers/License.html"
     - "move MediaInfo.dll pymediainfo"
     - "move Developers\\License.html docs"
     - "pip install --upgrade setuptools pytest pytest-runner twine wheel"

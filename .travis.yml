@@ -46,7 +46,7 @@ before_install: |
     source multibuild/common_utils.sh
     source multibuild/travis_steps.sh
     before_install
-    curl https://mediaarea.net/download/binary/libmediainfo0/18.05/MediaInfo_DLL_18.05_Mac_i386+x86_64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
+    curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_i386+x86_64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
     mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
     mv MediaInfoLib/License.html docs
   fi
@@ -66,4 +66,5 @@ after_success: |
 env:
   global:
     # TWINE_PASSWORD
-    secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="
+    - secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="
+    - MEDIAINFO_VERSION: 18.12
