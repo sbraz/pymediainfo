@@ -32,7 +32,7 @@ probably best to just demonstrate how it works:
  media_info = MediaInfo.parse('my_video_file.mov')
  for track in media_info.tracks:
      if track.track_type == 'Video':
-         print track.bit_rate, track.bit_rate_mode, track.codec
+         print(track.bit_rate, track.bit_rate_mode, track.codec)
  
  # output: 46033920 CBR DV
 
@@ -60,10 +60,10 @@ This will enable you to write consuming code like:
  media_info = MediaInfo.parse('my_video_file.mov')
  for track in media_info.tracks:
      if track.bit_rate is not None:
-         print "%s: %s" % (track.track_type, track.bit_rate)
+         print("{}: {}".format(track.track_type, track.bit_rate))
      else:
-         print """%s tracks do not have bit rate
-                  associated with them.""" % track.track_type
+         print("""{} tracks do not have bit rate
+                  associated with them.""".format(track.track_type))
 
 Output::
 
