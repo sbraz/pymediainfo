@@ -16,8 +16,6 @@ matrix:
   include:
     - python: 3.7
       dist: xenial
-      # TODO: remove this hack once it's not required any more
-      sudo: true
     - os: osx
       # Not required but makes Travis' output prettier
       python: 2.7
