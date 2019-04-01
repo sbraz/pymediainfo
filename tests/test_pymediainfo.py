@@ -14,6 +14,8 @@ os_is_nt = os.name in ("nt", "dos", "os2", "ce")
 
 if sys.version_info < (3, 3):
     FileNotFoundError = IOError
+if sys.version_info < (3, 2):
+    unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -161,3 +163,9 @@ class MediaInfoEqTest(unittest.TestCase):
         self.assertEqual(self.mp4_mi.tracks[0], pickle.loads(pickled_track))
         pickled_mi = pickle.dumps(self.mp4_mi)
         self.assertEqual(self.mp4_mi, pickle.loads(pickled_mi))
+
+class MediaInfoTextOutputTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), text=True)
+    def test_text_output(self):
+        self.assertRegex(self.mi, r"Stream size\s+: 373836\b")

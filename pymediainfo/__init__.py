@@ -203,7 +203,7 @@ class MediaInfo(object):
             return False
     @classmethod
     def parse(cls, filename, library_file=None, cover_data=False,
-            encoding_errors="strict", parse_speed=0.5):
+            encoding_errors="strict", parse_speed=0.5, text=False):
         """
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
@@ -222,8 +222,11 @@ class MediaInfo(object):
             this option takes values between 0 and 1.
             A higher value will yield more precise results in some cases
             but will also increase parsing time.
+        :param bool text: if ``True``, MediaInfo's text output will be returned instead
+            of a :class:`MediaInfo` object.
         :type filename: str or pathlib.Path
-        :rtype: MediaInfo
+        :rtype: str if `text` is ``True``.
+        :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file
             (Python ≥ 3.3), does not work on Windows.
         :raises IOError: if passed a non-existent file (Python < 3.3),
@@ -278,17 +281,20 @@ class MediaInfo(object):
         if (sys.version_info < (3,) and os.name == "posix"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
-        lib.MediaInfo_Option(None, "Inform", xml_option)
+        lib.MediaInfo_Option(None, "Inform", "" if text else xml_option)
         lib.MediaInfo_Option(None, "Complete", "1")
         lib.MediaInfo_Option(None, "ParseSpeed", str(parse_speed))
         if lib.MediaInfo_Open(handle, filename) == 0:
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))
-        xml = lib.MediaInfo_Inform(handle, 0)
+        output = lib.MediaInfo_Inform(handle, 0)
         # Delete the handle
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
-        return cls(xml, encoding_errors)
+        if text:
+            return output
+        else:
+            return cls(output, encoding_errors)
     def to_data(self):
         """
         Returns a dict representation of the object's :py:class:`Tracks <Track>`.
