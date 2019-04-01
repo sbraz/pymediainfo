@@ -49,14 +49,10 @@ class MediaInfoTest(unittest.TestCase):
 
 class MediaInfoInvalidXMLTest(unittest.TestCase):
     def setUp(self):
-        if sys.version_info < (2, 7):
-            self._exc_class = xml.parsers.expat.ExpatError
-        else:
-            self._exc_class = xml.etree.ElementTree.ParseError
         with open(os.path.join(data_dir, 'invalid.xml'), 'r') as f:
             self.xml_data = f.read()
     def test_parse_invalid_xml(self):
-        self.assertRaises(self._exc_class, MediaInfo, self.xml_data)
+        self.assertRaises(xml.etree.ElementTree.ParseError, MediaInfo, self.xml_data)
 
 class MediaInfoLibraryTest(unittest.TestCase):
     def setUp(self):
