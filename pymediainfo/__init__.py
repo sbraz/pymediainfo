@@ -59,9 +59,8 @@ class Track(object):
     def __setstate__(self, state):
         self.__dict__ = state
     def __init__(self, xml_dom_fragment):
-        self.xml_dom_fragment = xml_dom_fragment
         self.track_type = xml_dom_fragment.attrib['type']
-        for el in self.xml_dom_fragment:
+        for el in xml_dom_fragment:
             node_name = el.tag.lower().strip().strip('_')
             if node_name == 'id':
                 node_name = 'track_id'
@@ -134,12 +133,27 @@ class MediaInfo(object):
     :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
         parameter before parsing `xml`.
     :raises xml.etree.ElementTree.ParseError: if passed invalid XML.
+    :var tracks: A list of :py:class:`Track` objects which the media file contains.
+        For instance:
+
+        >>> mi = pymediainfo.MediaInfo.parse("/path/to/file.mp4")
+        >>> for t in mi.tracks:
+        ...     print(t)
+        <Track track_id='None', track_type='General'>
+        <Track track_id='1', track_type='Text'>
     """
     def __init__(self, xml, encoding_errors="strict"):
-        self.xml_dom = MediaInfo._parse_xml_data_into_dom(xml, encoding_errors)
-    @staticmethod
-    def _parse_xml_data_into_dom(xml_data, encoding_errors="strict"):
-        return ET.fromstring(xml_data.encode("utf-8", encoding_errors))
+        xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
+        self.tracks = []
+        # This is the case for libmediainfo < 18.03
+        # https://github.com/sbraz/pymediainfo/issues/57
+        # https://github.com/MediaArea/MediaInfoLib/commit/575a9a32e6960ea34adb3bc982c64edfa06e95eb
+        if xml_dom.tag == "File":
+            xpath = "track"
+        else:
+            xpath = "File/track"
+        for xml_track in xml_dom.iterfind(xpath):
+            self.tracks.append(Track(xml_track))
     @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
@@ -271,33 +285,6 @@ class MediaInfo(object):
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
         return cls(xml, encoding_errors)
-    def _populate_tracks(self):
-        self._tracks = []
-        # This is the case for libmediainfo < 18.03
-        # https://github.com/sbraz/pymediainfo/issues/57
-        # https://github.com/MediaArea/MediaInfoLib/commit/575a9a32e6960ea34adb3bc982c64edfa06e95eb
-        if self.xml_dom.tag == "File":
-            xpath = "track"
-        else:
-            xpath = "File/track"
-        for xml_track in self.xml_dom.iterfind(xpath):
-            self._tracks.append(Track(xml_track))
-    @property
-    def tracks(self):
-        """
-        A list of :py:class:`Track` objects which the media file contains.
-
-        For instance:
-
-        >>> mi = pymediainfo.MediaInfo.parse("/path/to/file.mp4")
-        >>> for t in mi.tracks:
-        ...     print(t)
-        <Track track_id='None', track_type='General'>
-        <Track track_id='1', track_type='Text'>
-        """
-        if not hasattr(self, "_tracks"):
-            self._populate_tracks()
-        return self._tracks
     def to_data(self):
         """
         Returns a dict representation of the object's :py:class:`Tracks <Track>`.
