@@ -65,7 +65,9 @@ This will enable you to write consuming code like:
          print("""{} tracks do not have bit rate
                   associated with them.""".format(track.track_type))
 
-Output::
+Output:
+
+.. code-block:: text
 
  General tracks do not have bit rate associated with them.
  Video: 46033920
