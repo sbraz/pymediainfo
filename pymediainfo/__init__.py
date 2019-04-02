@@ -85,7 +85,7 @@ class Track(object):
                     except:
                         pass
     def __repr__(self):
-        return("<Track track_id='{0}', track_type='{1}'>".format(self.track_id, self.track_type))
+        return("<Track track_id='{}', track_type='{}'>".format(self.track_id, self.track_type))
     def to_data(self):
         """
         Returns a dict representation of the track attributes.
@@ -260,7 +260,7 @@ class MediaInfo(object):
         lib.MediaInfo_Option(None, "Complete", "1")
         lib.MediaInfo_Option(None, "ParseSpeed", str(parse_speed))
         if lib.MediaInfo_Open(handle, filename) == 0:
-            raise RuntimeError("An eror occured while opening {0}"
+            raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))
         xml = lib.MediaInfo_Inform(handle, 0)
         # Delete the handle
