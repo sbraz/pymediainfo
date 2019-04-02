@@ -54,6 +54,10 @@ class Track(object):
         except:
             pass
         return None
+    def __getstate__(self):
+        return self.__dict__
+    def __setstate__(self, state):
+        self.__dict__ = state
     def __init__(self, xml_dom_fragment):
         self.xml_dom_fragment = xml_dom_fragment
         self.track_type = xml_dom_fragment.attrib['type']
