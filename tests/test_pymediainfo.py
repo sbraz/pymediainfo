@@ -4,6 +4,7 @@ import os
 import sys
 import unittest
 import xml
+import pickle
 
 import pytest
 
@@ -155,3 +156,8 @@ class MediaInfoEqTest(unittest.TestCase):
         self.assertEqual(self.mp3_mi, self.mp3_other_mi)
         self.assertNotEqual(self.mp3_mi.tracks[0], self.mp4_mi.tracks[0])
         self.assertNotEqual(self.mp3_mi, self.mp4_mi)
+    def test_pickle_unpickle(self):
+        pickled_track = pickle.dumps(self.mp4_mi.tracks[0])
+        self.assertEqual(self.mp4_mi.tracks[0], pickle.loads(pickled_track))
+        pickled_mi = pickle.dumps(self.mp4_mi)
+        self.assertEqual(self.mp4_mi, pickle.loads(pickled_mi))
