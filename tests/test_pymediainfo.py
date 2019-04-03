@@ -144,3 +144,14 @@ class MediaInfoSlowParseTest(unittest.TestCase):
         )
     def test_slow_parse_speed(self):
         self.assertEqual(self.mi.tracks[2].stream_size, "3353 / 45")
+
+class MediaInfoEqTest(unittest.TestCase):
+    def setUp(self):
+        self.mp3_mi = MediaInfo.parse(os.path.join(data_dir, "sample_with_cover.mp3"))
+        self.mp3_other_mi = MediaInfo.parse(os.path.join(data_dir, "sample_with_cover.mp3"))
+        self.mp4_mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"))
+    def test_eq(self):
+        self.assertEqual(self.mp3_mi.tracks[0], self.mp3_other_mi.tracks[0])
+        self.assertEqual(self.mp3_mi, self.mp3_other_mi)
+        self.assertNotEqual(self.mp3_mi.tracks[0], self.mp4_mi.tracks[0])
+        self.assertNotEqual(self.mp3_mi, self.mp4_mi)

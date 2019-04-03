@@ -48,6 +48,8 @@ class Track(object):
 
     All available attributes can be obtained by calling :func:`to_data`.
     """
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
     def __getattribute__(self, name):
         try:
             return object.__getattribute__(self, name)
@@ -142,6 +144,8 @@ class MediaInfo(object):
         <Track track_id='None', track_type='General'>
         <Track track_id='1', track_type='Text'>
     """
+    def __eq__(self, other):
+        return self.tracks == other.tracks
     def __init__(self, xml, encoding_errors="strict"):
         xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
         self.tracks = []
