@@ -219,7 +219,7 @@ class MediaInfo(object):
     @classmethod
     def parse(cls, filename, library_file=None, cover_data=False,
             encoding_errors="strict", parse_speed=0.5, text=False,
-            full=True):
+            full=True, legacy_stream_display=False):
         """
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
@@ -242,6 +242,7 @@ class MediaInfo(object):
             of a :class:`MediaInfo` object.
         :param bool full: display additional tags, including computer-readable values
             for sizes and durations.
+        :param bool legacy_stream_display: display additional information about streams.
         :type filename: str or pathlib.Path
         :rtype: str if `text` is ``True``.
         :rtype: :class:`MediaInfo` otherwise.
@@ -288,6 +289,7 @@ class MediaInfo(object):
         lib.MediaInfo_Option(None, "Inform", "" if text else xml_option)
         lib.MediaInfo_Option(None, "Complete", "1" if full else "")
         lib.MediaInfo_Option(None, "ParseSpeed", str(parse_speed))
+        lib.MediaInfo_Option(None, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
         if lib.MediaInfo_Open(handle, filename) == 0:
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))

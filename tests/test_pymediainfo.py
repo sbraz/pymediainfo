@@ -173,3 +173,11 @@ class MediaInfoTextOutputTest(unittest.TestCase):
         self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), text=True)
     def test_text_output(self):
         self.assertRegex(self.mi, r"Stream size\s+: 373836\b")
+
+class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
+    def setUp(self):
+        self.mi = MediaInfo.parse(os.path.join(data_dir, "aac_he_v2.aac"))
+        self.legacy_mi = MediaInfo.parse(os.path.join(data_dir, "aac_he_v2.aac"), legacy_stream_display=True)
+    def test_legacy_stream_display(self):
+        self.assertEqual(self.mi.tracks[1].channel_s, 2)
+        self.assertEqual(self.legacy_mi.tracks[1].channel_s, "2 / 1 / 1")
