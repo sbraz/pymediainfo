@@ -3,10 +3,10 @@ import os
 import re
 import locale
 import json
+import ctypes
 import sys
 from pkg_resources import get_distribution, DistributionNotFound
 import xml.etree.ElementTree as ET
-from ctypes import *
 
 try:
     import pathlib
@@ -162,9 +162,9 @@ class MediaInfo(object):
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         if os_is_nt:
-            lib_type = WinDLL
+            lib_type = ctypes.WinDLL
         else:
-            lib_type = CDLL
+            lib_type = ctypes.CDLL
         if library_file is None:
             if os_is_nt:
                 library_names = ("MediaInfo.dll",)
@@ -184,7 +184,22 @@ class MediaInfo(object):
             library_names = (library_file,)
         for i, library in enumerate(library_names, start=1):
             try:
-                return lib_type(library)
+                lib = lib_type(library)
+                # Define arguments and return types
+                lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
+                lib.MediaInfo_New.argtypes = []
+                lib.MediaInfo_New.restype  = ctypes.c_void_p
+                lib.MediaInfo_Option.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_wchar_p]
+                lib.MediaInfo_Option.restype = ctypes.c_wchar_p
+                lib.MediaInfo_Inform.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+                lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
+                lib.MediaInfo_Open.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p]
+                lib.MediaInfo_Open.restype = ctypes.c_size_t
+                lib.MediaInfo_Delete.argtypes = [ctypes.c_void_p]
+                lib.MediaInfo_Delete.restype  = None
+                lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
+                lib.MediaInfo_Close.restype = None
+                return lib
             except OSError:
                 # If we've tried all possible filenames
                 if i == len(library_names):
@@ -249,20 +264,6 @@ class MediaInfo(object):
             # Test whether the file is readable
             with open(filename, "rb"):
                 pass
-        # Define arguments and return types
-        lib.MediaInfo_Inform.restype = c_wchar_p
-        lib.MediaInfo_New.argtypes = []
-        lib.MediaInfo_New.restype  = c_void_p
-        lib.MediaInfo_Option.argtypes = [c_void_p, c_wchar_p, c_wchar_p]
-        lib.MediaInfo_Option.restype = c_wchar_p
-        lib.MediaInfo_Inform.argtypes = [c_void_p, c_size_t]
-        lib.MediaInfo_Inform.restype = c_wchar_p
-        lib.MediaInfo_Open.argtypes = [c_void_p, c_wchar_p]
-        lib.MediaInfo_Open.restype = c_size_t
-        lib.MediaInfo_Delete.argtypes = [c_void_p]
-        lib.MediaInfo_Delete.restype  = None
-        lib.MediaInfo_Close.argtypes = [c_void_p]
-        lib.MediaInfo_Close.restype = None
         # Obtain the library version
         lib_version = lib.MediaInfo_Option(None, "Info_Version", "")
         lib_version = tuple(int(_) for _ in re.search("^MediaInfoLib - v(\\S+)", lib_version).group(1).split("."))
