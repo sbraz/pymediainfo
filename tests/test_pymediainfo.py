@@ -181,3 +181,25 @@ class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
     def test_legacy_stream_display(self):
         self.assertEqual(self.mi.tracks[1].channel_s, 2)
         self.assertEqual(self.legacy_mi.tracks[1].channel_s, "2 / 1 / 1")
+
+class MediaInfoOptionsTest(unittest.TestCase):
+    def setUp(self):
+        self.mi_detail1 = MediaInfo.parse(
+            os.path.join(data_dir, "aac_he_v2.aac"),
+            mediainfo_options={"Details": "1"},
+            text=True,
+        )
+        self.mi_detail0 = MediaInfo.parse(
+            os.path.join(data_dir, "aac_he_v2.aac"),
+            mediainfo_options={"Details": "0"},
+            text=True,
+        )
+    def test_mediainfo_options(self):
+        self.assertNotEqual(
+            self.mi_detail0,
+            self.mi_detail1,
+        )
+        self.assertEqual(
+            self.mi_detail0,
+            MediaInfo.parse(os.path.join(data_dir, "aac_he_v2.aac"), text=True)
+        )
