@@ -5,6 +5,7 @@ import locale
 import json
 import ctypes
 import sys
+import warnings
 from pkg_resources import get_distribution, DistributionNotFound
 import xml.etree.ElementTree as ET
 
@@ -223,7 +224,7 @@ class MediaInfo(object):
     @classmethod
     def parse(cls, filename, library_file=None, cover_data=False,
             encoding_errors="strict", parse_speed=0.5, text=False,
-            full=True, legacy_stream_display=False):
+            full=True, legacy_stream_display=False, mediainfo_options=None):
         """
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
@@ -247,6 +248,8 @@ class MediaInfo(object):
         :param bool full: display additional tags, including computer-readable values
             for sizes and durations.
         :param bool legacy_stream_display: display additional information about streams.
+        :param dict mediainfo_options: additional options that will be passed to the `MediaInfo_Option` function,
+            for example: ``{"Language": "raw"}``
         :type filename: str or pathlib.Path
         :rtype: str if `text` is ``True``.
         :rtype: :class:`MediaInfo` otherwise.
@@ -291,6 +294,15 @@ class MediaInfo(object):
         lib.MediaInfo_Option(handle, "Complete", "1" if full else "")
         lib.MediaInfo_Option(handle, "ParseSpeed", str(parse_speed))
         lib.MediaInfo_Option(handle, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
+        if mediainfo_options is not None:
+            if lib_version < (19, 9):
+                warnings.warn("This version of MediaInfo ({}) does not support resetting all options to their default values, "
+                    "passing it custom options is not recommended and may result in unpredictable behavior, "
+                    "see https://github.com/MediaArea/MediaInfoLib/issues/1128".format(lib_version_str),
+                    RuntimeWarning
+                )
+            for option_name, option_value in mediainfo_options.items():
+                lib.MediaInfo_Option(handle, option_name, option_value)
         if lib.MediaInfo_Open(handle, filename) == 0:
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))

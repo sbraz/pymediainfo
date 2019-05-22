@@ -137,7 +137,7 @@ class MediaInfoCoverDataTest(unittest.TestCase):
         _, lib_version_str, lib_version = MediaInfo._get_library()
         if lib_version < (18, 3):
             pytest.skip("Cover_Data option not supported by this library version "
-                "(found v{}, v18.03 required)".format(lib_version_str)
+                "(v{} detected, v18.03 required)".format(lib_version_str)
             )
         self.assertEqual(self.no_cover_mi.tracks[0].cover_data, None)
 
@@ -191,3 +191,24 @@ class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
     def test_legacy_stream_display(self):
         self.assertEqual(self.mi.tracks[1].channel_s, 2)
         self.assertEqual(self.legacy_mi.tracks[1].channel_s, "2 / 1 / 1")
+
+class MediaInfoOptionsTest(unittest.TestCase):
+    def setUp(self):
+        _, lib_version_str, lib_version = MediaInfo._get_library()
+        if lib_version < (19, 9):
+            pytest.skip("Reset option not supported by this library version "
+                "(v{} detected, v19.09 required)".format(lib_version_str)
+            )
+        self.raw_language_mi = MediaInfo.parse(
+            os.path.join(data_dir, "sample.mkv"),
+            mediainfo_options={"Language": "raw"},
+        )
+        # Parsing the file without the custom options afterwards
+        # allows us to check that the "Reset" option worked
+        # https://github.com/MediaArea/MediaInfoLib/issues/1128
+        self.normal_mi = MediaInfo.parse(
+            os.path.join(data_dir, "sample.mkv"),
+        )
+    def test_mediainfo_options(self):
+        self.assertEqual(self.normal_mi.tracks[1].other_language[0], "English")
+        self.assertEqual(self.raw_language_mi.tracks[1].language, "en")
