@@ -265,8 +265,10 @@ class MediaInfo(object):
             # Test whether the file is readable
             with open(filename, "rb"):
                 pass
+        # Create a MediaInfo handle
+        handle = lib.MediaInfo_New()
         # Obtain the library version
-        lib_version = lib.MediaInfo_Option(None, "Info_Version", "")
+        lib_version = lib.MediaInfo_Option(handle, "Info_Version", "")
         lib_version = tuple(int(_) for _ in re.search("^MediaInfoLib - v(\\S+)", lib_version).group(1).split("."))
         # The XML option was renamed starting with version 17.10
         if lib_version >= (17, 10):
@@ -276,9 +278,7 @@ class MediaInfo(object):
         # Cover_Data is not extracted by default since version 18.03
         # See https://github.com/MediaArea/MediaInfoLib/commit/d8fd88a1c282d1c09388c55ee0b46029e7330690
         if lib_version >= (18, 3):
-            lib.MediaInfo_Option(None, "Cover_Data", "base64" if cover_data else "")
-        # Create a MediaInfo handle
-        handle = lib.MediaInfo_New()
+            lib.MediaInfo_Option(handle, "Cover_Data", "base64" if cover_data else "")
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
         # Fix for https://github.com/sbraz/pymediainfo/issues/22
         # Python 2 does not change LC_CTYPE
@@ -286,10 +286,10 @@ class MediaInfo(object):
         if (sys.version_info < (3,) and os.name == "posix"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
-        lib.MediaInfo_Option(None, "Inform", "" if text else xml_option)
-        lib.MediaInfo_Option(None, "Complete", "1" if full else "")
-        lib.MediaInfo_Option(None, "ParseSpeed", str(parse_speed))
-        lib.MediaInfo_Option(None, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
+        lib.MediaInfo_Option(handle, "Inform", "" if text else xml_option)
+        lib.MediaInfo_Option(handle, "Complete", "1" if full else "")
+        lib.MediaInfo_Option(handle, "ParseSpeed", str(parse_speed))
+        lib.MediaInfo_Option(handle, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
         if lib.MediaInfo_Open(handle, filename) == 0:
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))
