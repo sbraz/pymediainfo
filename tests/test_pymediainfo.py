@@ -120,16 +120,24 @@ class MediaInfoTestParseNonExistentFile(unittest.TestCase):
 
 class MediaInfoCoverDataTest(unittest.TestCase):
     def setUp(self):
-        self.mi = MediaInfo.parse(
+        self.cover_mi = MediaInfo.parse(
                 os.path.join(data_dir, "sample_with_cover.mp3"),
                 cover_data=True
         )
+        self.no_cover_mi = MediaInfo.parse(
+                os.path.join(data_dir, "sample_with_cover.mp3")
+        )
     def test_parse_cover_data(self):
         self.assertEqual(
-                self.mi.tracks[0].cover_data,
+                self.cover_mi.tracks[0].cover_data,
                 "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
                 "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
+    @pytest.mark.skipif(os.environ.get("TRAVIS") == "true" and sys.platform != "darwin",
+            reason="Xenial's libmediainfo doesn't support the Cover_Data option (requires v18.03)"
+    )
+    def test_parse_no_cover_data(self):
+        self.assertEqual(self.no_cover_mi.tracks[0].cover_data, None)
 
 class MediaInfoTrackParsingTest(unittest.TestCase):
     def test_track_parsing(self):

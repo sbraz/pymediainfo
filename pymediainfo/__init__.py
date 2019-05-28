@@ -275,8 +275,8 @@ class MediaInfo(object):
             xml_option = "XML"
         # Cover_Data is not extracted by default since version 18.03
         # See https://github.com/MediaArea/MediaInfoLib/commit/d8fd88a1c282d1c09388c55ee0b46029e7330690
-        if cover_data and lib_version >= (18, 3):
-            lib.MediaInfo_Option(None, "Cover_Data", "base64")
+        if lib_version >= (18, 3):
+            lib.MediaInfo_Option(None, "Cover_Data", "base64" if cover_data else "")
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
