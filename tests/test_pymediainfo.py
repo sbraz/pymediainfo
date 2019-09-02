@@ -133,10 +133,12 @@ class MediaInfoCoverDataTest(unittest.TestCase):
                 "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
                 "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
-    @pytest.mark.skipif(os.environ.get("TRAVIS") == "true" and sys.platform != "darwin",
-            reason="Xenial's libmediainfo doesn't support the Cover_Data option (requires v18.03)"
-    )
     def test_parse_no_cover_data(self):
+        _, lib_version_str, lib_version = MediaInfo._get_library()
+        if lib_version < (18, 3):
+            pytest.skip("Cover_Data option not supported by this library version "
+                "(found v{}, v18.03 required)".format(lib_version_str)
+            )
         self.assertEqual(self.no_cover_mi.tracks[0].cover_data, None)
 
 class MediaInfoTrackParsingTest(unittest.TestCase):

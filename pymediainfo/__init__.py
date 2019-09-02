@@ -199,7 +199,11 @@ class MediaInfo(object):
                 lib.MediaInfo_Delete.restype  = None
                 lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
                 lib.MediaInfo_Close.restype = None
-                return lib
+                # Obtain the library version
+                lib_version_str = lib.MediaInfo_Option(None, "Info_Version", "")
+                lib_version_str = re.search(r"^MediaInfoLib - v(\S+)", lib_version_str).group(1)
+                lib_version = tuple(int(_) for _ in lib_version_str.split("."))
+                return (lib, lib_version_str, lib_version)
             except OSError:
                 # If we've tried all possible filenames
                 if i == len(library_names):
@@ -253,7 +257,7 @@ class MediaInfo(object):
         :raises RuntimeError: if parsing fails, this should not
             happen unless libmediainfo itself fails.
         """
-        lib = cls._get_library(library_file)
+        lib, lib_version_str, lib_version = cls._get_library(library_file)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             filename = str(filename)
             url = False
@@ -267,9 +271,6 @@ class MediaInfo(object):
                 pass
         # Create a MediaInfo handle
         handle = lib.MediaInfo_New()
-        # Obtain the library version
-        lib_version = lib.MediaInfo_Option(handle, "Info_Version", "")
-        lib_version = tuple(int(_) for _ in re.search("^MediaInfoLib - v(\\S+)", lib_version).group(1).split("."))
         # The XML option was renamed starting with version 17.10
         if lib_version >= (17, 10):
             xml_option = "OLDXML"
