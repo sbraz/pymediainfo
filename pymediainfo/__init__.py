@@ -295,6 +295,11 @@ class MediaInfo(object):
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))
         output = lib.MediaInfo_Inform(handle, 0)
+        # Reset all options to their defaults so that they aren't
+        # retained when the parse method is called several times
+        # https://github.com/MediaArea/MediaInfoLib/issues/1128
+        if lib_version > (19, 7):
+            lib.MediaInfo_Option(handle, "Reset", "")
         # Delete the handle
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
