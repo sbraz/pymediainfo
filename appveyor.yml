@@ -1,5 +1,5 @@
 environment:
-  MEDIAINFO_VERSION: 18.12
+  MEDIAINFO_VERSION: 19.09
   TWINE_PASSWORD:
     secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
   matrix:
