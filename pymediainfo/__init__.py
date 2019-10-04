@@ -160,6 +160,15 @@ class MediaInfo(object):
         for xml_track in xml_dom.iterfind(xpath):
             self.tracks.append(Track(xml_track))
     @staticmethod
+    def _parse_filename(filename):
+        if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):
+            return os.fspath(filename), False
+        elif pathlib is not None and isinstance(filename, pathlib.PurePath):
+            return str(filename), False
+        else:
+            url = urlparse.urlparse(filename)
+            return filename, bool(url.scheme)
+    @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         if os_is_nt:
@@ -271,7 +280,7 @@ class MediaInfo(object):
                 * ``"JSON"``
 
                 * ``%``-delimited templates (see ``mediainfo --Info-Parameters``)
-        :type filename: str or pathlib.Path
+        :type filename: str or pathlib.Path or os.PathLike
         :rtype: str if `output` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file
@@ -295,14 +304,10 @@ class MediaInfo(object):
 
         """
         lib, handle, lib_version_str, lib_version = cls._get_library(library_file)
-        if pathlib is not None and isinstance(filename, pathlib.PurePath):
-            filename = str(filename)
-            url = False
-        else:
-            url = urlparse.urlparse(filename)
+        filename, is_url = cls._parse_filename(filename)
         # Try to open the file (if it's not a URL)
         # Doesn't work on Windows because paths are URLs
-        if not (url and url.scheme):
+        if not is_url:
             # Test whether the file is readable
             with open(filename, "rb"):
                 pass

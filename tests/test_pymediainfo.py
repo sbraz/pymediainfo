@@ -118,6 +118,33 @@ class MediaInfoPathlibTest(unittest.TestCase):
         path = self.pathlib.Path(data_dir) / "this file does not exist"
         self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
 
+class MediaInfoFilenameTypesTest(unittest.TestCase):
+    def test_parse_filename_str(self):
+        path = os.path.join(data_dir, "test.txt")
+        filename, is_url = MediaInfo._parse_filename(path)
+        # Windows paths are URLs
+        if not os_is_nt:
+            self.assertFalse(is_url)
+        self.assertEqual(filename, path)
+    def test_parse_filename_pathlib(self):
+        pathlib = pytest.importorskip("pathlib")
+        path = pathlib.Path(data_dir, "test.txt")
+        filename, is_url = MediaInfo._parse_filename(path)
+        self.assertFalse(is_url)
+        self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
+    @pytest.mark.skipif(sys.version_info < (3, 6), reason="os.PathLike requires Python 3.6")
+    def test_parse_filename_pathlike(self):
+        class PathLikeObject(os.PathLike):
+            def __fspath__(self):
+                return os.path.join(data_dir, "test.txt")
+        path = PathLikeObject()
+        filename, is_url = MediaInfo._parse_filename(path)
+        self.assertFalse(is_url)
+        self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
+    def test_parse_filename_url(self):
+        filename, is_url = MediaInfo._parse_filename("https://localhost")
+        self.assertTrue(is_url)
+
 class MediaInfoTestParseNonExistentFile(unittest.TestCase):
     @pytest.mark.skipif(os_is_nt, reason="Windows paths are URLs")
     def test_parse_non_existent_path(self):
