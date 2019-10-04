@@ -6,9 +6,14 @@ import unittest
 import xml
 import pickle
 
+try:
+    from pathlib import Path
+except ImportError:
+    pass
+
 import pytest
 
-from pymediainfo import MediaInfo
+from pymediainfo import MediaInfo, convert_filename
 
 os_is_nt = os.name in ("nt", "dos", "os2", "ce")
 
@@ -111,6 +116,33 @@ class MediaInfoPathlibTest(unittest.TestCase):
     def test_parse_non_existent_path_pathlib(self):
         path = self.pathlib.Path(data_dir) / "this file does not exist"
         self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
+
+
+class MediaInfoTestFilenameTypes(unittest.TestCase):
+    def test_convert_filename_str(self):
+        path = os.path.join(data_dir, "test.txt")
+        filename, url = convert_filename(path)
+        self.assertEqual(filename, path)
+
+    @pytest.mark.skipif(
+        sys.version_info < (3, 4),
+        reason="Were testing the pathlib route of execution, but pathlib only shipped with py3.4+")
+    def test_convert_filename_str(self):
+        path = Path(data_dir, "test.txt")
+        filename, url = convert_filename(path)
+        self.assertEqual(filename, path)
+
+    @pytest.mark.skipif(
+        sys.version_info < (3, 6),
+        reason="Were testing the os.fspath route of execution, but os.PathLike was only introduced in py3.6")
+    def test_convert_filename_str(self):
+        class PathLikeObject(os.PathLike):
+            def __fspath__(self):
+                return os.path.join(data_dir, "test.txt")
+        path = PathLikeObject()
+        filename, url = convert_filename(path)
+        self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
+
 
 class MediaInfoTestParseNonExistentFile(unittest.TestCase):
     @pytest.mark.skipif(os_is_nt, reason="Windows paths are URLs")

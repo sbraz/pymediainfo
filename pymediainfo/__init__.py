@@ -232,7 +232,7 @@ class MediaInfo(object):
         >>> pymediainfo.MediaInfo.parse("tests/data/sample.mkv",
         ...     library_file="/path/to/libmediainfo.dylib")
 
-        :param filename: path to the media file which will be analyzed.
+        :param str | Path | os.PathLike filename: path to the media file which will be analyzed.
             A URL can also be used if libmediainfo was compiled
             with CURL support.
         :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
@@ -261,11 +261,7 @@ class MediaInfo(object):
             happen unless libmediainfo itself fails.
         """
         lib, lib_version_str, lib_version = cls._get_library(library_file)
-        if pathlib is not None and isinstance(filename, pathlib.PurePath):
-            filename = str(filename)
-            url = False
-        else:
-            url = urlparse.urlparse(filename)
+        filename, url = convert_filename(filename)
         # Try to open the file (if it's not a URL)
         # Doesn't work on Windows because paths are URLs
         if not (url and url.scheme):
@@ -336,3 +332,11 @@ class MediaInfo(object):
         :rtype: str
         """
         return json.dumps(self.to_data())
+
+
+def convert_filename(filename):
+    if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):
+        return os.fspath(filename), False
+    elif pathlib is not None and isinstance(filename, pathlib.PurePath):
+        return str(filename), False
+    return filename, urlparse.urlparse(filename)
