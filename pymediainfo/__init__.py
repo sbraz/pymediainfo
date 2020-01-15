@@ -200,11 +200,13 @@ class MediaInfo(object):
                 lib.MediaInfo_Delete.restype  = None
                 lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
                 lib.MediaInfo_Close.restype = None
-                # Obtain the library version
-                lib_version_str = lib.MediaInfo_Option(None, "Info_Version", "")
+                # Without a handle, there might be problems when using concurrent threads
+                # https://github.com/sbraz/pymediainfo/issues/76#issuecomment-574759621
+                handle = lib.MediaInfo_New()
+                lib_version_str = lib.MediaInfo_Option(handle, "Info_Version", "")
                 lib_version_str = re.search(r"^MediaInfoLib - v(\S+)", lib_version_str).group(1)
                 lib_version = tuple(int(_) for _ in lib_version_str.split("."))
-                return (lib, lib_version_str, lib_version)
+                return (lib, handle, lib_version_str, lib_version)
             except OSError:
                 # If we've tried all possible filenames
                 if i == len(library_names):
@@ -217,7 +219,9 @@ class MediaInfo(object):
         :rtype: bool
         """
         try:
-            cls._get_library(library_file)
+            lib, handle = cls._get_library(library_file)[:2]
+            lib.MediaInfo_Close(handle)
+            lib.MediaInfo_Delete(handle)
             return True
         except:
             return False
@@ -260,7 +264,7 @@ class MediaInfo(object):
         :raises RuntimeError: if parsing fails, this should not
             happen unless libmediainfo itself fails.
         """
-        lib, lib_version_str, lib_version = cls._get_library(library_file)
+        lib, handle, lib_version_str, lib_version = cls._get_library(library_file)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             filename = str(filename)
             url = False
@@ -272,8 +276,6 @@ class MediaInfo(object):
             # Test whether the file is readable
             with open(filename, "rb"):
                 pass
-        # Create a MediaInfo handle
-        handle = lib.MediaInfo_New()
         # The XML option was renamed starting with version 17.10
         if lib_version >= (17, 10):
             xml_option = "OLDXML"

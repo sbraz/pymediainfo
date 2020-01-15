@@ -134,7 +134,9 @@ class MediaInfoCoverDataTest(unittest.TestCase):
                 "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
     def test_parse_no_cover_data(self):
-        _, lib_version_str, lib_version = MediaInfo._get_library()
+        lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
+        lib.MediaInfo_Close(handle)
+        lib.MediaInfo_Delete(handle)
         if lib_version < (18, 3):
             pytest.skip("Cover_Data option not supported by this library version "
                 "(v{} detected, v18.03 required)".format(lib_version_str)
@@ -194,7 +196,9 @@ class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
 
 class MediaInfoOptionsTest(unittest.TestCase):
     def setUp(self):
-        _, lib_version_str, lib_version = MediaInfo._get_library()
+        lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
+        lib.MediaInfo_Close(handle)
+        lib.MediaInfo_Delete(handle)
         if lib_version < (19, 9):
             pytest.skip("Reset option not supported by this library version "
                 "(v{} detected, v19.09 required)".format(lib_version_str)
