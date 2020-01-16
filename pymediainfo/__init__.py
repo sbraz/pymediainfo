@@ -314,7 +314,9 @@ class MediaInfo(object):
         # Reset all options to their defaults so that they aren't
         # retained when the parse method is called several times
         # https://github.com/MediaArea/MediaInfoLib/issues/1128
-        if lib_version > (19, 7):
+        # Do not call it when it is not required because it breaks threads
+        # https://github.com/sbraz/pymediainfo/issues/76#issuecomment-575245093
+        if mediainfo_options is not None and lib_version >= (19, 9):
             lib.MediaInfo_Option(handle, "Reset", "")
         # Delete the handle
         lib.MediaInfo_Close(handle)
