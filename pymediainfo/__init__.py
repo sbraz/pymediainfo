@@ -61,6 +61,8 @@ class Track(object):
         return self.__dict__
     def __setstate__(self, state):
         self.__dict__ = state
+    def __str__(self):
+    	return json.dumps(self.to_data())
     def __init__(self, xml_dom_fragment):
         self.track_type = xml_dom_fragment.attrib['type']
         for el in xml_dom_fragment:
@@ -148,7 +150,7 @@ class MediaInfo(object):
     def __eq__(self, other):
         return self.tracks == other.tracks
     def __str__(self):
-    	return json.dumps(self.to_data(), sort_keys=True, indent=4)
+    	return json.dumps(self.to_data())
     def __init__(self, xml, encoding_errors="strict"):
         xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
         self.tracks = []
