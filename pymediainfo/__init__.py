@@ -147,6 +147,8 @@ class MediaInfo(object):
     """
     def __eq__(self, other):
         return self.tracks == other.tracks
+    def __str__(self):
+    	return json.dumps(self.to_data(), sort_keys=True, indent=4)
     def __init__(self, xml, encoding_errors="strict"):
         xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
         self.tracks = []
