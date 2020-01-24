@@ -5,6 +5,7 @@ import sys
 import unittest
 import xml
 import pickle
+import threading
 
 import pytest
 
@@ -18,6 +19,10 @@ if sys.version_info < (3, 2):
     unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
+lib.MediaInfo_Close(handle)
+lib.MediaInfo_Delete(handle)
 
 class MediaInfoTest(unittest.TestCase):
     def setUp(self):
@@ -133,14 +138,11 @@ class MediaInfoCoverDataTest(unittest.TestCase):
                 "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
                 "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
-    def test_parse_no_cover_data(self):
-        lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
-        lib.MediaInfo_Close(handle)
-        lib.MediaInfo_Delete(handle)
-        if lib_version < (18, 3):
-            pytest.skip("Cover_Data option not supported by this library version "
+    @pytest.mark.skipif(lib_version < (18, 3),
+            reason="Cover_Data option not supported by this library version "
                 "(v{} detected, v18.03 required)".format(lib_version_str)
-            )
+    )
+    def test_parse_no_cover_data(self):
         self.assertEqual(self.no_cover_mi.tracks[0].cover_data, None)
 
 class MediaInfoTrackParsingTest(unittest.TestCase):
@@ -194,15 +196,12 @@ class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
         self.assertEqual(self.mi.tracks[1].channel_s, 2)
         self.assertEqual(self.legacy_mi.tracks[1].channel_s, "2 / 1 / 1")
 
+@pytest.mark.skipif(lib_version < (19, 9),
+        reason="Reset option not supported by this library version "
+            "(v{} detected, v19.09 required)".format(lib_version_str)
+)
 class MediaInfoOptionsTest(unittest.TestCase):
     def setUp(self):
-        lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
-        lib.MediaInfo_Close(handle)
-        lib.MediaInfo_Delete(handle)
-        if lib_version < (19, 9):
-            pytest.skip("Reset option not supported by this library version "
-                "(v{} detected, v19.09 required)".format(lib_version_str)
-            )
         self.raw_language_mi = MediaInfo.parse(
             os.path.join(data_dir, "sample.mkv"),
             mediainfo_options={"Language": "raw"},
@@ -216,3 +215,38 @@ class MediaInfoOptionsTest(unittest.TestCase):
     def test_mediainfo_options(self):
         self.assertEqual(self.normal_mi.tracks[1].other_language[0], "English")
         self.assertEqual(self.raw_language_mi.tracks[1].language, "en")
+
+# Unittests can't be parametrized
+# https://github.com/pytest-dev/pytest/issues/541
+@pytest.mark.parametrize("test_file", ["sample.mkv", "sample.mp4", "sample_with_cover.mp3"]) 
+@pytest.mark.skipif(lib_version < (20, 3),
+        reason="This version of the library is not thread-safe "
+            "(v{} detected, v20.03 required)".format(lib_version_str)
+)
+def test_thread_safety(test_file):
+    expected_result = MediaInfo.parse(os.path.join(data_dir, test_file))
+    results = []
+    lock = threading.Lock()
+    def target():
+        try:
+            result = MediaInfo.parse(os.path.join(data_dir, test_file))
+            with lock:
+                results.append(result)
+        except:
+            pass
+    threads = []
+    thread_count = 100
+    for i in range(thread_count):
+        t = threading.Thread(target=target)
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+    # Each thread should have produced a result
+    assert len(results) == thread_count
+    maxDiff = None
+    for r in results:
+        # Test dicts first because they will show a diff
+        # in case they don't match
+        assert r.to_data() == expected_result.to_data()
+        assert r == expected_result
