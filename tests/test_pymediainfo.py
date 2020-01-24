@@ -3,12 +3,10 @@ from __future__ import unicode_literals
 
 import os
 import pickle
+import pytest
 import sys
 import unittest
 import xml
-
-import pytest
-
 from pymediainfo import MediaInfo
 
 os_is_nt = os.name in ("nt", "dos", "os2", "ce")
@@ -148,18 +146,18 @@ class MediaInfoTestParseNonExistentFile(unittest.TestCase):
 class MediaInfoCoverDataTest(unittest.TestCase):
     def setUp(self):
         self.cover_mi = MediaInfo.parse(
-                os.path.join(data_dir, "sample_with_cover.mp3"),
-                cover_data=True
+            os.path.join(data_dir, "sample_with_cover.mp3"),
+            cover_data=True
         )
         self.no_cover_mi = MediaInfo.parse(
-                os.path.join(data_dir, "sample_with_cover.mp3")
+            os.path.join(data_dir, "sample_with_cover.mp3")
         )
 
     def test_parse_cover_data(self):
         self.assertEqual(
-                self.cover_mi.tracks[0].cover_data,
-                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
-                "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
+            self.cover_mi.tracks[0].cover_data,
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
+            "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
 
     def test_parse_no_cover_data(self):
@@ -186,8 +184,8 @@ class MediaInfoRuntimeErrorTest(unittest.TestCase):
 class MediaInfoSlowParseTest(unittest.TestCase):
     def setUp(self):
         self.mi = MediaInfo.parse(
-                os.path.join(data_dir, "vbr_requires_parsespeed_1.mp4"),
-                parse_speed=1
+            os.path.join(data_dir, "vbr_requires_parsespeed_1.mp4"),
+            parse_speed=1
         )
 
     def test_slow_parse_speed(self):

@@ -51,6 +51,7 @@ class Track(object):
 
     All available attributes can be obtained by calling :func:`to_data`.
     """
+
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
@@ -66,9 +67,6 @@ class Track(object):
 
     def __setstate__(self, state):
         self.__dict__ = state
-
-    def __str__(self):
-        return json.dumps(self.to_data())
 
     def __init__(self, xml_dom_fragment):
         self.track_type = xml_dom_fragment.attrib['type']
@@ -156,11 +154,9 @@ class MediaInfo(object):
         <Track track_id='None', track_type='General'>
         <Track track_id='1', track_type='Text'>
     """
+
     def __eq__(self, other):
         return self.tracks == other.tracks
-
-    def __str__(self):
-        return json.dumps(self.to_data())
 
     def __init__(self, xml, encoding_errors="strict"):
         xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
@@ -313,7 +309,8 @@ class MediaInfo(object):
         lib.MediaInfo_Option(handle, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
         if mediainfo_options is not None:
             if lib_version < (19, 9):
-                warnings.warn("This version of MediaInfo ({}) does not support resetting all options to their default values, "
+                warnings.warn(
+                    "This version of MediaInfo ({}) does not support resetting all options to their default values, "
                     "passing it custom options is not recommended and may result in unpredictable behavior, "
                     "see https://github.com/MediaArea/MediaInfoLib/issues/1128".format(lib_version_str),
                     RuntimeWarning
