@@ -304,6 +304,8 @@ class MediaInfo(object):
             for option_name, option_value in mediainfo_options.items():
                 lib.MediaInfo_Option(handle, option_name, option_value)
         if lib.MediaInfo_Open(handle, filename) == 0:
+            lib.MediaInfo_Close(handle)
+            lib.MediaInfo_Delete(handle)
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))
         output = lib.MediaInfo_Inform(handle, 0)
