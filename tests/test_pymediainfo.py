@@ -96,7 +96,7 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
 
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self):
-        self.mi = MediaInfo.parse("https://github.com/sbraz/pymediainfo/blob/master/tests/data/sample.mkv?raw=true")
+        self.mi = MediaInfo.parse("https://github.com/sbraz/pymediainfo/raw/master/tests/data/sample.mkv")
     def test_parse_url(self):
         self.assertEqual(len(self.mi.tracks), 2)
 
