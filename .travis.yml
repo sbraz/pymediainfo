@@ -66,4 +66,4 @@ env:
   global:
     # TWINE_PASSWORD
     - secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="
-    - MEDIAINFO_VERSION: 19.09
+    - MEDIAINFO_VERSION: 20.03
