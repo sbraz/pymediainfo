@@ -5,6 +5,8 @@ python:
 - 3.4
 - 3.5
 - 3.6
+- 3.7
+- 3.8
 - pypy
 - pypy3
 addons:
@@ -13,25 +15,22 @@ addons:
     - libmediainfo-dev
 matrix:
   include:
-    - python: 3.7
-      dist: xenial
     - os: osx
       # Not required but makes Travis' output prettier
-      python: 2.7
       language: generic
       env: MB_PYTHON_VERSION=2.7
     - os: osx
-      python: 3.5
       language: generic
       env: MB_PYTHON_VERSION=3.5
     - os: osx
-      python: 3.6
       language: generic
       env: MB_PYTHON_VERSION=3.6
     - os: osx
-      python: 3.7
       language: generic
       env: MB_PYTHON_VERSION=3.7
+    - os: osx
+      language: generic
+      env: MB_PYTHON_VERSION=3.8
 before_install: |
   if [ $TRAVIS_OS_NAME == osx ]; then
     git clone https://github.com/matthew-brett/multibuild
