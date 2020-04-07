@@ -233,6 +233,12 @@ class MediaInfo(object):
         Analyze a media file using libmediainfo.
         If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
 
+        .. note::
+            Because of the way the underlying library works, this method should not
+            be called simultaneously from multiple threads *with different arguments*.
+            Doing so will cause inconsistencies or failures by changing
+            library options that are shared across threads.
+
         >>> pymediainfo.MediaInfo.parse("tests/data/sample.mkv",
         ...     library_file="/path/to/libmediainfo.dylib")
 
@@ -253,7 +259,9 @@ class MediaInfo(object):
             for sizes and durations.
         :param bool legacy_stream_display: display additional information about streams.
         :param dict mediainfo_options: additional options that will be passed to the `MediaInfo_Option` function,
-            for example: ``{"Language": "raw"}``
+            for example: ``{"Language": "raw"}``. Do not use this parameter when running the
+            method simultaneously from multiple threads, it will trigger a reset of all options
+            which will cause inconsistencies or failures.
         :type filename: str or pathlib.Path
         :rtype: str if `text` is ``True``.
         :rtype: :class:`MediaInfo` otherwise.
