@@ -6,6 +6,7 @@ import unittest
 import xml
 import pickle
 import threading
+import json
 
 import pytest
 
@@ -250,3 +251,19 @@ def test_thread_safety(test_file):
         # in case they don't match
         assert r.to_data() == expected_result.to_data()
         assert r == expected_result
+
+class MediaInfoOutputTest(unittest.TestCase):
+    def test_text_output(self):
+        mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), output="")
+        self.assertRegex(mi, r"Stream size\s+: 373836\b")
+    @pytest.mark.skipif(lib_version < (18, 3),
+            reason="This version of the library does not support JSON output "
+                "(v{} detected, v18.03 required)".format(lib_version_str)
+    )
+    def test_json_output(self):
+        mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), output="JSON")
+        parsed = json.loads(mi)
+        self.assertEqual(parsed["media"]["track"][0]["FileSize"], "404567")
+    def test_parameter_output(self):
+        mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), output="General;%FileSize%")
+        self.assertEqual(mi, "404567")

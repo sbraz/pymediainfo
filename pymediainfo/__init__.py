@@ -228,7 +228,8 @@ class MediaInfo(object):
     @classmethod
     def parse(cls, filename, library_file=None, cover_data=False,
             encoding_errors="strict", parse_speed=0.5, text=False,
-            full=True, legacy_stream_display=False, mediainfo_options=None):
+            full=True, legacy_stream_display=False, mediainfo_options=None,
+            output=None):
         """
         Analyze a media file using libmediainfo.
 
@@ -249,8 +250,6 @@ class MediaInfo(object):
             this option takes values between 0 and 1.
             A higher value will yield more precise results in some cases
             but will also increase parsing time.
-        :param bool text: if ``True``, MediaInfo's text output will be returned instead
-            of a :class:`MediaInfo` object.
         :param bool full: display additional tags, including computer-readable values
             for sizes and durations.
         :param bool legacy_stream_display: display additional information about streams.
@@ -258,8 +257,22 @@ class MediaInfo(object):
             for example: ``{"Language": "raw"}``. Do not use this parameter when running the
             method simultaneously from multiple threads, it will trigger a reset of all options
             which will cause inconsistencies or failures.
+        :param str output: custom output format for MediaInfo, corresponds to the CLI's
+            ``--Output`` parameter. Setting this causes the method to
+            return a `str` instead of a :class:`MediaInfo` object.
+
+            Useful values include:
+                * the empty `str` ``""`` (corresponds to the default
+                  text output, obtained when running ``mediainfo`` with no
+                  additional parameters)
+
+                * ``"XML"``
+
+                * ``"JSON"``
+
+                * ``%``-delimited templates (see ``mediainfo --Info-Parameters``)
         :type filename: str or pathlib.Path
-        :rtype: str if `text` is ``True``.
+        :rtype: str if `output` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file
             (Python ≥ 3.3), does not work on Windows.
@@ -267,6 +280,19 @@ class MediaInfo(object):
             does not work on Windows.
         :raises RuntimeError: if parsing fails, this should not
             happen unless libmediainfo itself fails.
+
+        Examples:
+            >>> pymediainfo.MediaInfo.parse("tests/data/sample.mkv")
+                <pymediainfo.MediaInfo object at 0x7fa83a3db240>
+
+            >>> import json
+            >>> mi = pymediainfo.MediaInfo.parse("tests/data/sample.mkv",
+            ...     output="JSON")
+            >>> json.loads(mi)["media"]["track"][0]
+                {'@type': 'General', 'TextCount': '1', 'FileExtension': 'mkv',
+                    'FileSize': '5904',  … }
+
+
         """
         lib, handle, lib_version_str, lib_version = cls._get_library(library_file)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
@@ -296,7 +322,13 @@ class MediaInfo(object):
         if (sys.version_info < (3,) and os.name == "posix"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
-        lib.MediaInfo_Option(handle, "Inform", "" if text else xml_option)
+        if text:
+            warnings.warn('The "text" option is obsolete and will be removed '
+                    'in the next major version. Use output="" instead.',
+                    DeprecationWarning
+            )
+            output = ""
+        lib.MediaInfo_Option(handle, "Inform", xml_option if output is None else output)
         lib.MediaInfo_Option(handle, "Complete", "1" if full else "")
         lib.MediaInfo_Option(handle, "ParseSpeed", str(parse_speed))
         lib.MediaInfo_Option(handle, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
@@ -314,7 +346,7 @@ class MediaInfo(object):
             lib.MediaInfo_Delete(handle)
             raise RuntimeError("An eror occured while opening {}"
                     " with libmediainfo".format(filename))
-        output = lib.MediaInfo_Inform(handle, 0)
+        info = lib.MediaInfo_Inform(handle, 0)
         # Reset all options to their defaults so that they aren't
         # retained when the parse method is called several times
         # https://github.com/MediaArea/MediaInfoLib/issues/1128
@@ -325,10 +357,10 @@ class MediaInfo(object):
         # Delete the handle
         lib.MediaInfo_Close(handle)
         lib.MediaInfo_Delete(handle)
-        if text:
-            return output
+        if output is None:
+            return cls(info, encoding_errors)
         else:
-            return cls(output, encoding_errors)
+            return info
     def to_data(self):
         """
         Returns a dict representation of the object's :py:class:`Tracks <Track>`.
