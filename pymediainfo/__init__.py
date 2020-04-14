@@ -231,16 +231,12 @@ class MediaInfo(object):
             full=True, legacy_stream_display=False, mediainfo_options=None):
         """
         Analyze a media file using libmediainfo.
-        If libmediainfo is located in a non-standard location, the `library_file` parameter can be used:
 
         .. note::
             Because of the way the underlying library works, this method should not
             be called simultaneously from multiple threads *with different arguments*.
             Doing so will cause inconsistencies or failures by changing
             library options that are shared across threads.
-
-        >>> pymediainfo.MediaInfo.parse("tests/data/sample.mkv",
-        ...     library_file="/path/to/libmediainfo.dylib")
 
         :param filename: path to the media file which will be analyzed.
             A URL can also be used if libmediainfo was compiled
