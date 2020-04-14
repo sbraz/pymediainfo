@@ -1,4 +1,5 @@
 os: linux
+dist: xenial
 language: python
 python:
 - 2.7
@@ -12,8 +13,8 @@ python:
 addons:
   apt:
     packages:
-    - libmediainfo-dev
-matrix:
+    - libmms0
+jobs:
   include:
     - os: osx
       # Not required but makes Travis' output prettier
@@ -41,6 +42,14 @@ before_install: |
     curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_i386+x86_64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
     mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
     mv MediaInfoLib/License.html docs
+  else
+    pushd /tmp
+    libzen_deb=libzen0v5_${LIBZEN_VERSION}-1_amd64.xUbuntu_${UBUNTU_VERSION}.deb
+    mediainfo_deb=libmediainfo0v5_${MEDIAINFO_VERSION}-1_amd64.xUbuntu_${UBUNTU_VERSION}.deb
+    curl -O https://mediaarea.net/download/binary/libzen0/${LIBZEN_VERSION}/${libzen_deb}
+    curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/${mediainfo_deb}
+    sudo dpkg -i ${libzen_deb} ${mediainfo_deb}
+    popd
   fi
   pip install pytest pytest-runner setuptools_scm
 script: "python setup.py test"
@@ -67,3 +76,5 @@ env:
     # TWINE_PASSWORD
     - secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="
     - MEDIAINFO_VERSION: 20.03
+    - LIBZEN_VERSION: 0.4.38
+    - UBUNTU_VERSION: 16.04
