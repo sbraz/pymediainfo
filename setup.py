@@ -36,6 +36,10 @@ setup(
     author='Louis Sautier',
     author_email='sautier.louis@gmail.com',
     url='https://github.com/sbraz/pymediainfo',
+    project_urls={
+        "Documentation": "https://pymediainfo.readthedocs.io/",
+        "Bugs": "https://github.com/sbraz/pymediainfo/issues",
+    },
     description="""A Python wrapper for the mediainfo library.""",
     long_description=long_description,
     packages=find_packages(),
