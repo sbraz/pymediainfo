@@ -21,9 +21,11 @@ if sys.version_info < (3, 2):
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
-lib.MediaInfo_Close(handle)
-lib.MediaInfo_Delete(handle)
+def _get_library_version():
+    lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
+    lib.MediaInfo_Close(handle)
+    lib.MediaInfo_Delete(handle)
+    return lib_version_str, lib_version
 
 class MediaInfoTest(unittest.TestCase):
     def setUp(self):
@@ -166,11 +168,12 @@ class MediaInfoCoverDataTest(unittest.TestCase):
                 "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
                 "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="
         )
-    @pytest.mark.skipif(lib_version < (18, 3),
-            reason="Cover_Data option not supported by this library version "
-                "(v{} detected, v18.03 required)".format(lib_version_str)
-    )
     def test_parse_no_cover_data(self):
+        lib_version_str, lib_version = _get_library_version()
+        if lib_version < (18, 3):
+            pytest.skip("The Cover_Data option is not supported by this library version "
+                "(v{} detected, v18.03 required)".format(lib_version_str)
+            )
         self.assertEqual(self.no_cover_mi.tracks[0].cover_data, None)
 
 class MediaInfoTrackParsingTest(unittest.TestCase):
@@ -224,12 +227,13 @@ class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
         self.assertEqual(self.mi.tracks[1].channel_s, 2)
         self.assertEqual(self.legacy_mi.tracks[1].channel_s, "2 / 1 / 1")
 
-@pytest.mark.skipif(lib_version < (19, 9),
-        reason="Reset option not supported by this library version "
-            "(v{} detected, v19.09 required)".format(lib_version_str)
-)
 class MediaInfoOptionsTest(unittest.TestCase):
     def setUp(self):
+        lib_version_str, lib_version = _get_library_version()
+        if lib_version < (19, 9):
+            pytest.skip("The Reset option is not supported by this library version "
+                "(v{} detected, v19.09 required)".format(lib_version_str)
+            )
         self.raw_language_mi = MediaInfo.parse(
             os.path.join(data_dir, "sample.mkv"),
             mediainfo_options={"Language": "raw"},
@@ -246,12 +250,13 @@ class MediaInfoOptionsTest(unittest.TestCase):
 
 # Unittests can't be parametrized
 # https://github.com/pytest-dev/pytest/issues/541
-@pytest.mark.parametrize("test_file", ["sample.mkv", "sample.mp4", "sample_with_cover.mp3"]) 
-@pytest.mark.skipif(lib_version < (20, 3),
-        reason="This version of the library is not thread-safe "
-            "(v{} detected, v20.03 required)".format(lib_version_str)
-)
+@pytest.mark.parametrize("test_file", ["sample.mkv", "sample.mp4", "sample_with_cover.mp3"])
 def test_thread_safety(test_file):
+    lib_version_str, lib_version = _get_library_version()
+    if lib_version < (20, 3):
+        pytest.skip("This version of the library is not thread-safe "
+            "(v{} detected, v20.03 required)".format(lib_version_str)
+        )
     expected_result = MediaInfo.parse(os.path.join(data_dir, test_file))
     results = []
     lock = threading.Lock()
@@ -283,11 +288,12 @@ class MediaInfoOutputTest(unittest.TestCase):
     def test_text_output(self):
         mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), output="")
         self.assertRegex(mi, r"Stream size\s+: 373836\b")
-    @pytest.mark.skipif(lib_version < (18, 3),
-            reason="This version of the library does not support JSON output "
-                "(v{} detected, v18.03 required)".format(lib_version_str)
-    )
     def test_json_output(self):
+        lib_version_str, lib_version = _get_library_version()
+        if lib_version < (18, 3):
+            pytest.skip("This version of the library does not support JSON output "
+                "(v{} detected, v18.03 required)".format(lib_version_str)
+            )
         mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), output="JSON")
         parsed = json.loads(mi)
         self.assertEqual(parsed["media"]["track"][0]["FileSize"], "404567")
