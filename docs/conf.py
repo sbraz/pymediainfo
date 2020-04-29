@@ -17,6 +17,8 @@ import sys
 import os
 import subprocess
 
+import pkg_resources
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -51,15 +53,22 @@ project = 'pymediainfo'
 copyright = 'Patrick Altman, Louis Sautier'
 author = 'Patrick Altman, Louis Sautier'
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
-# The project root is the parent directory
-root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# Get the version from setup.py --version (inspired by jaraco.packaging)
-version = subprocess.check_output([sys.executable, "setup.py", "--version"], cwd=root, universal_newlines=True).strip()
+# We can't use setuptools_scm's version on Read the Docs because they alter
+# conf.py before running Sphinx, dirtying the repository, which results in
+# an incorrect version being computed.
+# https://github.com/pypa/setuptools_scm/issues/84
+# https://github.com/readthedocs/readthedocs.org/issues/2144
+# Instead, follow setuptools_scm's recommendation and rely on the
+# version of the installed package (which is correct because
+# the repository hasn't been changed prior to installation).
+# https://github.com/pypa/setuptools_scm#usage-from-sphinx
+if os.environ.get("READTHEDOCS") == "True":
+    version = pkg_resources.get_distribution(project).version
+else:
+    # The project root is the parent directory
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Get the version from setup.py --version (inspired by jaraco.packaging)
+    version = subprocess.check_output([sys.executable, "setup.py", "--version"], cwd=root, universal_newlines=True).strip()
 # The full version, including alpha/beta/rc tags.
 release = version
 
