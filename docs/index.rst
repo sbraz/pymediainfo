@@ -13,11 +13,17 @@ Requirements
 ============
 
 This is a simple wrapper around the MediaInfo library, which you can find
-at https://mediaarea.net/en/MediaInfo
+at https://mediaarea.net/en/MediaInfo.
 
-Binary wheels containing the library are provided for Windows and Mac OS X.
+.. note::
+  * Without the library, this package **cannot parse media files**,
+    which severely limits its functionality.
 
-Packages are available for `several Linux distributions <https://repology.org/metapackage/python:pymediainfo>`_.
+  * Binary wheels containing a bundled library version are provided for Windows and Mac OS X.
+
+  * Packages are available for `several major Linux distributions <https://repology.org/metapackage/python:pymediainfo>`_.
+    They depend on the library most of the time and are the preferred way to use pymediainfo
+    on Linux unless a specific version of the package is required.
 
 ===============
 Using MediaInfo
@@ -28,24 +34,42 @@ probably best to just demonstrate how it works:
 
 .. code-block:: python
 
- from pymediainfo import MediaInfo
- media_info = MediaInfo.parse('my_video_file.mov')
- for track in media_info.tracks:
-     if track.track_type == 'Video':
-         print(track.bit_rate, track.bit_rate_mode, track.codec)
- 
- # output: 46033920 CBR DV
+  from pprint import pprint
+  from pymediainfo import MediaInfo
+  media_info = MediaInfo.parse("my_video_file.mp4")
+  for track in media_info.tracks:
+      if track.track_type == "Video":
+          print(track.bit_rate, track.frame_rate, track.format)
+      elif track.track_type == "Audio":
+          pprint(track.to_data())
+
+This will yield the following output:
+
+.. code-block:: none
+
+  3117597 23.976 AVC
+  {'bit_rate': 236392,
+   'bit_rate_mode': 'VBR',
+   'channel_layout': 'L R',
+   'channel_positions': 'Front: L R',
+   'channel_s': 2,
+   'codec_id': 'mp4a-40-2',
+   'commercial_name': 'AAC',
+   'compression_mode': 'Lossy',
+   …
+  }
+
 
 If you already have the XML data in a string in memory (e.g. you have previously
-parsed the file or were sent the dump from `mediainfo` from someone else) you
-can call the constructor directly:
+parsed the file or were sent the dump from ``mediainfo --output=OLDXML`` by someone
+else), you can call the constructor directly:
 
 .. code-block:: python
 
  from pymediainfo import MediaInfo
  media_info = MediaInfo(raw_xml_string)
 
-Since the attributes on the `Track` objects are being dynamically added as the
+Since the attributes on the :class:`pymediainfo.Track` objects are being dynamically added as the
 XML output from MediaInfo is being parsed, there isn't a firm definition of what
 will be available at runtime.  In order to make consuming the objects easier so
 that you can avoid having to use `hasattr` or `try/except` blocks, the
@@ -57,13 +81,13 @@ This will enable you to write consuming code like:
 .. code-block:: python
 
  from pymediainfo import MediaInfo
- media_info = MediaInfo.parse('my_video_file.mov')
+ media_info = MediaInfo.parse("my_video_file.mp4")
  for track in media_info.tracks:
-     if track.bit_rate is not None:
-         print("{}: {}".format(track.track_type, track.bit_rate))
-     else:
+     if track.bit_rate is None:
          print("""{} tracks do not have bit rate
                   associated with them.""".format(track.track_type))
+     else:
+         print("{}: {}".format(track.track_type, track.bit_rate))
 
 Output:
 
@@ -88,4 +112,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
