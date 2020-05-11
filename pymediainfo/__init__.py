@@ -349,7 +349,7 @@ class MediaInfo(object):
         if lib.MediaInfo_Open(handle, filename) == 0:
             lib.MediaInfo_Close(handle)
             lib.MediaInfo_Delete(handle)
-            raise RuntimeError("An eror occured while opening {}"
+            raise RuntimeError("An error occured while opening {}"
                     " with libmediainfo".format(filename))
         info = lib.MediaInfo_Inform(handle, 0)
         # Reset all options to their defaults so that they aren't
