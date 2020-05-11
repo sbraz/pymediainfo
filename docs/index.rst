@@ -39,15 +39,30 @@ probably best to just demonstrate how it works:
   media_info = MediaInfo.parse("my_video_file.mp4")
   for track in media_info.tracks:
       if track.track_type == "Video":
-          print(track.bit_rate, track.frame_rate, track.format)
+          print("Bit rate: {t.bit_rate}, Frame rate: {t.frame_rate}, "
+                "Format: {t.format}".format(t=track)
+          )
+          print("Duration (raw value):", track.duration)
+          print("Duration (other values:")
+          pprint(track.other_duration)
       elif track.track_type == "Audio":
+          print("Track data:")
           pprint(track.to_data())
 
 This will yield the following output:
 
 .. code-block:: none
 
-  3117597 23.976 AVC
+  Bit rate: 3117597, Frame rate: 23.976, Format: AVC
+  Duration (raw value): 958
+  Duration (other values):
+  ['958 ms',
+   '958 ms',
+   '958 ms',
+   '00:00:00.958',
+   '00:00:00;23',
+   '00:00:00.958 (00:00:00;23)']
+  Track data:
   {'bit_rate': 236392,
    'bit_rate_mode': 'VBR',
    'channel_layout': 'L R',
