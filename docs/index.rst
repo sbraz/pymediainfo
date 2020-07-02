@@ -32,10 +32,32 @@ Using MediaInfo
 There isn't much to this library so instead of a lot of documentation it is
 probably best to just demonstrate how it works:
 
+Getting information from an image
+---------------------------------
+
+.. code-block:: python
+
+  from pymediainfo import MediaInfo
+
+  media_info = MediaInfo.parse("/home/user/image.jpg")
+  for track in media_info.tracks:
+      if track.track_type == "Image":
+          print(f"{track.format} of {track.width}×{track.height} pixels.")
+
+Will return something like:
+
+.. code-block:: none
+
+  JPEG of 828×828 pixels.
+
+Getting information from a video
+--------------------------------
+
 .. code-block:: python
 
   from pprint import pprint
   from pymediainfo import MediaInfo
+
   media_info = MediaInfo.parse("my_video_file.mp4")
   for track in media_info.tracks:
       if track.track_type == "Video":
@@ -49,7 +71,7 @@ probably best to just demonstrate how it works:
           print("Track data:")
           pprint(track.to_data())
 
-This will yield the following output:
+Will return something like:
 
 .. code-block:: none
 
@@ -75,6 +97,18 @@ This will yield the following output:
   }
 
 
+Dumping objects
+---------------
+
+In order to make debugging easier, :class:`pymediainfo.MediaInfo`
+and :class:`pymediainfo.Track` objects can be converted to `dict`
+using :py:meth:`pymediainfo.MediaInfo.to_data` and
+:py:meth:`pymediainfo.Track.to_data` respectively. The previous
+example demonstrates that.
+
+Parsing existing MediaInfo output
+---------------------------------
+
 If you already have the XML data in a string in memory (e.g. you have previously
 parsed the file or were sent the dump from ``mediainfo --output=OLDXML`` by someone
 else), you can call the constructor directly:
@@ -83,6 +117,9 @@ else), you can call the constructor directly:
 
  from pymediainfo import MediaInfo
  media_info = MediaInfo(raw_xml_string)
+
+Accessing Track attributes
+--------------------------
 
 Since the attributes on the :class:`pymediainfo.Track` objects are being dynamically added as the
 XML output from MediaInfo is being parsed, there isn't a firm definition of what
