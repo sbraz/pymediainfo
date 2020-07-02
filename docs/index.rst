@@ -32,6 +32,28 @@ Using MediaInfo
 There isn't much to this library so instead of a lot of documentation it is
 probably best to just demonstrate how it works:
 
+Get informations on an image
+----------------------------
+
+.. code-block:: python
+
+  from pymediainfo import MediaInfo
+
+  media_info = MediaInfo.parse("/home/mdk/julien.jpg")
+
+  for track in media_info.tracks:
+      if track.track_type == "Image":
+          print(f"{track.format} of {track.width}×{track.height} pixels.")
+
+This print ssomething like:
+
+.. code-block:: none
+
+  JPEG of 828×828 pixels.
+
+Get informations on a video
+---------------------------
+
 .. code-block:: python
 
   from pprint import pprint
