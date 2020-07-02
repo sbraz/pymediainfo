@@ -50,7 +50,6 @@ setup(
     data_files=data_files,
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    install_requires=["setuptools"],
     tests_require=["pytest", "pytest-runner"],
     package_data={'pymediainfo': bin_files},
     cmdclass=cmdclass,
