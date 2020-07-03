@@ -12,8 +12,6 @@ import pytest
 
 from pymediainfo import MediaInfo
 
-os_is_nt = os.name in ("nt", "dos", "os2", "ce")
-
 if sys.version_info < (3, 3):
     FileNotFoundError = IOError
 if sys.version_info < (3, 2):
@@ -87,6 +85,19 @@ class MediaInfoLibraryTest(unittest.TestCase):
         self.assertEqual(self.mi.tracks[0].footersize, "59")
         self.assertEqual(self.non_full_mi.tracks[0].footersize, None)
 
+class MediaInfoFileLikeTest(unittest.TestCase):
+    def test_can_parse(self):
+        with open(os.path.join(data_dir, "sample.mp4"), "rb") as f:
+            MediaInfo.parse(f)
+    @pytest.mark.skipif(sys.version_info <= (3,), reason="r and rb are equivalent in Python 2")
+    def test_raises_on_text_mode_even_with_text(self):
+        with open(os.path.join(data_dir, "sample.xml")) as f:
+            self.assertRaises(ValueError, MediaInfo.parse, f)
+    @pytest.mark.skipif(sys.version_info <= (3,), reason="r and rb are equivalent in Python 2")
+    def test_raises_on_text_mode(self):
+        with open(os.path.join(data_dir, "sample.mkv")) as f:
+            self.assertRaises(ValueError, MediaInfo.parse, f)
+
 class MediaInfoUnicodeXMLTest(unittest.TestCase):
     def setUp(self):
         self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mkv"))
@@ -118,40 +129,33 @@ class MediaInfoPathlibTest(unittest.TestCase):
         path = self.pathlib.Path(data_dir) / "sample.mp4"
         mi = MediaInfo.parse(path)
         self.assertEqual(len(mi.tracks), 3)
-    @pytest.mark.skipif(os_is_nt, reason="Windows paths are URLs")
     def test_parse_non_existent_path_pathlib(self):
         path = self.pathlib.Path(data_dir) / "this file does not exist"
         self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
 
 class MediaInfoFilenameTypesTest(unittest.TestCase):
-    def test_parse_filename_str(self):
+    def test_normalize_filename_str(self):
         path = os.path.join(data_dir, "test.txt")
-        filename, is_url = MediaInfo._parse_filename(path)
-        # Windows paths are URLs
-        if not os_is_nt:
-            self.assertFalse(is_url)
+        filename = MediaInfo._normalize_filename(path)
         self.assertEqual(filename, path)
-    def test_parse_filename_pathlib(self):
+    def test_normalize_filename_pathlib(self):
         pathlib = pytest.importorskip("pathlib")
         path = pathlib.Path(data_dir, "test.txt")
-        filename, is_url = MediaInfo._parse_filename(path)
-        self.assertFalse(is_url)
+        filename = MediaInfo._normalize_filename(path)
         self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
     @pytest.mark.skipif(sys.version_info < (3, 6), reason="os.PathLike requires Python 3.6")
-    def test_parse_filename_pathlike(self):
+    def test_normalize_filename_pathlike(self):
         class PathLikeObject(os.PathLike):
             def __fspath__(self):
                 return os.path.join(data_dir, "test.txt")
         path = PathLikeObject()
-        filename, is_url = MediaInfo._parse_filename(path)
-        self.assertFalse(is_url)
+        filename = MediaInfo._normalize_filename(path)
         self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
-    def test_parse_filename_url(self):
-        filename, is_url = MediaInfo._parse_filename("https://localhost")
-        self.assertTrue(is_url)
+    def test_normalize_filename_url(self):
+        filename = MediaInfo._normalize_filename("https://localhost")
+        self.assertEqual(filename, "https://localhost")
 
 class MediaInfoTestParseNonExistentFile(unittest.TestCase):
-    @pytest.mark.skipif(os_is_nt, reason="Windows paths are URLs")
     def test_parse_non_existent_path(self):
         path = os.path.join(data_dir, "this file does not exist")
         self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
@@ -286,6 +290,20 @@ def test_thread_safety(test_file):
         # in case they don't match
         assert r.to_data() == expected_result.to_data()
         assert r == expected_result
+
+@pytest.mark.parametrize("test_file", test_media_files)
+def test_filelike_returns_the_same(test_file):
+    filename = os.path.join(data_dir, test_file)
+    mi_from_filename = MediaInfo.parse(filename)
+    with open(filename, "rb") as f:
+        mi_from_file = MediaInfo.parse(f)
+    assert len(mi_from_file.tracks) == len(mi_from_filename.tracks)
+    for track_from_file, track_from_filename in zip(mi_from_file.tracks, mi_from_filename.tracks):
+        # The General track will differ, typically not giving the file name
+        if track_from_file.track_type != "General":
+            # Test dicts first because they will produce a diff
+            assert track_from_file.to_data() == track_from_filename.to_data()
+            assert track_from_file == track_from_filename
 
 class MediaInfoOutputTest(unittest.TestCase):
     def test_text_output(self):
