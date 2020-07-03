@@ -160,14 +160,12 @@ class MediaInfo(object):
         for xml_track in xml_dom.iterfind(xpath):
             self.tracks.append(Track(xml_track))
     @staticmethod
-    def _parse_filename(filename):
+    def _normalize_filename(filename):
         if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):
-            return os.fspath(filename), False
-        elif pathlib is not None and isinstance(filename, pathlib.PurePath):
-            return str(filename), False
-        else:
-            url = urlparse.urlparse(filename)
-            return filename, bool(url.scheme)
+            return os.fspath(filename)
+        if pathlib is not None and isinstance(filename, pathlib.PurePath):
+            return str(filename)
+        return filename
     @staticmethod
     def _get_library(library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
@@ -205,6 +203,14 @@ class MediaInfo(object):
                 lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
                 lib.MediaInfo_Open.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p]
                 lib.MediaInfo_Open.restype = ctypes.c_size_t
+                lib.MediaInfo_Open_Buffer_Init.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64,]
+                lib.MediaInfo_Open_Buffer_Init.restype = ctypes.c_size_t
+                lib.MediaInfo_Open_Buffer_Continue.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_size_t,]
+                lib.MediaInfo_Open_Buffer_Continue.restype = ctypes.c_size_t
+                lib.MediaInfo_Open_Buffer_Continue_GoTo_Get.argtypes = [ctypes.c_void_p]
+                lib.MediaInfo_Open_Buffer_Continue_GoTo_Get.restype = ctypes.c_uint64
+                lib.MediaInfo_Open_Buffer_Finalize.argtypes = [ctypes.c_void_p]
+                lib.MediaInfo_Open_Buffer_Finalize.restype = ctypes.c_size_t
                 lib.MediaInfo_Delete.argtypes = [ctypes.c_void_p]
                 lib.MediaInfo_Delete.restype  = None
                 lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
@@ -248,7 +254,7 @@ class MediaInfo(object):
             Doing so will cause inconsistencies or failures by changing
             library options that are shared across threads.
 
-        :param filename: path to the media file which will be analyzed.
+        :param filename: path to the media file or file-like object which will be analyzed.
             A URL can also be used if libmediainfo was compiled
             with CURL support.
         :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
@@ -280,11 +286,12 @@ class MediaInfo(object):
                 * ``"JSON"``
 
                 * ``%``-delimited templates (see ``mediainfo --Info-Parameters``)
-        :type filename: str or pathlib.Path or os.PathLike
+        :type filename: str or pathlib.Path or os.PathLike or file-like object
         :rtype: str if `output` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file
-            (Python ≥ 3.3), does not work on Windows.
+            (or IOError if FileNotFoundError does not exists)
+        :raises ValueError: if passed a file-like object opened in text mode.
         :raises IOError: if passed a non-existent file (Python < 3.3),
             does not work on Windows.
         :raises RuntimeError: if parsing fails, this should not
@@ -304,13 +311,6 @@ class MediaInfo(object):
 
         """
         lib, handle, lib_version_str, lib_version = cls._get_library(library_file)
-        filename, is_url = cls._parse_filename(filename)
-        # Try to open the file (if it's not a URL)
-        # Doesn't work on Windows because paths are URLs
-        if not is_url:
-            # Test whether the file is readable
-            with open(filename, "rb"):
-                pass
         # The XML option was renamed starting with version 17.10
         if lib_version >= (17, 10):
             xml_option = "OLDXML"
@@ -346,11 +346,44 @@ class MediaInfo(object):
                 )
             for option_name, option_value in mediainfo_options.items():
                 lib.MediaInfo_Option(handle, option_name, option_value)
-        if lib.MediaInfo_Open(handle, filename) == 0:
-            lib.MediaInfo_Close(handle)
-            lib.MediaInfo_Delete(handle)
-            raise RuntimeError("An error occured while opening {}"
-                    " with libmediainfo".format(filename))
+        try:
+            filename.seek(0, 2)
+            file_size = filename.tell()
+            filename.seek(0)
+        except AttributeError:  # filename is not a file-like object
+            file_size = None
+
+        if file_size is not None:  # We have a file-like object, use the buffer protocol:
+            if 'b' not in getattr(filename, 'mode', 'b'):
+                raise ValueError("file should be opened in binary mode")
+            lib.MediaInfo_Open_Buffer_Init(handle, file_size, 0)
+            while True:
+                buffer = filename.read(64 * 1024)
+                if buffer:
+                    if ctypes.c_size_t(lib.MediaInfo_Open_Buffer_Continue(handle, buffer, len(buffer))).value & 0x08:
+                        break
+                    # Ask MediaInfo if we need to seek
+                    seek = ctypes.c_longlong(lib.MediaInfo_Open_Buffer_Continue_GoTo_Get(handle)).value
+                    if seek != -1:
+                        filename.seek(seek)
+                        # Inform MediaInfo we have sought
+                        lib.MediaInfo_Open_Buffer_Init(handle, file_size, filename.tell())
+                else:
+                    break
+            lib.MediaInfo_Open_Buffer_Finalize(handle)
+        else:  # We have a filename, simply pass it:
+            filename = cls._normalize_filename(filename)
+            if lib.MediaInfo_Open(handle, filename) == 0:
+                lib.MediaInfo_Close(handle)
+                lib.MediaInfo_Delete(handle)
+                if "://" not in filename and not os.path.exists(filename):
+                    try:
+                        Error = FileNotFoundError
+                    except NameError: # Python 2 compat
+                        Error = IOError
+                    raise Error(filename)
+                raise RuntimeError("An error occured while opening {}"
+                                   " with libmediainfo".format(filename))
         info = lib.MediaInfo_Inform(handle, 0)
         # Reset all options to their defaults so that they aren't
         # retained when the parse method is called several times
