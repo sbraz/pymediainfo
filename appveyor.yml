@@ -1,3 +1,6 @@
+image:
+  # Currently required to support Python 3.9
+  - Visual Studio 2019
 environment:
   MEDIAINFO_VERSION: 20.09
   TWINE_PASSWORD:
@@ -8,11 +11,13 @@ environment:
     - PYTHON: "C:/Python36"
     - PYTHON: "C:/Python37"
     - PYTHON: "C:/Python38"
+    - PYTHON: "C:/Python39"
     - PYTHON: "C:/Python27-x64"
     - PYTHON: "C:/Python35-x64"
     - PYTHON: "C:/Python36-x64"
     - PYTHON: "C:/Python37-x64"
     - PYTHON: "C:/Python38-x64"
+    - PYTHON: "C:/Python39-x64"
 install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"

@@ -8,6 +8,7 @@ python:
 - 3.6
 - 3.7
 - 3.8
+- 3.9
 - pypy
 - pypy3
 addons:
@@ -32,6 +33,9 @@ jobs:
     - os: osx
       language: generic
       env: MB_PYTHON_VERSION=3.8
+    - os: osx
+      language: generic
+      env: MB_PYTHON_VERSION=3.9
 before_install: |
   if [ $TRAVIS_OS_NAME == osx ]; then
     git clone https://github.com/matthew-brett/multibuild
@@ -59,11 +63,11 @@ notifications:
     on_failure: change
 after_success: |
   if [[ $TRAVIS_TAG ]]; then
-    if [[ $TRAVIS_OS_NAME == osx && $MB_PYTHON_VERSION == 3.7 ]]; then
+    if [[ $TRAVIS_OS_NAME == osx && $MB_PYTHON_VERSION == $PYTHON_DEPLOY_VERSION ]]; then
       python setup.py bdist_wheel
       pip install twine
       twine upload --skip-existing -u sbraz dist/*
-    elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == 3.7 ]]; then
+    elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == $PYTHON_DEPLOY_VERSION ]]; then
       # sdists generated on OSX have a problem with the accented test file
       # https://github.com/sbraz/pymediainfo/issues/67
       python setup.py sdist
@@ -78,3 +82,4 @@ env:
     - MEDIAINFO_VERSION: 20.09
     - LIBZEN_VERSION: 0.4.38
     - UBUNTU_VERSION: 16.04
+    - PYTHON_DEPLOY_VERSION: 3.8
