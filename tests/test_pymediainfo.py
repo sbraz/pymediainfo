@@ -20,6 +20,8 @@ if sys.version_info < (3, 2):
     unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+test_media_files = ["sample.mkv", "sample.mp4", "sample_with_cover.mp3",
+        "mpeg4.mp4", "mp3.mp3", "mp4-with-audio.mp4"]
 
 def _get_library_version():
     lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
@@ -250,7 +252,7 @@ class MediaInfoOptionsTest(unittest.TestCase):
 
 # Unittests can't be parametrized
 # https://github.com/pytest-dev/pytest/issues/541
-@pytest.mark.parametrize("test_file", ["sample.mkv", "sample.mp4", "sample_with_cover.mp3"])
+@pytest.mark.parametrize("test_file", test_media_files)
 def test_thread_safety(test_file):
     lib_version_str, lib_version = _get_library_version()
     if lib_version < (20, 3):
