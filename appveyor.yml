@@ -28,10 +28,11 @@ install:
     - ps: "7z -y x MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z MediaInfo.dll Developers/License.html"
     - "move MediaInfo.dll pymediainfo"
     - "move Developers\\License.html docs"
-    - "pip install --upgrade setuptools pytest pytest-runner twine wheel"
+    - "pip install --upgrade setuptools pytest twine wheel"
+    - "python setup.py install"
 build_script:
   - "python setup.py bdist_wheel"
 test_script:
-  - "python setup.py test"
+  - "pytest"
 deploy_script:
   - ps: If ($env:APPVEYOR_REPO_TAG -eq "true") { Invoke-Expression "twine upload --skip-existing -u sbraz dist/*" }

@@ -55,8 +55,9 @@ before_install: |
     sudo dpkg -i ${libzen_deb} ${mediainfo_deb}
     popd
   fi
-  pip install pytest pytest-runner setuptools_scm
-script: "python setup.py test"
+  pip install pytest setuptools_scm
+  python setup.py install
+script: pytest
 notifications:
   email:
     on_success: change
