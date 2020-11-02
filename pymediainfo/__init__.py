@@ -289,11 +289,9 @@ class MediaInfo(object):
         :type filename: str or pathlib.Path or os.PathLike or file-like object
         :rtype: str if `output` is set.
         :rtype: :class:`MediaInfo` otherwise.
-        :raises FileNotFoundError: if passed a non-existent file
-            (or IOError if FileNotFoundError does not exists)
+        :raises FileNotFoundError: if passed a non-existent file.
+        :raises IOError: if passed a non-existent file (Python < 3.3).
         :raises ValueError: if passed a file-like object opened in text mode.
-        :raises IOError: if passed a non-existent file (Python < 3.3),
-            does not work on Windows.
         :raises RuntimeError: if parsing fails, this should not
             happen unless libmediainfo itself fails.
 
@@ -354,12 +352,15 @@ class MediaInfo(object):
             file_size = None
 
         if file_size is not None:  # We have a file-like object, use the buffer protocol:
-            if 'b' not in getattr(filename, 'mode', 'b'):
-                raise ValueError("file should be opened in binary mode")
+            # Some file-like objects do not have a mode
+            if "b" not in getattr(filename, "mode", "b"):
+                raise ValueError("File should be opened in binary mode")
             lib.MediaInfo_Open_Buffer_Init(handle, file_size, 0)
             while True:
                 buffer = filename.read(64 * 1024)
                 if buffer:
+                    # https://github.com/MediaArea/MediaInfoLib/blob/v20.09/Source/MediaInfo/File__Analyze.h#L1429
+                    # 4th bit = finished
                     if ctypes.c_size_t(lib.MediaInfo_Open_Buffer_Continue(handle, buffer, len(buffer))).value & 0x08:
                         break
                     # Ask MediaInfo if we need to seek
@@ -373,15 +374,18 @@ class MediaInfo(object):
             lib.MediaInfo_Open_Buffer_Finalize(handle)
         else:  # We have a filename, simply pass it:
             filename = cls._normalize_filename(filename)
+            # If an error occured
             if lib.MediaInfo_Open(handle, filename) == 0:
                 lib.MediaInfo_Close(handle)
                 lib.MediaInfo_Delete(handle)
+                # If filename doesn't look like a URL and doesn't exist
                 if "://" not in filename and not os.path.exists(filename):
                     try:
                         Error = FileNotFoundError
                     except NameError: # Python 2 compat
                         Error = IOError
                     raise Error(filename)
+                # We ran into another kind of error
                 raise RuntimeError("An error occured while opening {}"
                                    " with libmediainfo".format(filename))
         info = lib.MediaInfo_Inform(handle, 0)

@@ -90,13 +90,11 @@ class MediaInfoFileLikeTest(unittest.TestCase):
     def test_can_parse(self):
         with open(os.path.join(data_dir, "sample.mp4"), "rb") as f:
             MediaInfo.parse(f)
-
-    @pytest.mark.skipif(sys.version_info <= (3, 0), reason="r and rb are equivalent in Python 2.7")
+    @pytest.mark.skipif(sys.version_info <= (3,), reason="r and rb are equivalent in Python 2")
     def test_raises_on_text_mode_even_with_text(self):
         with open(os.path.join(data_dir, "sample.xml")) as f:
             self.assertRaises(ValueError, MediaInfo.parse, f)
-
-    @pytest.mark.skipif(sys.version_info <= (3, 0), reason="r and rb are equivalent in Python 2.7")
+    @pytest.mark.skipif(sys.version_info <= (3,), reason="r and rb are equivalent in Python 2")
     def test_raises_on_text_mode(self):
         with open(os.path.join(data_dir, "sample.mkv")) as f:
             self.assertRaises(ValueError, MediaInfo.parse, f)
@@ -259,19 +257,6 @@ class MediaInfoOptionsTest(unittest.TestCase):
         self.assertEqual(self.normal_mi.tracks[1].other_language[0], "English")
         self.assertEqual(self.raw_language_mi.tracks[1].language, "en")
 
-
-@pytest.mark.parametrize("test_file", glob(os.path.join(data_dir, "*")))
-def test_by_file_and_by_buffer_returns_the_same(test_file):
-    filename = os.path.join(data_dir, test_file)
-    with_filename = MediaInfo.parse(filename)
-    with open(filename, "rb") as f:
-        with_file = MediaInfo.parse(f)
-    assert len(with_file.tracks) == len(with_filename.tracks)
-    # Track 0, General, will differ, typically not giving the filename.
-    for track in range(1, 3):
-        if len(with_file.tracks) > track:
-            assert with_file.tracks[track].to_data() == with_filename.tracks[track].to_data()
-
 # Unittests can't be parametrized
 # https://github.com/pytest-dev/pytest/issues/541
 @pytest.mark.parametrize("test_file", test_media_files)
@@ -307,6 +292,20 @@ def test_thread_safety(test_file):
         # in case they don't match
         assert r.to_data() == expected_result.to_data()
         assert r == expected_result
+
+@pytest.mark.parametrize("test_file", test_media_files)
+def test_filelike_returns_the_same(test_file):
+    filename = os.path.join(data_dir, test_file)
+    mi_from_filename = MediaInfo.parse(filename)
+    with open(filename, "rb") as f:
+        mi_from_file = MediaInfo.parse(f)
+    assert len(mi_from_file.tracks) == len(mi_from_filename.tracks)
+    for track_from_file, track_from_filename in zip(mi_from_file.tracks, mi_from_filename.tracks):
+        # The General track will differ, typically not giving the filename
+        if track_from_file.track_type != "General":
+            # Test dicts first because they will produce a diff
+            assert track_from_file.to_data() == track_from_filename.to_data()
+            assert track_from_file == track_from_filename
 
 class MediaInfoOutputTest(unittest.TestCase):
     def test_text_output(self):
