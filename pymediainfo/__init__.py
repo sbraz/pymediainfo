@@ -361,10 +361,10 @@ class MediaInfo(object):
                 if buffer:
                     # https://github.com/MediaArea/MediaInfoLib/blob/v20.09/Source/MediaInfo/File__Analyze.h#L1429
                     # 4th bit = finished
-                    if ctypes.c_size_t(lib.MediaInfo_Open_Buffer_Continue(handle, buffer, len(buffer))).value & 0x08:
+                    if lib.MediaInfo_Open_Buffer_Continue(handle, buffer, len(buffer)) & 0x08:
                         break
                     # Ask MediaInfo if we need to seek
-                    seek = ctypes.c_longlong(lib.MediaInfo_Open_Buffer_Continue_GoTo_Get(handle)).value
+                    seek = lib.MediaInfo_Open_Buffer_Continue_GoTo_Get(handle)
                     if seek != -1:
                         filename.seek(seek)
                         # Inform MediaInfo we have sought
