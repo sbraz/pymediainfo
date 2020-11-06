@@ -365,7 +365,7 @@ class MediaInfo(object):
                         break
                     # Ask MediaInfo if we need to seek
                     seek = lib.MediaInfo_Open_Buffer_Continue_GoTo_Get(handle)
-                    if seek != -1:
+                    if seek != ctypes.c_uint64(-1).value:
                         filename.seek(seek)
                         # Inform MediaInfo we have sought
                         lib.MediaInfo_Open_Buffer_Init(handle, file_size, filename.tell())
