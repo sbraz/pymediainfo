@@ -1,5 +1,6 @@
 # vim: set fileencoding=utf-8 :
 import os
+import pathlib
 import re
 import locale
 import json
@@ -10,21 +11,11 @@ from pkg_resources import get_distribution, DistributionNotFound
 import xml.etree.ElementTree as ET
 
 try:
-    import pathlib
-except ImportError:
-    pathlib = None
-
-if sys.version_info < (3,):
-    import urlparse
-else:
-    import urllib.parse as urlparse
-
-try:
     __version__ = get_distribution("pymediainfo").version
 except DistributionNotFound:
     pass
 
-class Track(object):
+class Track:
     """
     An object associated with a media file track.
 
@@ -113,7 +104,7 @@ class Track(object):
         return data
 
 
-class MediaInfo(object):
+class MediaInfo:
     """
     An object containing information about a media file.
 
@@ -290,7 +281,6 @@ class MediaInfo(object):
         :rtype: str if `output` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file.
-        :raises IOError: if passed a non-existent file (Python < 3.3).
         :raises ValueError: if passed a file-like object opened in text mode.
         :raises RuntimeError: if parsing fails, this should not
             happen unless libmediainfo itself fails.
@@ -319,12 +309,6 @@ class MediaInfo(object):
         if lib_version >= (18, 3):
             lib.MediaInfo_Option(handle, "Cover_Data", "base64" if cover_data else "")
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
-        # Fix for https://github.com/sbraz/pymediainfo/issues/22
-        # Python 2 does not change LC_CTYPE
-        # at startup: https://bugs.python.org/issue6203
-        if (sys.version_info < (3,) and os.name == "posix"
-                and locale.getlocale() == (None, None)):
-            locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
         lib.MediaInfo_Option(handle, "Inform", xml_option if output is None else output)
         lib.MediaInfo_Option(handle, "Complete", "1" if full else "")
         lib.MediaInfo_Option(handle, "ParseSpeed", str(parse_speed))
@@ -375,11 +359,7 @@ class MediaInfo(object):
                 lib.MediaInfo_Delete(handle)
                 # If filename doesn't look like a URL and doesn't exist
                 if "://" not in filename and not os.path.exists(filename):
-                    try:
-                        Error = FileNotFoundError
-                    except NameError: # Python 2 compat
-                        Error = IOError
-                    raise Error(filename)
+                    raise FileNotFoundError(filename)
                 # We ran into another kind of error
                 raise RuntimeError("An error occured while opening {}"
                                    " with libmediainfo".format(filename))

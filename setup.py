@@ -25,7 +25,7 @@ if os.path.exists(bin_license):
                 python, abi, plat = bdist_wheel.get_tag(self)
                 # The python code works for any Python version,
                 # not just the one we are running to build the wheel
-                return 'py2.py3', 'none', plat
+                return 'py3', 'none', plat
 
         cmdclass['bdist_wheel'] = platform_bdist_wheel
     except ImportError:
@@ -49,18 +49,17 @@ setup(
     license='MIT',
     data_files=data_files,
     use_scm_version=True,
+    python_requires=">=3.6",
     setup_requires=["setuptools_scm"],
     install_requires=["setuptools"],
     package_data={'pymediainfo': bin_files},
     cmdclass=cmdclass,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Operating System :: POSIX :: Linux",

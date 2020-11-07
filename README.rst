@@ -22,6 +22,6 @@ pymediainfo
 
 This small package is a wrapper around the MediaInfo library.
 
-It works on Linux, Mac OS X and Windows and is tested with Python 2.7, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, PyPy and PyPy3.
+It works on Linux, Mac OS X and Windows and is tested with Python 3.6, 3.7, 3.8, 3.9 and PyPy3.
 
 See https://pymediainfo.readthedocs.io/ for more information.

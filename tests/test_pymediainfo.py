@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
+import pathlib
 import sys
 import unittest
 import xml
@@ -11,11 +12,6 @@ import json
 import pytest
 
 from pymediainfo import MediaInfo
-
-if sys.version_info < (3, 3):
-    FileNotFoundError = IOError
-if sys.version_info < (3, 2):
-    unittest.TestCase.assertRegex = unittest.TestCase.assertRegexpMatches
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 test_media_files = ["sample.mkv", "sample.mp4", "sample_with_cover.mp3",
@@ -89,11 +85,9 @@ class MediaInfoFileLikeTest(unittest.TestCase):
     def test_can_parse(self):
         with open(os.path.join(data_dir, "sample.mp4"), "rb") as f:
             MediaInfo.parse(f)
-    @pytest.mark.skipif(sys.version_info <= (3,), reason="r and rb are equivalent in Python 2")
     def test_raises_on_text_mode_even_with_text(self):
         with open(os.path.join(data_dir, "sample.xml")) as f:
             self.assertRaises(ValueError, MediaInfo.parse, f)
-    @pytest.mark.skipif(sys.version_info <= (3,), reason="r and rb are equivalent in Python 2")
     def test_raises_on_text_mode(self):
         with open(os.path.join(data_dir, "sample.mkv")) as f:
             self.assertRaises(ValueError, MediaInfo.parse, f)
@@ -123,14 +117,12 @@ class MediaInfoURLTest(unittest.TestCase):
         self.assertEqual(len(self.mi.tracks), 2)
 
 class MediaInfoPathlibTest(unittest.TestCase):
-    def setUp(self):
-        self.pathlib = pytest.importorskip("pathlib")
     def test_parse_pathlib_path(self):
-        path = self.pathlib.Path(data_dir) / "sample.mp4"
+        path = pathlib.Path(data_dir) / "sample.mp4"
         mi = MediaInfo.parse(path)
         self.assertEqual(len(mi.tracks), 3)
     def test_parse_non_existent_path_pathlib(self):
-        path = self.pathlib.Path(data_dir) / "this file does not exist"
+        path = pathlib.Path(data_dir) / "this file does not exist"
         self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
 
 class MediaInfoFilenameTypesTest(unittest.TestCase):
@@ -139,11 +131,9 @@ class MediaInfoFilenameTypesTest(unittest.TestCase):
         filename = MediaInfo._normalize_filename(path)
         self.assertEqual(filename, path)
     def test_normalize_filename_pathlib(self):
-        pathlib = pytest.importorskip("pathlib")
         path = pathlib.Path(data_dir, "test.txt")
         filename = MediaInfo._normalize_filename(path)
         self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
-    @pytest.mark.skipif(sys.version_info < (3, 6), reason="os.PathLike requires Python 3.6")
     def test_normalize_filename_pathlike(self):
         class PathLikeObject(os.PathLike):
             def __fspath__(self):

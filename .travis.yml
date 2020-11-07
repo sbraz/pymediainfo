@@ -2,14 +2,10 @@ os: linux
 dist: xenial
 language: python
 python:
-- 2.7
-- 3.4
-- 3.5
 - 3.6
 - 3.7
 - 3.8
 - 3.9
-- pypy
 - pypy3
 addons:
   apt:
@@ -19,12 +15,6 @@ jobs:
   include:
     - os: osx
       # Not required but makes Travis' output prettier
-      language: generic
-      env: MB_PYTHON_VERSION=2.7
-    - os: osx
-      language: generic
-      env: MB_PYTHON_VERSION=3.5
-    - os: osx
       language: generic
       env: MB_PYTHON_VERSION=3.6
     - os: osx
