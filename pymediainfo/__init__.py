@@ -1,19 +1,24 @@
 # vim: set fileencoding=utf-8 :
+"""
+This module is a wrapper around the MediaInfo library.
+"""
+import ctypes
+import json
 import os
 import pathlib
 import re
-import locale
-import json
-import ctypes
 import sys
 import warnings
-from pkg_resources import get_distribution, DistributionNotFound
 import xml.etree.ElementTree as ET
+from typing import Any, Dict, Optional, Tuple, Union
+
+from pkg_resources import DistributionNotFound, get_distribution
 
 try:
     __version__ = get_distribution("pymediainfo").version
 except DistributionNotFound:
     pass
+
 
 class Track:
     """
@@ -21,7 +26,8 @@ class Track:
 
     Each :class:`Track` attribute corresponds to attributes parsed from MediaInfo's output.
     All attributes are lower case. Attributes that are present several times such as Duration
-    yield a second attribute starting with `other_` which is a list of all alternative attribute values.
+    yield a second attribute starting with `other_` which is a list of all alternative
+    attribute values.
 
     When a non-existing attribute is accessed, `None` is returned.
 
@@ -40,50 +46,61 @@ class Track:
 
     All available attributes can be obtained by calling :func:`to_data`.
     """
-    def __eq__(self, other):
+
+    def __eq__(self, other):  # type: ignore
         return self.__dict__ == other.__dict__
-    def __getattribute__(self, name):
+
+    def __getattribute__(self, name):  # type: ignore
         try:
             return object.__getattribute__(self, name)
-        except:
+        except AttributeError:
             pass
         return None
-    def __getstate__(self):
+
+    def __getstate__(self):  # type: ignore
         return self.__dict__
-    def __setstate__(self, state):
+
+    def __setstate__(self, state):  # type: ignore
         self.__dict__ = state
-    def __init__(self, xml_dom_fragment):
-        self.track_type = xml_dom_fragment.attrib['type']
-        for el in xml_dom_fragment:
-            node_name = el.tag.lower().strip().strip('_')
-            if node_name == 'id':
-                node_name = 'track_id'
-            node_value = el.text
+
+    def __init__(self, xml_dom_fragment: ET.Element):
+        self.track_type = xml_dom_fragment.attrib["type"]
+        for elem in xml_dom_fragment:
+            node_name = elem.tag.lower().strip().strip("_")
+            if node_name == "id":
+                node_name = "track_id"
+            node_value = elem.text
             other_node_name = "other_%s" % node_name
             if getattr(self, node_name) is None:
                 setattr(self, node_name, node_value)
             else:
                 if getattr(self, other_node_name) is None:
-                    setattr(self, other_node_name, [node_value, ])
+                    setattr(self, other_node_name, [node_value])
                 else:
                     getattr(self, other_node_name).append(node_value)
 
-        for o in [d for d in self.__dict__.keys() if d.startswith('other_')]:
+        for other in [d for d in self.__dict__.keys() if d.startswith("other_")]:
             try:
-                primary = o.replace('other_', '')
+                primary = other.replace("other_", "")
+                # Attempt to convert the main value to int
                 setattr(self, primary, int(getattr(self, primary)))
-            except:
-                for v in getattr(self, o):
+            except ValueError:
+                # If it fails, try to set the main value to an int taken from other values
+                for value in getattr(self, other):
                     try:
                         current = getattr(self, primary)
-                        setattr(self, primary, int(v))
-                        getattr(self, o).append(current)
+                        # Set the main value to an int
+                        setattr(self, primary, int(value))
+                        # Append its previous value to other values
+                        getattr(self, other).append(current)
                         break
-                    except:
+                    except ValueError:
                         pass
-    def __repr__(self):
-        return("<Track track_id='{}', track_type='{}'>".format(self.track_id, self.track_type))
-    def to_data(self):
+
+    def __repr__(self):  # type: ignore
+        return "<Track track_id='{}', track_type='{}'>".format(self.track_id, self.track_type)
+
+    def to_data(self) -> Dict[str, Any]:
         """
         Returns a dict representation of the track attributes.
 
@@ -97,11 +114,7 @@ class Track:
 
         :rtype: dict
         """
-        data = {}
-        for k, v in self.__dict__.items():
-            if k != 'xml_dom_fragment':
-                data[k] = v
-        return data
+        return self.__dict__
 
 
 class MediaInfo:
@@ -136,9 +149,11 @@ class MediaInfo:
         <Track track_id='None', track_type='General'>
         <Track track_id='1', track_type='Text'>
     """
-    def __eq__(self, other):
+
+    def __eq__(self, other):  # type: ignore
         return self.tracks == other.tracks
-    def __init__(self, xml, encoding_errors="strict"):
+
+    def __init__(self, xml: str, encoding_errors: str = "strict"):
         xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
         self.tracks = []
         # This is the case for libmediainfo < 18.03
@@ -150,16 +165,19 @@ class MediaInfo:
             xpath = "File/track"
         for xml_track in xml_dom.iterfind(xpath):
             self.tracks.append(Track(xml_track))
+
     @staticmethod
-    def _normalize_filename(filename):
-        if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):
+    def _normalize_filename(filename: Any) -> Any:
+        # TODO: wait for https://github.com/python/typeshed/pull/4582 pylint: disable=fixme
+        # to be included in a mypy release
+        if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):  # type: ignore
             return os.fspath(filename)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             return str(filename)
         return filename
 
     @classmethod
-    def _define_library_prototypes(cls, lib):
+    def _define_library_prototypes(cls, lib: Any) -> Any:
         lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
         lib.MediaInfo_New.argtypes = []
         lib.MediaInfo_New.restype = ctypes.c_void_p
@@ -195,10 +213,14 @@ class MediaInfo:
         lib.MediaInfo_Close.restype = None
 
     @classmethod
-    def _get_library(cls, library_file=None):
+    def _get_library(
+        # pylint: disable=too-many-branches
+        cls,
+        library_file: Optional[str] = None,
+    ) -> Tuple[Any, Any, str, Tuple[int, ...]]:
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         if os_is_nt:
-            lib_type = ctypes.WinDLL
+            lib_type = ctypes.WinDLL  # type: ignore
         else:
             lib_type = ctypes.CDLL
         if library_file is None:
@@ -233,8 +255,9 @@ class MediaInfo:
                 # If we've tried all possible filenames
                 if i == len(library_names):
                     raise
+
     @classmethod
-    def can_parse(cls, library_file=None):
+    def can_parse(cls, library_file: Optional[str] = None) -> bool:
         """
         Checks whether media files can be analyzed using libmediainfo.
 
@@ -245,13 +268,24 @@ class MediaInfo:
             lib.MediaInfo_Close(handle)
             lib.MediaInfo_Delete(handle)
             return True
-        except:
+        except Exception:  # pylint: disable=broad-except
             return False
+
     @classmethod
-    def parse(cls, filename, library_file=None, cover_data=False,
-            encoding_errors="strict", parse_speed=0.5,
-            full=True, legacy_stream_display=False, mediainfo_options=None,
-            output=None):
+    def parse(
+        # pylint: disable=too-many-statements
+        # pylint: disable=too-many-branches, too-many-locals, too-many-arguments
+        cls,
+        filename: Any,
+        library_file: Optional[str] = None,
+        cover_data: bool = False,
+        encoding_errors: str = "strict",
+        parse_speed: float = 0.5,
+        full: bool = True,
+        legacy_stream_display: bool = False,
+        mediainfo_options: Optional[Dict[str, str]] = None,
+        output: Optional[str] = None,
+    ) -> Union[str, "MediaInfo"]:
         """
         Analyze a media file using libmediainfo.
 
@@ -264,7 +298,8 @@ class MediaInfo:
         :param filename: path to the media file or file-like object which will be analyzed.
             A URL can also be used if libmediainfo was compiled
             with CURL support.
-        :param str library_file: path to the libmediainfo library, this should only be used if the library cannot be auto-detected.
+        :param str library_file: path to the libmediainfo library, this should only be used if
+            the library cannot be auto-detected.
         :param bool cover_data: whether to retrieve cover data as base64.
         :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
             parameter before parsing MediaInfo's XML output.
@@ -275,10 +310,10 @@ class MediaInfo:
         :param bool full: display additional tags, including computer-readable values
             for sizes and durations.
         :param bool legacy_stream_display: display additional information about streams.
-        :param dict mediainfo_options: additional options that will be passed to the `MediaInfo_Option` function,
-            for example: ``{"Language": "raw"}``. Do not use this parameter when running the
-            method simultaneously from multiple threads, it will trigger a reset of all options
-            which will cause inconsistencies or failures.
+        :param dict mediainfo_options: additional options that will be passed to the
+            `MediaInfo_Option` function, for example: ``{"Language": "raw"}``.
+            Do not use this parameter when running the method simultaneously from multiple threads,
+            it will trigger a reset of all options which will cause inconsistencies or failures.
         :param str output: custom output format for MediaInfo, corresponds to the CLI's
             ``--Output`` parameter. Setting this causes the method to
             return a `str` instead of a :class:`MediaInfo` object.
@@ -321,7 +356,7 @@ class MediaInfo:
         else:
             xml_option = "XML"
         # Cover_Data is not extracted by default since version 18.03
-        # See https://github.com/MediaArea/MediaInfoLib/commit/d8fd88a1c282d1c09388c55ee0b46029e7330690
+        # See https://github.com/MediaArea/MediaInfoLib/commit/d8fd88a1
         if lib_version >= (18, 3):
             lib.MediaInfo_Option(handle, "Cover_Data", "base64" if cover_data else "")
         lib.MediaInfo_Option(handle, "CharSet", "UTF-8")
@@ -331,10 +366,12 @@ class MediaInfo:
         lib.MediaInfo_Option(handle, "LegacyStreamDisplay", "1" if legacy_stream_display else "")
         if mediainfo_options is not None:
             if lib_version < (19, 9):
-                warnings.warn("This version of MediaInfo ({}) does not support resetting all options to their default values, "
-                    "passing it custom options is not recommended and may result in unpredictable behavior, "
-                    "see https://github.com/MediaArea/MediaInfoLib/issues/1128".format(lib_version_str),
-                    RuntimeWarning
+                warnings.warn(
+                    "This version of MediaInfo (v{}) does not support resetting all "
+                    "options to their default values, passing it custom options is not recommended "
+                    "and may result in unpredictable behavior, see "
+                    "https://github.com/MediaArea/MediaInfoLib/issues/1128".format(lib_version_str),
+                    RuntimeWarning,
                 )
             for option_name, option_value in mediainfo_options.items():
                 lib.MediaInfo_Option(handle, option_name, option_value)
@@ -342,10 +379,10 @@ class MediaInfo:
             filename.seek(0, 2)
             file_size = filename.tell()
             filename.seek(0)
-        except AttributeError: # filename is not a file-like object
+        except AttributeError:  # filename is not a file-like object
             file_size = None
 
-        if file_size is not None: # We have a file-like object, use the buffer protocol:
+        if file_size is not None:  # We have a file-like object, use the buffer protocol:
             # Some file-like objects do not have a mode
             if "b" not in getattr(filename, "mode", "b"):
                 raise ValueError("File should be opened in binary mode")
@@ -367,7 +404,7 @@ class MediaInfo:
                 else:
                     break
             lib.MediaInfo_Open_Buffer_Finalize(handle)
-        else: # We have a filename, simply pass it:
+        else:  # We have a filename, simply pass it:
             filename = cls._normalize_filename(filename)
             # If an error occured
             if lib.MediaInfo_Open(handle, filename) == 0:
@@ -377,9 +414,10 @@ class MediaInfo:
                 if "://" not in filename and not os.path.exists(filename):
                     raise FileNotFoundError(filename)
                 # We ran into another kind of error
-                raise RuntimeError("An error occured while opening {}"
-                                   " with libmediainfo".format(filename))
-        info = lib.MediaInfo_Inform(handle, 0)
+                raise RuntimeError(
+                    "An error occured while opening {}" " with libmediainfo".format(filename)
+                )
+        info: str = lib.MediaInfo_Inform(handle, 0)
         # Reset all options to their defaults so that they aren't
         # retained when the parse method is called several times
         # https://github.com/MediaArea/MediaInfoLib/issues/1128
@@ -392,19 +430,17 @@ class MediaInfo:
         lib.MediaInfo_Delete(handle)
         if output is None:
             return cls(info, encoding_errors)
-        else:
-            return info
-    def to_data(self):
+        return info
+
+    def to_data(self) -> Dict[str, Any]:
         """
         Returns a dict representation of the object's :py:class:`Tracks <Track>`.
 
         :rtype: dict
         """
-        data = {'tracks': []}
-        for track in self.tracks:
-            data['tracks'].append(track.to_data())
-        return data
-    def to_json(self):
+        return {"tracks": [_.to_data() for _ in self.tracks]}
+
+    def to_json(self) -> str:
         """
         Returns a JSON representation of the object's :py:class:`Tracks <Track>`.
 
