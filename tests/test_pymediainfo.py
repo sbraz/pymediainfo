@@ -220,12 +220,6 @@ class MediaInfoEqTest(unittest.TestCase):
         pickled_mi = pickle.dumps(self.mp4_mi)
         self.assertEqual(self.mp4_mi, pickle.loads(pickled_mi))
 
-class MediaInfoTextOutputTest(unittest.TestCase):
-    def setUp(self):
-        self.mi = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"), text=True)
-    def test_text_output(self):
-        self.assertRegex(self.mi, r"Stream size\s+: 373836\b")
-
 class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
     def setUp(self):
         self.mi = MediaInfo.parse(os.path.join(data_dir, "aac_he_v2.aac"))

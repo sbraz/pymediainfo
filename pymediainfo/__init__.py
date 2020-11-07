@@ -242,7 +242,7 @@ class MediaInfo(object):
             return False
     @classmethod
     def parse(cls, filename, library_file=None, cover_data=False,
-            encoding_errors="strict", parse_speed=0.5, text=False,
+            encoding_errors="strict", parse_speed=0.5,
             full=True, legacy_stream_display=False, mediainfo_options=None,
             output=None):
         """
@@ -325,12 +325,6 @@ class MediaInfo(object):
         if (sys.version_info < (3,) and os.name == "posix"
                 and locale.getlocale() == (None, None)):
             locale.setlocale(locale.LC_CTYPE, locale.getdefaultlocale())
-        if text:
-            warnings.warn('The "text" option is obsolete and will be removed '
-                    'in the next major version. Use output="" instead.',
-                    DeprecationWarning
-            )
-            output = ""
         lib.MediaInfo_Option(handle, "Inform", xml_option if output is None else output)
         lib.MediaInfo_Option(handle, "Complete", "1" if full else "")
         lib.MediaInfo_Option(handle, "ParseSpeed", str(parse_speed))
