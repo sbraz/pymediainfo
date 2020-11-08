@@ -157,8 +157,45 @@ class MediaInfo:
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             return str(filename)
         return filename
-    @staticmethod
-    def _get_library(library_file=None):
+
+    @classmethod
+    def _define_library_prototypes(cls, lib):
+        lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
+        lib.MediaInfo_New.argtypes = []
+        lib.MediaInfo_New.restype = ctypes.c_void_p
+        lib.MediaInfo_Option.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_wchar_p,
+            ctypes.c_wchar_p,
+        ]
+        lib.MediaInfo_Option.restype = ctypes.c_wchar_p
+        lib.MediaInfo_Inform.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+        lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
+        lib.MediaInfo_Open.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p]
+        lib.MediaInfo_Open.restype = ctypes.c_size_t
+        lib.MediaInfo_Open_Buffer_Init.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_uint64,
+            ctypes.c_uint64,
+        ]
+        lib.MediaInfo_Open_Buffer_Init.restype = ctypes.c_size_t
+        lib.MediaInfo_Open_Buffer_Continue.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_char_p,
+            ctypes.c_size_t,
+        ]
+        lib.MediaInfo_Open_Buffer_Continue.restype = ctypes.c_size_t
+        lib.MediaInfo_Open_Buffer_Continue_GoTo_Get.argtypes = [ctypes.c_void_p]
+        lib.MediaInfo_Open_Buffer_Continue_GoTo_Get.restype = ctypes.c_uint64
+        lib.MediaInfo_Open_Buffer_Finalize.argtypes = [ctypes.c_void_p]
+        lib.MediaInfo_Open_Buffer_Finalize.restype = ctypes.c_size_t
+        lib.MediaInfo_Delete.argtypes = [ctypes.c_void_p]
+        lib.MediaInfo_Delete.restype = None
+        lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
+        lib.MediaInfo_Close.restype = None
+
+    @classmethod
+    def _get_library(cls, library_file=None):
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         if os_is_nt:
             lib_type = ctypes.WinDLL
@@ -184,28 +221,7 @@ class MediaInfo:
         for i, library in enumerate(library_names, start=1):
             try:
                 lib = lib_type(library)
-                # Define arguments and return types
-                lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
-                lib.MediaInfo_New.argtypes = []
-                lib.MediaInfo_New.restype  = ctypes.c_void_p
-                lib.MediaInfo_Option.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_wchar_p]
-                lib.MediaInfo_Option.restype = ctypes.c_wchar_p
-                lib.MediaInfo_Inform.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
-                lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
-                lib.MediaInfo_Open.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p]
-                lib.MediaInfo_Open.restype = ctypes.c_size_t
-                lib.MediaInfo_Open_Buffer_Init.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64,]
-                lib.MediaInfo_Open_Buffer_Init.restype = ctypes.c_size_t
-                lib.MediaInfo_Open_Buffer_Continue.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_size_t,]
-                lib.MediaInfo_Open_Buffer_Continue.restype = ctypes.c_size_t
-                lib.MediaInfo_Open_Buffer_Continue_GoTo_Get.argtypes = [ctypes.c_void_p]
-                lib.MediaInfo_Open_Buffer_Continue_GoTo_Get.restype = ctypes.c_uint64
-                lib.MediaInfo_Open_Buffer_Finalize.argtypes = [ctypes.c_void_p]
-                lib.MediaInfo_Open_Buffer_Finalize.restype = ctypes.c_size_t
-                lib.MediaInfo_Delete.argtypes = [ctypes.c_void_p]
-                lib.MediaInfo_Delete.restype  = None
-                lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
-                lib.MediaInfo_Close.restype = None
+                cls._define_library_prototypes(lib)
                 # Without a handle, there might be problems when using concurrent threads
                 # https://github.com/sbraz/pymediainfo/issues/76#issuecomment-574759621
                 handle = lib.MediaInfo_New()
