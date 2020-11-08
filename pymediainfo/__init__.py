@@ -240,21 +240,24 @@ class MediaInfo:
                     break
         else:
             library_names = (library_file,)
-        for i, library in enumerate(library_names, start=1):
+        for library in library_names:
             try:
                 lib = lib_type(library)
                 cls._define_library_prototypes(lib)
                 # Without a handle, there might be problems when using concurrent threads
                 # https://github.com/sbraz/pymediainfo/issues/76#issuecomment-574759621
                 handle = lib.MediaInfo_New()
-                lib_version_str = lib.MediaInfo_Option(handle, "Info_Version", "")
-                lib_version_str = re.search(r"^MediaInfoLib - v(\S+)", lib_version_str).group(1)
-                lib_version = tuple(int(_) for _ in lib_version_str.split("."))
+                version = lib.MediaInfo_Option(handle, "Info_Version", "")
+                match = re.search(r"^MediaInfoLib - v(\S+)", version)
+                if match:
+                    lib_version_str = match.group(1)
+                    lib_version = tuple(int(_) for _ in lib_version_str.split("."))
+                else:
+                    raise RuntimeError("Could not determine library version")
                 return (lib, handle, lib_version_str, lib_version)
             except OSError:
-                # If we've tried all possible filenames
-                if i == len(library_names):
-                    raise
+                pass
+        raise OSError("Failed to load library")
 
     @classmethod
     def can_parse(cls, library_file: Optional[str] = None) -> bool:
@@ -333,6 +336,7 @@ class MediaInfo:
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file.
         :raises ValueError: if passed a file-like object opened in text mode.
+        :raises OSError: if the library file could not be loaded.
         :raises RuntimeError: if parsing fails, this should not
             happen unless libmediainfo itself fails.
 
