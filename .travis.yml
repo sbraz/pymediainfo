@@ -1,31 +1,45 @@
 os: linux
-dist: xenial
+dist: bionic
 language: python
-python:
-- 3.6
-- 3.7
-- 3.8
-- 3.9
-- pypy3
 addons:
   apt:
     packages:
     - libmms0
 jobs:
   include:
+    - python: &python_main_version 3.8
+      env: TOXENV=black,flake8,isort,mypy,pylint
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 3.7
+      env: TOXENV=py37
+    - python: 3.8
+      env: TOXENV=py38
+    - python: 3.9
+      env: TOXENV=py39
+    - python: pypy3
+      env: TOXENV=pypy3
     - os: osx
       # Not required but makes Travis' output prettier
       language: generic
-      env: MB_PYTHON_VERSION=3.6
+      env:
+        - MB_PYTHON_VERSION=3.6
+        - TOXENV=py36
     - os: osx
       language: generic
-      env: MB_PYTHON_VERSION=3.7
+      env:
+        - MB_PYTHON_VERSION=3.7
+        - TOXENV=py37
     - os: osx
       language: generic
-      env: MB_PYTHON_VERSION=3.8
+      env:
+        - MB_PYTHON_VERSION=3.8
+        - TOXENV=py38
     - os: osx
       language: generic
-      env: MB_PYTHON_VERSION=3.9
+      env:
+        - MB_PYTHON_VERSION=3.9
+        - TOXENV=py39
 before_install: |
   if [ $TRAVIS_OS_NAME == osx ]; then
     git clone https://github.com/matthew-brett/multibuild
@@ -34,6 +48,8 @@ before_install: |
     source multibuild/travis_steps.sh
     before_install
     curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_i386+x86_64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
+    # Required for tests to pass with tox
+    cp MediaInfoLib/libmediainfo.0.dylib /usr/local/lib
     mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
     mv MediaInfoLib/License.html docs
   else
@@ -45,20 +61,19 @@ before_install: |
     sudo dpkg -i ${libzen_deb} ${mediainfo_deb}
     popd
   fi
-  pip install pytest setuptools_scm
-  python setup.py install
-script: pytest
+  pip install tox
+script: tox -p
 notifications:
   email:
     on_success: change
     on_failure: change
 after_success: |
   if [[ $TRAVIS_TAG ]]; then
-    if [[ $TRAVIS_OS_NAME == osx && $MB_PYTHON_VERSION == $PYTHON_DEPLOY_VERSION ]]; then
+    if [[ $TRAVIS_OS_NAME == osx && $MB_PYTHON_VERSION == $PYTHON_MAIN_VERSION ]]; then
+      pip install wheel twine
       python setup.py bdist_wheel
-      pip install twine
       twine upload --skip-existing -u sbraz dist/*.{whl,gz}
-    elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == $PYTHON_DEPLOY_VERSION ]]; then
+    elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == $PYTHON_MAIN_VERSION ]]; then
       # sdists generated on OSX have a problem with the accented test file
       # https://github.com/sbraz/pymediainfo/issues/67
       python setup.py sdist
@@ -72,5 +87,5 @@ env:
     - secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="
     - MEDIAINFO_VERSION: 20.09
     - LIBZEN_VERSION: 0.4.38
-    - UBUNTU_VERSION: 16.04
-    - PYTHON_DEPLOY_VERSION: 3.8
+    - UBUNTU_VERSION: 18.04
+    - PYTHON_MAIN_VERSION: *python_main_version

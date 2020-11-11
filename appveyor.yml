@@ -7,13 +7,21 @@ environment:
     secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
   matrix:
     - PYTHON: "C:/Python36"
+      TOXENV: py36
     - PYTHON: "C:/Python37"
+      TOXENV: py37
     - PYTHON: "C:/Python38"
+      TOXENV: py38
     - PYTHON: "C:/Python39"
+      TOXENV: py39
     - PYTHON: "C:/Python36-x64"
+      TOXENV: py36
     - PYTHON: "C:/Python37-x64"
+      TOXENV: py37
     - PYTHON: "C:/Python38-x64"
+      TOXENV: py38
     - PYTHON: "C:/Python39-x64"
+      TOXENV: py39
 install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
@@ -22,13 +30,15 @@ install:
     - ps: "unzip -o MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip LIBCURL.DLL"
     - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/${Env:MEDIAINFO_VERSION}/MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z"
     - ps: "7z -y x MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z MediaInfo.dll Developers/License.html"
+    # Required for tests to pass with tox, Windows looks for DLLs in PATH
+    - ps: "Copy-Item -Path MediaInfo.dll -Destination ${Env:PYTHON}"
     - "move MediaInfo.dll pymediainfo"
     - "move Developers\\License.html docs"
-    - "pip install --upgrade setuptools pytest twine wheel"
-    - "python setup.py install"
+    # TODO: remove the constraint when https://github.com/tox-dev/tox/issues/1550 is fixed
+    - "pip install --upgrade setuptools pytest tox==3.8.3 twine wheel"
 build_script:
   - "python setup.py bdist_wheel"
 test_script:
-  - "pytest"
+  - "tox"
 deploy_script:
   - ps: If ($env:APPVEYOR_REPO_TAG -eq "true") { Invoke-Expression "twine upload --skip-existing -u sbraz dist/*.whl" }
