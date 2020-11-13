@@ -8,7 +8,7 @@ addons:
 jobs:
   include:
     - python: &python_main_version 3.8
-      env: TOXENV=black,flake8,isort,mypy,pylint
+      env: TOXENV=docs,black,flake8,isort,mypy,pylint
     - python: 3.6
       env: TOXENV=py36
     - python: 3.7
