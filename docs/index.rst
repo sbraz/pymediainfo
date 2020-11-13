@@ -40,15 +40,20 @@ Getting information from an image
   from pymediainfo import MediaInfo
 
   media_info = MediaInfo.parse("/home/user/image.jpg")
-  for track in media_info.tracks:
-      if track.track_type == "Image":
-          print(f"{track.format} of {track.width}×{track.height} pixels.")
+  # Tracks can be accessed via the 'tracks' attribute or through shortcuts
+  # such as 'image_tracks', 'audio_tracks', 'video_tracks', etc.
+  general_track = media_info.general_tracks[0]
+  image_track = media_info.image_tracks[0]
+  print(
+      f"{image_track.format} of {image_track.width}×{image_track.height} pixels"
+      f" and {general_track.file_size} bytes."
+  )
 
 Will return something like:
 
 .. code-block:: none
 
-  JPEG of 828×828 pixels.
+  JPEG of 828×828 pixels and 19098 bytes.
 
 Getting information from a video
 --------------------------------

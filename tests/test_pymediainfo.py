@@ -368,3 +368,43 @@ class MediaInfoOutputTest(unittest.TestCase):
             os.path.join(data_dir, "sample.mp4"), output="General;%FileSize%"
         )
         self.assertEqual(media_info, "404567")
+
+
+class MediaInfoTrackShortcutsTests(unittest.TestCase):
+    def setUp(self):
+        self.mi_audio = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"))
+        self.mi_text = MediaInfo.parse(os.path.join(data_dir, "sample.mkv"))
+        self.mi_image = MediaInfo.parse(os.path.join(data_dir, "empty.gif"))
+        with open(os.path.join(data_dir, "other_track.xml")) as f:
+            self.mi_other = MediaInfo(f.read())
+
+    def test_empty_list(self):
+        self.assertEqual(self.mi_audio.text_tracks, [])
+
+    def test_general_tracks(self):
+        self.assertEqual(len(self.mi_audio.general_tracks), 1)
+        self.assertIsNotNone(self.mi_audio.general_tracks[0].file_name)
+
+    def test_video_tracks(self):
+        self.assertEqual(len(self.mi_audio.video_tracks), 1)
+        self.assertIsNotNone(self.mi_audio.video_tracks[0].display_aspect_ratio)
+
+    def test_audio_tracks(self):
+        self.assertEqual(len(self.mi_audio.audio_tracks), 1)
+        self.assertIsNotNone(self.mi_audio.audio_tracks[0].sampling_rate)
+
+    def test_text_tracks(self):
+        self.assertEqual(len(self.mi_text.text_tracks), 1)
+        self.assertEqual(self.mi_text.text_tracks[0].kind_of_stream, "Text")
+
+    def test_other_tracks(self):
+        self.assertEqual(len(self.mi_other.other_tracks), 2)
+        self.assertEqual(self.mi_other.other_tracks[0].type, "Time code")
+
+    def test_image_tracks(self):
+        self.assertEqual(len(self.mi_image.image_tracks), 1)
+        self.assertEqual(self.mi_image.image_tracks[0].width, 1)
+
+    def test_menu_tracks(self):
+        self.assertEqual(len(self.mi_text.menu_tracks), 1)
+        self.assertEqual(self.mi_text.menu_tracks[0].kind_of_stream, "Menu")

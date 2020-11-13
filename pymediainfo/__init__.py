@@ -10,7 +10,7 @@ import re
 import sys
 import warnings
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -25,7 +25,7 @@ class Track:
     An object associated with a media file track.
 
     Each :class:`Track` attribute corresponds to attributes parsed from MediaInfo's output.
-    All attributes are lower case. Attributes that are present several times such as Duration
+    All attributes are lower case. Attributes that are present several times such as `Duration`
     yield a second attribute starting with `other_` which is a list of all alternative
     attribute values.
 
@@ -38,7 +38,7 @@ class Track:
     <Track track_id='None', track_type='General'>
     >>> t.duration
     3000
-    >>> t.to_data()["other_duration"]
+    >>> t.other_duration
     ['3 s 0 ms', '3 s 0 ms', '3 s 0 ms',
         '00:00:03.000', '00:00:03.000']
     >>> type(t.non_existing)
@@ -166,6 +166,65 @@ class MediaInfo:
         for xml_track in xml_dom.iterfind(xpath):
             self.tracks.append(Track(xml_track))
 
+    def _tracks(self, track_type: str) -> List[Track]:
+        return [track for track in self.tracks if track.track_type == track_type]
+
+    @property
+    def general_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``General``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("General")
+
+    @property
+    def video_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``Video``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("Video")
+
+    @property
+    def audio_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``Audio``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("Audio")
+
+    @property
+    def text_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``Text``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("Text")
+
+    @property
+    def other_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``Other``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("Other")
+
+    @property
+    def image_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``Image``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("Image")
+
+    @property
+    def menu_tracks(self) -> List[Track]:
+        """
+        :return: All :class:`Track`\\s of type ``Menu``.
+        :rtype: list of :class:`Track`\\s
+        """
+        return self._tracks("Menu")
+
     @staticmethod
     def _normalize_filename(filename: Any) -> Any:
         # TODO: wait for https://github.com/python/typeshed/pull/4582 pylint: disable=fixme
@@ -264,6 +323,8 @@ class MediaInfo:
         """
         Checks whether media files can be analyzed using libmediainfo.
 
+        :param str library_file: path to the libmediainfo library, this should only be used if
+            the library cannot be auto-detected.
         :rtype: bool
         """
         try:

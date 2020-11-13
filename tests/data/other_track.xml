@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.09">
+  <File>
+    <track type="General">
+      <Complete_name>test.mxf</Complete_name>
+    </track>
+    <track type="Video">
+      <ID>2</ID>
+      <Format>MPEG Video</Format>
+      <Format_version>Version 2</Format_version>
+    </track>
+    <track type="Audio">
+      <ID>3</ID>
+      <Format>PCM</Format>
+    </track>
+    <track type="Other" typeorder="1">
+      <ID>1-Material</ID>
+      <Type>Time code</Type>
+      <Format>MXF TC</Format>
+      <Frame_rate>25.000 FPS</Frame_rate>
+      <Time_code_of_first_frame>00:00:00:00</Time_code_of_first_frame>
+      <Time_code_settings>Material Package</Time_code_settings>
+      <Time_code__striped>Yes</Time_code__striped>
+    </track>
+    <track type="Other" typeorder="2">
+      <ID>1-Source</ID>
+      <Type>Time code</Type>
+      <Format>MXF TC</Format>
+      <Frame_rate>25.000 FPS</Frame_rate>
+      <Time_code_of_first_frame>00:00:00:00</Time_code_of_first_frame>
+      <Time_code_settings>Source Package</Time_code_settings>
+      <Time_code__striped>Yes</Time_code__striped>
+    </track>
+  </File>
+</Mediainfo>
