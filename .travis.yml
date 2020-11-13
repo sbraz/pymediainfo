@@ -8,38 +8,45 @@ addons:
 jobs:
   include:
     - python: &python_main_version 3.8
-      env: TOXENV=docs,black,flake8,isort,mypy,pylint
+      env:
+        TOXENV: docs,black,flake8,isort,mypy,pylint
+        TOX_PARALLEL: "-p"
     - python: 3.6
-      env: TOXENV=py36
+      env:
+        TOXENV: py36
     - python: 3.7
-      env: TOXENV=py37
+      env:
+        TOXENV: py37
     - python: 3.8
-      env: TOXENV=py38
+      env:
+        TOXENV: py38
     - python: 3.9
-      env: TOXENV=py39
+      env:
+        TOXENV: py39
     - python: pypy3
-      env: TOXENV=pypy3
+      env:
+        TOXENV: pypy3
     - os: osx
       # Not required but makes Travis' output prettier
       language: generic
       env:
-        - MB_PYTHON_VERSION=3.6
-        - TOXENV=py36
+        MB_PYTHON_VERSION: 3.6
+        TOXENV: py36
     - os: osx
       language: generic
       env:
-        - MB_PYTHON_VERSION=3.7
-        - TOXENV=py37
+        MB_PYTHON_VERSION: 3.7
+        TOXENV: py37
     - os: osx
       language: generic
       env:
-        - MB_PYTHON_VERSION=3.8
-        - TOXENV=py38
+        MB_PYTHON_VERSION: 3.8
+        TOXENV: py38
     - os: osx
       language: generic
       env:
-        - MB_PYTHON_VERSION=3.9
-        - TOXENV=py39
+        MB_PYTHON_VERSION: 3.9
+        TOXENV: py39
 before_install: |
   if [ $TRAVIS_OS_NAME == osx ]; then
     git clone https://github.com/matthew-brett/multibuild
@@ -62,7 +69,7 @@ before_install: |
     popd
   fi
   pip install tox
-script: tox -p
+script: "tox $TOX_PARALLEL"
 notifications:
   email:
     on_success: change
@@ -89,3 +96,4 @@ env:
     - LIBZEN_VERSION: 0.4.38
     - UBUNTU_VERSION: 18.04
     - PYTHON_MAIN_VERSION: *python_main_version
+    - TOX_PARALLEL_NO_SPINNER: 1
