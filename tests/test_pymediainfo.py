@@ -142,7 +142,7 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
 @pytest.mark.internet
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self):
-        url = "https://github.com/sbraz/pymediainfo/raw/master/tests/data/sample.mkv"
+        url = "https://github.com/sbraz/pymediainfo/raw/v5.0/tests/data/sample.mkv"
         self.media_info = MediaInfo.parse(url)
 
     def test_parse_url(self):
