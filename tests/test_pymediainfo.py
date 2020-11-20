@@ -146,7 +146,7 @@ class MediaInfoURLTest(unittest.TestCase):
         self.media_info = MediaInfo.parse(url)
 
     def test_parse_url(self):
-        self.assertEqual(len(self.media_info.tracks), 2)
+        self.assertEqual(len(self.media_info.tracks), 3)
 
 
 class MediaInfoPathlibTest(unittest.TestCase):
