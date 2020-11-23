@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.09">
+  <File>
+    <track type="General">
+      <Count>331</Count>
+      <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+      <Kind_of_stream>General</Kind_of_stream>
+      <Kind_of_stream>General</Kind_of_stream>
+      <Stream_identifier>0</Stream_identifier>
+      <Count_of_video_streams>1</Count_of_video_streams>
+      <Count_of_audio_streams>1</Count_of_audio_streams>
+      <OtherCount>2</OtherCount>
+      <Video_Format_List>AVC</Video_Format_List>
+      <Video_Format_WithHint_List>AVC</Video_Format_WithHint_List>
+      <Codecs_Video>AVC</Codecs_Video>
+      <Audio_Format_List>AAC LC</Audio_Format_List>
+      <Audio_Format_WithHint_List>AAC LC</Audio_Format_WithHint_List>
+      <Audio_codecs>AAC LC</Audio_codecs>
+      <Other_Format_List>RTP / RTP</Other_Format_List>
+      <Other_Format_WithHint_List>RTP / RTP</Other_Format_WithHint_List>
+      <Other_Codec_List>RTP / RTP</Other_Codec_List>
+      <Other_Language_List>English / English</Other_Language_List>
+    </track>
+  </File>
+</Mediainfo>
