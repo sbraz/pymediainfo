@@ -56,11 +56,21 @@ class MediaInfoTest(unittest.TestCase):
                 break
 
     def test_track_other_attributes(self):
-        for track in self.media_info.tracks:
-            if track.track_type == "General":
-                self.assertEqual(5, len(track.other_file_size))
-                self.assertEqual(4, len(track.other_duration))
-                break
+        general_tracks = [
+            track for track in self.media_info.tracks if track.track_type == "General"
+        ]
+        general_track = general_tracks[0]
+        self.assertEqual(5, len(general_track.other_file_size))
+        self.assertEqual(
+            ["1mn 1s", "1mn 1s 394ms", "1mn 1s", "00:01:01.394"], general_track.other_duration
+        )
+
+    def test_track_existing_other_attributes(self):
+        with open(os.path.join(data_dir, "issue100.xml")) as f:
+            media_info = MediaInfo(f.read())
+        general_tracks = [track for track in media_info.tracks if track.track_type == "General"]
+        general_track = general_tracks[0]
+        self.assertEqual(general_track.other_format_list, "RTP / RTP")
 
     def test_load_mediainfo_from_string(self):
         self.assertEqual(4, len(self.media_info.tracks))

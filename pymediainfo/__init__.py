@@ -65,34 +65,38 @@ class Track:
 
     def __init__(self, xml_dom_fragment: ET.Element):
         self.track_type = xml_dom_fragment.attrib["type"]
+        repeated_attributes = []
         for elem in xml_dom_fragment:
             node_name = elem.tag.lower().strip().strip("_")
             if node_name == "id":
                 node_name = "track_id"
             node_value = elem.text
-            other_node_name = "other_%s" % node_name
             if getattr(self, node_name) is None:
                 setattr(self, node_name, node_value)
             else:
+                other_node_name = f"other_{node_name}"
+                repeated_attributes.append((node_name, other_node_name))
                 if getattr(self, other_node_name) is None:
                     setattr(self, other_node_name, [node_value])
                 else:
                     getattr(self, other_node_name).append(node_value)
 
-        for other in [d for d in self.__dict__.keys() if d.startswith("other_")]:
+        for primary_key, other_key in repeated_attributes:
             try:
-                primary = other.replace("other_", "")
                 # Attempt to convert the main value to int
-                setattr(self, primary, int(getattr(self, primary)))
+                # Usually, if an attribute is repeated, one of its value
+                # is an int and others are human-readable formats
+                setattr(self, primary_key, int(getattr(self, primary_key)))
             except ValueError:
-                # If it fails, try to set the main value to an int taken from other values
-                for value in getattr(self, other):
+                # If it fails, try to find a secondary value
+                # that is an int and swap it with the main value
+                for other_value in getattr(self, other_key):
                     try:
-                        current = getattr(self, primary)
+                        current = getattr(self, primary_key)
                         # Set the main value to an int
-                        setattr(self, primary, int(value))
+                        setattr(self, primary_key, int(other_value))
                         # Append its previous value to other values
-                        getattr(self, other).append(current)
+                        getattr(self, other_key).append(current)
                         break
                     except ValueError:
                         pass
