@@ -83,7 +83,7 @@ after_success: |
     # We only want to upload distributions from environments where
     # the actual test suite runs, and not just QA stuff like pylint & friends,
     # so we make sure it's a py-something tox environment
-    elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == $PYTHON_MAIN_VERSION && TOXENV == py?? ]]; then
+    elif [[ $TRAVIS_OS_NAME == linux && $TRAVIS_PYTHON_VERSION == $PYTHON_MAIN_VERSION && $TOXENV == py?? ]]; then
       # sdists generated on OSX have a problem with the accented test file
       # https://github.com/sbraz/pymediainfo/issues/67
       python setup.py sdist
