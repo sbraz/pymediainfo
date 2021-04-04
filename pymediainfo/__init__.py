@@ -231,9 +231,7 @@ class MediaInfo:
 
     @staticmethod
     def _normalize_filename(filename: Any) -> Any:
-        # TODO: wait for https://github.com/python/typeshed/pull/4582 pylint: disable=fixme
-        # to be included in a mypy release
-        if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):  # type: ignore
+        if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):
             return os.fspath(filename)
         if pathlib is not None and isinstance(filename, pathlib.PurePath):
             return str(filename)
