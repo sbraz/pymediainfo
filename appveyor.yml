@@ -2,6 +2,8 @@ image:
   # Currently required to support Python 3.9
   - Visual Studio 2019
 environment:
+  # Work around https://github.com/tox-dev/tox/issues/1550
+  PYTHONIOENCODING: utf-8
   MEDIAINFO_VERSION: 20.09
   TWINE_PASSWORD:
     secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
@@ -34,8 +36,7 @@ install:
     - ps: "Copy-Item -Path MediaInfo.dll -Destination ${Env:PYTHON}"
     - "move MediaInfo.dll pymediainfo"
     - "move Developers\\License.html docs"
-    # TODO: remove the constraint when https://github.com/tox-dev/tox/issues/1550 is fixed
-    - "pip install --upgrade setuptools tox==3.8.3 twine wheel"
+    - "pip install --upgrade setuptools tox twine wheel"
 build_script:
   - "python setup.py bdist_wheel"
 test_script:
