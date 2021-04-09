@@ -12,12 +12,15 @@ import warnings
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from pkg_resources import DistributionNotFound, get_distribution
+try:
+    from importlib.metadata import version, PackageNotFoundError  # noqa
+except ImportError:
+    from importlib_metadata import version, PackageNotFoundError  # noqa
 
 try:
-    __version__ = get_distribution("pymediainfo").version
-except DistributionNotFound:
-    pass
+    __version__ = version("pymediainfo")
+except PackageNotFoundError:
+    __version__ = ''
 
 
 class Track:

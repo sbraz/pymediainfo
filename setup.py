@@ -52,7 +52,7 @@ setup(
     use_scm_version=True,
     python_requires=">=3.6",
     setup_requires=["setuptools_scm"],
-    install_requires=["setuptools"],
+    install_requires=['importlib_metadata; python_version<"3.8"'],
     package_data={'pymediainfo': bin_files},
     cmdclass=cmdclass,
     classifiers=[

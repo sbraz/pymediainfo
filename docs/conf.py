@@ -17,7 +17,10 @@ import os
 import subprocess
 import sys
 
-import pkg_resources
+try:
+    from importlib.metadata import version  # noqa
+except ImportError:
+    from importlib_metadata import version  # noqa
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -66,7 +69,7 @@ author = 'Patrick Altman, Louis Sautier'
 # the repository hasn't been changed prior to installation).
 # https://github.com/pypa/setuptools_scm#usage-from-sphinx
 if os.environ.get("READTHEDOCS") == "True":
-    version = pkg_resources.get_distribution(project).version
+    version = version(project)
 else:
     # The project root is the parent directory
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
