@@ -20,7 +20,7 @@ except ImportError:
 try:
     __version__ = version("pymediainfo")
 except PackageNotFoundError:
-    __version__ = ''
+    __version__ = ""
 
 
 class Track:
