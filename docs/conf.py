@@ -17,6 +17,8 @@ import os
 import subprocess
 import sys
 
+import setuptools_scm
+
 try:
     from importlib import metadata
 except ImportError:
@@ -71,10 +73,8 @@ author = 'Patrick Altman, Louis Sautier'
 if os.environ.get("READTHEDOCS") == "True":
     version = metadata.version("pymediainfo")
 else:
-    # The project root is the parent directory
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    # Get the version from setup.py --version (inspired by jaraco.packaging)
-    version = subprocess.check_output([sys.executable, "setup.py", "--version"], cwd=root, universal_newlines=True).strip()
+    # fallback_root must be specified for this to work with PyPI tarballs
+    version = setuptools_scm.get_version(root="..", fallback_root="..", relative_to=__file__)
 # The full version, including alpha/beta/rc tags.
 release = version
 
