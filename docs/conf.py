@@ -14,10 +14,6 @@
 # serve to show the default.
 
 import os
-import subprocess
-import sys
-
-import setuptools_scm
 
 try:
     from importlib import metadata
@@ -73,6 +69,7 @@ author = 'Patrick Altman, Louis Sautier'
 if os.environ.get("READTHEDOCS") == "True":
     version = metadata.version("pymediainfo")
 else:
+    import setuptools_scm
     # fallback_root must be specified for this to work with PyPI tarballs
     version = setuptools_scm.get_version(root="..", fallback_root="..", relative_to=__file__)
 # The full version, including alpha/beta/rc tags.
