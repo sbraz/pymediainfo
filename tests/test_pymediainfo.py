@@ -5,6 +5,7 @@ import json
 import os
 import pathlib
 import pickle
+import tempfile
 import threading
 import unittest
 import xml
@@ -112,6 +113,15 @@ class MediaInfoLibraryTest(unittest.TestCase):
     def test_full_option(self):
         self.assertEqual(self.media_info.tracks[0].footersize, "59")
         self.assertEqual(self.non_full_mi.tracks[0].footersize, None)
+
+    def test_raises_on_nonexistent_library(self):  # pylint: disable=no-self-use
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            nonexistent_library = os.path.join(tmp_dir, "nonexistent-libmediainfo.so")
+            with pytest.raises(OSError) as exc:
+                MediaInfo.parse(
+                    os.path.join(data_dir, "sample.mp4"), library_file=nonexistent_library
+                )
+            assert rf"Failed to load library from {nonexistent_library}" in str(exc.value)
 
 
 class MediaInfoFileLikeTest(unittest.TestCase):

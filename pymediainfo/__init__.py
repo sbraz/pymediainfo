@@ -276,9 +276,26 @@ class MediaInfo:
         lib.MediaInfo_Close.argtypes = [ctypes.c_void_p]
         lib.MediaInfo_Close.restype = None
 
+    @staticmethod
+    def _get_library_paths(os_is_nt: bool) -> Tuple[str]:
+        if os_is_nt:
+            library_paths = ("MediaInfo.dll",)
+        elif sys.platform == "darwin":
+            library_paths = ("libmediainfo.0.dylib", "libmediainfo.dylib")
+        else:
+            library_paths = ("libmediainfo.so.0",)
+        script_dir = os.path.dirname(__file__)
+        # Look for the library file in the script folder
+        for library in library_paths:
+            absolute_library_path = os.path.join(script_dir, library)
+            if os.path.isfile(absolute_library_path):
+                # If we find it, don't try any other filename
+                library_paths = (absolute_library_path,)
+                break
+        return library_paths
+
     @classmethod
     def _get_library(
-        # pylint: disable=too-many-branches
         cls,
         library_file: Optional[str] = None,
     ) -> Tuple[Any, Any, str, Tuple[int, ...]]:
@@ -288,25 +305,13 @@ class MediaInfo:
         else:
             lib_type = ctypes.CDLL
         if library_file is None:
-            if os_is_nt:
-                library_names = ("MediaInfo.dll",)
-            elif sys.platform == "darwin":
-                library_names = ("libmediainfo.0.dylib", "libmediainfo.dylib")
-            else:
-                library_names = ("libmediainfo.so.0",)
-            script_dir = os.path.dirname(__file__)
-            # Look for the library file in the script folder
-            for library in library_names:
-                lib_path = os.path.join(script_dir, library)
-                if os.path.isfile(lib_path):
-                    # If we find it, don't try any other filename
-                    library_names = (lib_path,)
-                    break
+            library_paths = cls._get_library_paths(os_is_nt)
         else:
-            library_names = (library_file,)
-        for library in library_names:
+            library_paths = (library_file,)
+        exceptions = []
+        for library_path in library_paths:
             try:
-                lib = lib_type(library)
+                lib = lib_type(library_path)
                 cls._define_library_prototypes(lib)
                 # Without a handle, there might be problems when using concurrent threads
                 # https://github.com/sbraz/pymediainfo/issues/76#issuecomment-574759621
@@ -319,9 +324,13 @@ class MediaInfo:
                 else:
                     raise RuntimeError("Could not determine library version")
                 return (lib, handle, lib_version_str, lib_version)
-            except OSError:
-                pass
-        raise OSError("Failed to load library")
+            except OSError as exc:
+                exceptions.append(str(exc))
+        raise OSError(
+            "Failed to load library from {} - {}".format(
+                ", ".join(library_paths), ", ".join(exceptions)
+            )
+        )
 
     @classmethod
     def can_parse(cls, library_file: Optional[str] = None) -> bool:
