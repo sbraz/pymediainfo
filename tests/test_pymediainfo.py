@@ -1,10 +1,13 @@
 # pylint: disable=missing-module-docstring, missing-class-docstring, missing-function-docstring,
 # pylint: disable=protected-access
 
+import functools
+import http.server
 import json
 import os
 import pathlib
 import pickle
+import sys
 import tempfile
 import threading
 import unittest
@@ -159,14 +162,29 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
         self.assertEqual(len(self.media_info.tracks), 1)
 
 
-@pytest.mark.internet
+@pytest.mark.skipif(
+    sys.version_info < (3, 7),
+    reason="SimpleHTTPRequestHandler's 'directory' argument was added in Python 3.7",
+)
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self):
-        url = "https://github.com/sbraz/pymediainfo/raw/v5.0/tests/data/sample.mkv"
-        self.media_info = MediaInfo.parse(url)
+        HandlerClass = functools.partial(  # pylint: disable=invalid-name
+            http.server.SimpleHTTPRequestHandler,
+            directory=data_dir,
+        )
+        # Pick a random port so that parallel tests (e.g. via 'tox -p') do not clash
+        self.httpd = http.server.HTTPServer(("", 0), HandlerClass)
+        port = self.httpd.socket.getsockname()[1]
+        self.url = f"http://127.0.0.1:{port}/sample.mkv"
+        threading.Thread(target=self.httpd.serve_forever).start()
+
+    def tearDown(self):
+        self.httpd.shutdown()
+        self.httpd.server_close()
 
     def test_parse_url(self):
-        self.assertEqual(len(self.media_info.tracks), 3)
+        media_info = MediaInfo.parse(self.url)
+        self.assertEqual(len(media_info.tracks), 3)
 
 
 class MediaInfoPathlibTest(unittest.TestCase):
