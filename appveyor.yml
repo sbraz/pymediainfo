@@ -4,7 +4,7 @@ image:
 environment:
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
-  MEDIAINFO_VERSION: 21.03
+  MEDIAINFO_VERSION: 21.09
   TWINE_PASSWORD:
     secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
   matrix:
