@@ -37,7 +37,7 @@ def _get_library_version():
 
 class MediaInfoTest(unittest.TestCase):
     def setUp(self):
-        with open(os.path.join(data_dir, "sample.xml"), "r") as f:
+        with open(os.path.join(data_dir, "sample.xml"), "r", encoding="utf-8") as f:
             self.xml_data = f.read()
         self.media_info = MediaInfo(self.xml_data)
 
@@ -70,7 +70,7 @@ class MediaInfoTest(unittest.TestCase):
         )
 
     def test_track_existing_other_attributes(self):
-        with open(os.path.join(data_dir, "issue100.xml")) as f:
+        with open(os.path.join(data_dir, "issue100.xml"), encoding="utf-8") as f:
             media_info = MediaInfo(f.read())
         general_tracks = [track for track in media_info.tracks if track.track_type == "General"]
         general_track = general_tracks[0]
@@ -85,7 +85,7 @@ class MediaInfoTest(unittest.TestCase):
 
 class MediaInfoInvalidXMLTest(unittest.TestCase):
     def setUp(self):
-        with open(os.path.join(data_dir, "invalid.xml"), "r") as f:
+        with open(os.path.join(data_dir, "invalid.xml"), "r", encoding="utf-8") as f:
             self.xml_data = f.read()
 
     def test_parse_invalid_xml(self):
@@ -117,7 +117,7 @@ class MediaInfoLibraryTest(unittest.TestCase):
         self.assertEqual(self.media_info.tracks[0].footersize, "59")
         self.assertEqual(self.non_full_mi.tracks[0].footersize, None)
 
-    def test_raises_on_nonexistent_library(self):  # pylint: disable=no-self-use
+    def test_raises_on_nonexistent_library(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             nonexistent_library = os.path.join(tmp_dir, "nonexistent-libmediainfo.so")
             with pytest.raises(OSError) as exc:
@@ -128,16 +128,16 @@ class MediaInfoLibraryTest(unittest.TestCase):
 
 
 class MediaInfoFileLikeTest(unittest.TestCase):
-    def test_can_parse(self):  # pylint: disable=no-self-use
+    def test_can_parse(self):
         with open(os.path.join(data_dir, "sample.mp4"), "rb") as f:
             MediaInfo.parse(f)
 
     def test_raises_on_text_mode_even_with_text(self):
-        with open(os.path.join(data_dir, "sample.xml")) as f:
+        with open(os.path.join(data_dir, "sample.xml"), encoding="utf-8") as f:
             self.assertRaises(ValueError, MediaInfo.parse, f)
 
     def test_raises_on_text_mode(self):
-        with open(os.path.join(data_dir, "sample.mkv")) as f:
+        with open(os.path.join(data_dir, "sample.mkv"), encoding="utf-8") as f:
             self.assertRaises(ValueError, MediaInfo.parse, f)
 
 
@@ -413,7 +413,7 @@ class MediaInfoTrackShortcutsTests(unittest.TestCase):
         self.mi_audio = MediaInfo.parse(os.path.join(data_dir, "sample.mp4"))
         self.mi_text = MediaInfo.parse(os.path.join(data_dir, "sample.mkv"))
         self.mi_image = MediaInfo.parse(os.path.join(data_dir, "empty.gif"))
-        with open(os.path.join(data_dir, "other_track.xml")) as f:
+        with open(os.path.join(data_dir, "other_track.xml"), encoding="utf-8") as f:
             self.mi_other = MediaInfo(f.read())
 
     def test_empty_list(self):
