@@ -8,22 +8,26 @@ environment:
   TWINE_PASSWORD:
     secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
   matrix:
-    - PYTHON: "C:/Python36"
-      TOXENV: py36
     - PYTHON: "C:/Python37"
       TOXENV: py37
     - PYTHON: "C:/Python38"
       TOXENV: py38
     - PYTHON: "C:/Python39"
       TOXENV: py39
-    - PYTHON: "C:/Python36-x64"
-      TOXENV: py36
+    - PYTHON: "C:/Python310"
+      TOXENV: py310
+    - PYTHON: "C:/Python311"
+      TOXENV: py311
     - PYTHON: "C:/Python37-x64"
       TOXENV: py37
     - PYTHON: "C:/Python38-x64"
       TOXENV: py38
     - PYTHON: "C:/Python39-x64"
       TOXENV: py39
+    - PYTHON: "C:/Python310-x64"
+      TOXENV: py310
+    - PYTHON: "C:/Python311-x64"
+      TOXENV: py311
 install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"

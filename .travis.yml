@@ -7,13 +7,10 @@ addons:
     - libmms0
 jobs:
   include:
-    - python: &python_main_version 3.8
+    - python: &python_main_version 3.11
       env:
         TOXENV: docs,black,flake8,isort,mypy,pylint
         TOX_PARALLEL: "-p"
-    - python: 3.6
-      env:
-        TOXENV: py36
     - python: 3.7
       env:
         TOXENV: py37
@@ -23,16 +20,17 @@ jobs:
     - python: 3.9
       env:
         TOXENV: py39
+    - python: 3.10
+      env:
+        TOXENV: py310
+    - python: 3.11
+      env:
+        TOXENV: py311
     - python: pypy3
       env:
         TOXENV: pypy3
     - os: osx
       # Not required but makes Travis' output prettier
-      language: generic
-      env:
-        MB_PYTHON_VERSION: 3.6
-        TOXENV: py36
-    - os: osx
       language: generic
       env:
         MB_PYTHON_VERSION: 3.7
@@ -47,6 +45,16 @@ jobs:
       env:
         MB_PYTHON_VERSION: 3.9
         TOXENV: py39
+    - os: osx
+      language: generic
+      env:
+        MB_PYTHON_VERSION: 3.10
+        TOXENV: py310
+    - os: osx
+      language: generic
+      env:
+        MB_PYTHON_VERSION: 3.11
+        TOXENV: py311
 before_install: |
   if [ $TRAVIS_OS_NAME == osx ]; then
     git clone https://github.com/matthew-brett/multibuild
