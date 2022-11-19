@@ -1,5 +1,5 @@
 os: linux
-dist: bionic
+dist: jammy
 language: python
 addons:
   apt:
@@ -105,6 +105,6 @@ env:
     - secure: "WjxnZjhgG7SCFbtYNbCAv935y3GG1CBHKJZbjSag9dBNg41OF98Q4PjnK6KxQ68Avfsv8mTGn8FbbGyXU4J033khynMCDOPMo0MAKPVYTaon3GKXf9triyzuuFty5U0kydJyqQdiqpkJPgkOou19s/x1AesfBthUswS51kyWdeg="
     - MEDIAINFO_VERSION: 22.09
     - LIBZEN_VERSION: 0.4.39
-    - UBUNTU_VERSION: 18.04
+    - UBUNTU_VERSION: 22.04
     - PYTHON_MAIN_VERSION: *python_main_version
     - TOX_PARALLEL_NO_SPINNER: 1
