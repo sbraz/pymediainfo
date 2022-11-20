@@ -62,7 +62,7 @@ before_install: |
     source multibuild/common_utils.sh
     source multibuild/travis_steps.sh
     before_install
-    curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_i386+x86_64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
+    curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x86_64+arm64.tar.bz2 | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
     # Required for tests to pass with tox
     cp MediaInfoLib/libmediainfo.0.dylib /usr/local/lib
     mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
