@@ -1,34 +1,78 @@
-image:
-  # Currently required to support Python 3.9
-  - Visual Studio 2019
 environment:
+  LINUX_IMAGE: &linux_image Ubuntu2004
+  MACOS_IMAGE: &macos_image macos-monterey
+  WINDOWS_IMAGE: &windows_image Visual Studio 2022
+  LIBZEN_VERSION: 0.4.39
+  MEDIAINFO_VERSION: 22.09
+  UBUNTU_VERSION: 20.04
+  QA_PYTHON_VERSION: 3.11
+  # AppVeyor doesn't offer Python 3.11 on macOS yet
+  # https://github.com/appveyor/ci/issues/3858
+  DEPLOY_TOXENV: py310
+  PYPY_URL: https://downloads.python.org/pypy/pypy3.9-v7.3.9-linux64.tar.bz2
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
-  MEDIAINFO_VERSION: 22.09
+  TOX_PARALLEL_NO_SPINNER: 1
+  TWINE_USERNAME: "__token__"
   TWINE_PASSWORD:
-    secure: /EO8CxTxhQVNsGNZZvU51jjHwPW524rgddNlwOAyLoA=
+    secure: Jp2QpmAii1mmAXmotdXmPx5q679oMcRolziuu9m2pawkvOnRJtWMsI4uWiTiSbiw+HMbyyWwVpy+FiaPsHZxtM863PNNJidW1WDam4kn8EM+rznjgZfO9NSCcwZJU5jcTYCwuXo3+FnVNK5rvQ8QJ+Zu6WzH1Ysb+uJSz8e6xt7d7hoZbb9VH5bJC7tYrw+bH+TfA9juVpIYfCavozLLTDLqTcvPfJ+LXMPbiZO+oOztNsLRsviH2QAPXaLspXvCr6qUVH3A84KCdfSXCOZG0g/eYUZ6ilMLESe7DrYZrRc=
   matrix:
-    - PYTHON: "C:/Python37"
-      TOXENV: py37
-    - PYTHON: "C:/Python38"
-      TOXENV: py38
-    - PYTHON: "C:/Python39"
-      TOXENV: py39
-    - PYTHON: "C:/Python310"
-      TOXENV: py310
-    - PYTHON: "C:/Python311"
-      TOXENV: py311
-    - PYTHON: "C:/Python37-x64"
-      TOXENV: py37
-    - PYTHON: "C:/Python38-x64"
-      TOXENV: py38
-    - PYTHON: "C:/Python39-x64"
-      TOXENV: py39
-    - PYTHON: "C:/Python310-x64"
-      TOXENV: py310
-    - PYTHON: "C:/Python311-x64"
-      TOXENV: py311
-install:
+    - TOXENV: docs,black,flake8,isort,mypy,pylint
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: pypy3
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py37
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py38
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py39
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py310
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py311
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py38
+      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+    - TOXENV: py39
+      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+    - TOXENV: py310
+      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+    - TOXENV: py37
+      PYTHON: "C:/Python37"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py37
+      PYTHON: "C:/Python37-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py38
+      PYTHON: "C:/Python38"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py38
+      PYTHON: "C:/Python38-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py39
+      PYTHON: "C:/Python39"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py39
+      PYTHON: "C:/Python39-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py310
+      PYTHON: "C:/Python310"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py310
+      PYTHON: "C:/Python310-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py311
+      PYTHON: "C:/Python311"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py311
+      PYTHON: "C:/Python311-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+for:
+-
+  matrix:
+    only:
+    - APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+  install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
     - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
@@ -40,10 +84,86 @@ install:
     - ps: "Copy-Item -Path MediaInfo.dll -Destination ${Env:PYTHON}"
     - "move MediaInfo.dll pymediainfo"
     - "move Developers\\License.html docs"
-    - "pip install --upgrade setuptools tox twine wheel"
-build_script:
-  - "python setup.py bdist_wheel"
-test_script:
-  - "tox"
-deploy_script:
-  - ps: If ($env:APPVEYOR_REPO_TAG -eq "true") { Invoke-Expression "twine upload --skip-existing -u sbraz dist/*.whl" }
+    - "pip install tox"
+  build: off
+  test_script:
+    - "tox"
+  deploy_script:
+    - ps: |
+        If (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:TOXENV -eq $env:DEPLOY_TOXENV)) {
+          pip install twine wheel
+          python setup.py bdist_wheel
+          Invoke-Expression "twine upload --skip-existing dist/*.whl"
+        }
+-
+  matrix:
+    only:
+      - APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+  install: |
+    set -eo pipefail
+    PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
+    source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
+    pip install tox
+    curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x86_64+arm64.tar.bz2 \
+      | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
+    # Required for tests to pass with tox
+    cp MediaInfoLib/libmediainfo.0.dylib /usr/local/lib/
+  build: off
+  test_script:
+    - "tox"
+  deploy_script: |
+    set -eo pipefail
+    if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
+      mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
+      mv MediaInfoLib/License.html docs
+      pip install twine wheel
+      python setup.py bdist_wheel
+      twine upload --skip-existing dist/*.whl
+    fi
+-
+  matrix:
+    only:
+      - APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+  install: |
+    set -eo pipefail
+    if [[ $TOXENV =~ doc.* ]]; then
+      source "${HOME}/venv${QA_PYTHON_VERSION}/bin/activate"
+      pip install tox
+    else
+      if [[ $TOXENV == pypy3 ]]; then
+        pushd /tmp
+        curl -sS "$PYPY_URL" | tar xj
+        PATH="$(pwd)/pypy3.9-v7.3.9-linux64/bin/:$PATH"
+        python -m ensurepip
+        popd
+      else
+        PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
+        source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
+      fi
+      # "python -m pip" will work with the unpacked PyPy too, "pip" won't
+      python -m pip install tox
+      pushd /tmp
+      libzen_deb=libzen0v5_${LIBZEN_VERSION}-1_amd64.xUbuntu_${UBUNTU_VERSION}.deb
+      mediainfo_deb=libmediainfo0v5_${MEDIAINFO_VERSION}-1_amd64.xUbuntu_${UBUNTU_VERSION}.deb
+      curl -O "https://mediaarea.net/download/binary/libzen0/${LIBZEN_VERSION}/${libzen_deb}"
+      curl -O "https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/${mediainfo_deb}"
+      sudo apt-get -y install libmms0
+      sudo dpkg -i "${libzen_deb}" "${mediainfo_deb}"
+      popd
+    fi
+  build: off
+  test_script: |
+    if [[ $TOXENV =~ doc.* ]]; then
+      tox -p
+    else
+      # We want to see the progression of the tests so we can't run
+      # tox environments in parallel
+      tox
+    fi
+  deploy_script: |
+    set -eo pipefail
+    if [[ $APPVEYOR_REPO_TAG == "true" && ! $TOXENV =~ $DEPLOY_TOXENV ]]; then
+      pip install twine
+      python setup.py sdist
+      twine upload --skip-existing dist/*.gz
+    fi

@@ -13,9 +13,6 @@ pymediainfo
 .. image:: https://img.shields.io/pypi/implementation/pymediainfo.svg
   :target: https://pypi.org/project/pymediainfo
 
-.. image:: https://travis-ci.com/sbraz/pymediainfo.svg?branch=master
-  :target: https://travis-ci.com/sbraz/pymediainfo
-
 .. image:: https://ci.appveyor.com/api/projects/status/g15a2daem1oub57n/branch/master?svg=true
   :target: https://ci.appveyor.com/project/sbraz/pymediainfo
 
