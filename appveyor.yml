@@ -1,6 +1,6 @@
 environment:
   LINUX_IMAGE: &linux_image Ubuntu2004
-  MACOS_IMAGE: &macos_image macos-monterey
+  MACOS_IMAGE: &macos_image macos-catalina
   WINDOWS_IMAGE: &windows_image Visual Studio 2022
   LIBZEN_VERSION: 0.4.39
   MEDIAINFO_VERSION: 22.09
