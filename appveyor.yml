@@ -37,6 +37,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py310
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+    - TOXENV: py311
+      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py37
       PYTHON: "C:/Python37"
       APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
