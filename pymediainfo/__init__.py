@@ -362,6 +362,7 @@ class MediaInfo:
         full: bool = True,
         legacy_stream_display: bool = False,
         mediainfo_options: Optional[Dict[str, str]] = None,
+        buffer_size: Optional[int] = 64 * 1024,
         output: Optional[str] = None,
     ) -> Union[str, "MediaInfo"]:
         """
@@ -392,6 +393,8 @@ class MediaInfo:
             `MediaInfo_Option` function, for example: ``{"Language": "raw"}``.
             Do not use this parameter when running the method simultaneously from multiple threads,
             it will trigger a reset of all options which will cause inconsistencies or failures.
+        :param int buffer_size: size of the buffer used to read the file, in bytes. This is only
+            used when `filename` is a file-like object.
         :param str output: custom output format for MediaInfo, corresponds to the CLI's
             ``--Output`` parameter. Setting this causes the method to
             return a `str` instead of a :class:`MediaInfo` object.
@@ -467,7 +470,7 @@ class MediaInfo:
                 raise ValueError("File should be opened in binary mode")
             lib.MediaInfo_Open_Buffer_Init(handle, file_size, 0)
             while True:
-                buffer = filename.read(64 * 1024)
+                buffer = filename.read(buffer_size)
                 if buffer:
                     # https://github.com/MediaArea/MediaInfoLib/blob/v20.09/Source/MediaInfo/File__Analyze.h#L1429
                     # 4th bit = finished
