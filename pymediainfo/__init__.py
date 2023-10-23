@@ -362,8 +362,8 @@ class MediaInfo:
         full: bool = True,
         legacy_stream_display: bool = False,
         mediainfo_options: Optional[Dict[str, str]] = None,
-        buffer_size: Optional[int] = 64 * 1024,
         output: Optional[str] = None,
+        buffer_size: Optional[int] = 64 * 1024,
     ) -> Union[str, "MediaInfo"]:
         """
         Analyze a media file using libmediainfo.
