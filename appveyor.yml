@@ -1,15 +1,15 @@
 environment:
-  LINUX_IMAGE: &linux_image Ubuntu2004
+  LINUX_IMAGE: &linux_image Ubuntu2204
   MACOS_IMAGE: &macos_image macos-catalina
   WINDOWS_IMAGE: &windows_image Visual Studio 2022
-  LIBZEN_VERSION: 0.4.39
-  MEDIAINFO_VERSION: 22.09
-  UBUNTU_VERSION: 20.04
-  QA_PYTHON_VERSION: 3.11
-  # AppVeyor doesn't offer Python 3.11 on macOS yet
-  # https://github.com/appveyor/ci/issues/3858
-  DEPLOY_TOXENV: py310
-  PYPY_URL: https://downloads.python.org/pypy/pypy3.9-v7.3.9-linux64.tar.bz2
+  LIBZEN_VERSION: 0.4.41
+  MEDIAINFO_VERSION: 23.10
+  UBUNTU_VERSION: 22.04
+  QA_PYTHON_VERSION: 3.12
+  # Python 3.12 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3879
+  # Because of this, we can only deploy on 3.11
+  DEPLOY_TOXENV: py311
+  PYPY_URL: https://downloads.python.org/pypy/pypy3.10-v7.3.13-linux64.tar.bz2
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
   TOX_PARALLEL_NO_SPINNER: 1
@@ -30,6 +30,8 @@ environment:
     - TOXENV: py310
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: py311
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+    - TOXENV: py312
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: py38
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
@@ -135,7 +137,7 @@ for:
       if [[ $TOXENV == pypy3 ]]; then
         pushd /tmp
         curl -sS "$PYPY_URL" | tar xj
-        PATH="$(pwd)/pypy3.9-v7.3.9-linux64/bin/:$PATH"
+        PATH="$(pwd)/$(basename "$PYPY_URL" | sed -E 's/\.tar\.[^.]+$//')/bin/:$PATH"
         python -m ensurepip
         popd
       else
