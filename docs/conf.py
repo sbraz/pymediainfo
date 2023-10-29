@@ -15,6 +15,8 @@
 
 import os
 
+import setuptools_scm
+
 try:
     from importlib import metadata
 except ImportError:
@@ -57,21 +59,9 @@ project = 'pymediainfo'
 copyright = 'Patrick Altman, Louis Sautier'
 author = 'Patrick Altman, Louis Sautier'
 
-# We can't use setuptools_scm's version on Read the Docs because they alter
-# conf.py before running Sphinx, dirtying the repository, which results in
-# an incorrect version being computed.
-# https://github.com/pypa/setuptools_scm/issues/84
-# https://github.com/readthedocs/readthedocs.org/issues/2144
-# Instead, follow setuptools_scm's recommendation and rely on the
-# version of the installed package (which is correct because
-# the repository hasn't been changed prior to installation).
-# https://github.com/pypa/setuptools_scm#usage-from-sphinx
-if os.environ.get("READTHEDOCS") == "True":
-    version = metadata.version("pymediainfo")
-else:
-    import setuptools_scm
-    # fallback_root must be specified for this to work with PyPI tarballs
-    version = setuptools_scm.get_version(root="..", fallback_root="..", relative_to=__file__)
+# fallback_root must be specified for this to work with PyPI tarballs
+version = setuptools_scm.get_version(root="..", fallback_root="..", relative_to=__file__)
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
