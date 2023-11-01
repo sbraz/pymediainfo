@@ -71,6 +71,12 @@ environment:
     - TOXENV: py311
       PYTHON: "C:/Python311-x64"
       APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py312
+      PYTHON: "C:/Python312"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py312
+      PYTHON: "C:/Python312-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
 for:
 -
   matrix:
