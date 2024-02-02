@@ -283,7 +283,7 @@ class MediaInfo:
         elif sys.platform == "darwin":
             library_paths = ("libmediainfo.0.dylib", "libmediainfo.dylib")
         else:
-            library_paths = ("libmediainfo.so.0",)
+            library_paths = ("libmediainfo.so.0", "libmediainfo.so")
         script_dir = os.path.dirname(__file__)
         # Look for the library file in the script folder
         for library in library_paths:
