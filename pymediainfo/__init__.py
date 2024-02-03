@@ -279,7 +279,7 @@ class MediaInfo:
     @staticmethod
     def _get_library_paths(os_is_nt: bool) -> Tuple[str, ...]:
         if os_is_nt:
-            library_paths = ("MediaInfo.dll",)
+            library_paths: Tuple[str, ...] = ("MediaInfo.dll",)
         elif sys.platform == "darwin":
             library_paths = ("libmediainfo.0.dylib", "libmediainfo.dylib")
         else:
