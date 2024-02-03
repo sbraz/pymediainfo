@@ -277,7 +277,8 @@ class MediaInfo:
         lib.MediaInfo_Close.restype = None
 
     @staticmethod
-    def _get_library_paths(os_is_nt: bool) -> Tuple[str]:
+    def _get_library_paths(os_is_nt: bool) -> Tuple[str, ...]:
+        library_paths: Tuple[str, ...]
         if os_is_nt:
             library_paths = ("MediaInfo.dll",)
         elif sys.platform == "darwin":
