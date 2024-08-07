@@ -6,9 +6,7 @@ environment:
   MEDIAINFO_VERSION: 23.10
   UBUNTU_VERSION: 22.04
   QA_PYTHON_VERSION: 3.12
-  # Python 3.12 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3879
-  # Because of this, we can only deploy on 3.11
-  DEPLOY_TOXENV: py311
+  DEPLOY_TOXENV: py312
   PYPY_URL: https://downloads.python.org/pypy/pypy3.10-v7.3.13-linux64.tar.bz2
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
@@ -40,6 +38,8 @@ environment:
     - TOXENV: py310
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py311
+      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+    - TOXENV: py312
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py37
       PYTHON: "C:/Python37"
