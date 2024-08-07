@@ -4,4 +4,4 @@ all:
 
 .PHONY: qa
 qa:
-	tox -p -e "docs,black,flake8,isort,mypy,pylint"
+	tox -p -m qa
