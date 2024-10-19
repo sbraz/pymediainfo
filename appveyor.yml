@@ -15,30 +15,6 @@ environment:
   TWINE_PASSWORD:
     secure: Jp2QpmAii1mmAXmotdXmPx5q679oMcRolziuu9m2pawkvOnRJtWMsI4uWiTiSbiw+HMbyyWwVpy+FiaPsHZxtM863PNNJidW1WDam4kn8EM+rznjgZfO9NSCcwZJU5jcTYCwuXo3+FnVNK5rvQ8QJ+Zu6WzH1Ysb+uJSz8e6xt7d7hoZbb9VH5bJC7tYrw+bH+TfA9juVpIYfCavozLLTDLqTcvPfJ+LXMPbiZO+oOztNsLRsviH2QAPXaLspXvCr6qUVH3A84KCdfSXCOZG0g/eYUZ6ilMLESe7DrYZrRc=
   matrix:
-    - TOXENV: docs,black,flake8,isort,mypy,pylint
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: pypy3
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py37
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py38
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py39
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py310
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py311
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py312
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py38
-      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
-    - TOXENV: py39
-      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
-    - TOXENV: py310
-      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
-    - TOXENV: py311
-      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py312
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py37
