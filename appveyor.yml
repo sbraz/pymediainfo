@@ -155,7 +155,7 @@ for:
       popd
     fi
     curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_x86_64.zip
-    unzip MediaInfo_DLL_*_x86_64.zip -d x86_64
+    unzip MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_x86_64.zip -d x86_64
     curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_arm64.zip
     unzip MediaInfo_DLL_*_arm64.zip -d arm64
   build: off
