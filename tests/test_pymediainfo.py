@@ -210,7 +210,7 @@ class MediaInfoFilenameTypesTest(unittest.TestCase):
         self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
 
     def test_normalize_filename_pathlike(self) -> None:
-        class PathLikeObject(pathlib.Path):
+        class PathLikeObject(os.PathLike[str]):  # pylint: disable=too-few-public-methods
             def __fspath__(self) -> str:
                 return os.path.join(data_dir, "test.txt")
 

@@ -1,6 +1,7 @@
 """
 This module is a wrapper around the MediaInfo library.
 """
+
 from __future__ import annotations
 
 import ctypes
@@ -351,7 +352,8 @@ class MediaInfo:
     @overload
     @classmethod
     def parse(
-        # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-branches, too-many-statements
         cls,
         filename: Any,
         *,
@@ -364,13 +366,13 @@ class MediaInfo:
         mediainfo_options: dict[str, str] | None = None,
         output: str,
         buffer_size: int | None = 64 * 1024,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     @overload
     @classmethod
     def parse(
-        # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-branches, too-many-statements
         cls,
         filename: Any,
         *,
@@ -383,12 +385,12 @@ class MediaInfo:
         mediainfo_options: dict[str, str] | None = None,
         output: None = None,
         buffer_size: int | None = 64 * 1024,
-    ) -> MediaInfo:
-        ...
+    ) -> MediaInfo: ...
 
     @classmethod
     def parse(
-        # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-branches, too-many-statements
         cls,
         filename: Any,
         *,
