@@ -1,6 +1,6 @@
 environment:
   LINUX_IMAGE: &linux_image Ubuntu2204
-  MACOS_IMAGE: &macos_image macos-catalina
+  MACOS_IMAGE: &macos_image macos-monterey
   WINDOWS_IMAGE: &windows_image Visual Studio 2022
   LIBZEN_VERSION: 0.4.41
   MEDIAINFO_VERSION: 23.10
@@ -36,8 +36,6 @@ environment:
     - TOXENV: py311
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py312
-      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
-    - TOXENV: py313
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py39
       PYTHON: "C:/Python39"
@@ -77,7 +75,8 @@ for:
   install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
-    - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64; SET PLATFORM_WHEEL=win_amd64) ELSE (SET ARCH=i386; SET PLATFORM_WHEEL=win32)"
+    - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
+    - "IF %PYTHON:~-4% == -x64 (SET PLATFORM_WHEEL=win_amd64) ELSE (SET PLATFORM_WHEEL=win32)"
     - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/${Env:MEDIAINFO_VERSION}/MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip"
     - ps: "unzip -o MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip LIBCURL.DLL"
     - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/${Env:MEDIAINFO_VERSION}/MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z"
