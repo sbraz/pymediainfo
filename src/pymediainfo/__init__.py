@@ -1,7 +1,8 @@
-# vim: set fileencoding=utf-8 :
 """
 This module is a wrapper around the MediaInfo library.
 """
+from __future__ import annotations
+
 import ctypes
 import json
 import os
@@ -10,12 +11,8 @@ import re
 import sys
 import warnings
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata  # type: ignore
+from importlib import metadata
+from typing import Any, overload
 
 try:
     __version__ = metadata.version("pymediainfo")
@@ -50,23 +47,7 @@ class Track:
     All available attributes can be obtained by calling :func:`to_data`.
     """
 
-    def __eq__(self, other):  # type: ignore
-        return self.__dict__ == other.__dict__
-
-    def __getattribute__(self, name):  # type: ignore
-        try:
-            return object.__getattribute__(self, name)
-        except AttributeError:
-            pass
-        return None
-
-    def __getstate__(self):  # type: ignore
-        return self.__dict__
-
-    def __setstate__(self, state):  # type: ignore
-        self.__dict__ = state
-
-    def __init__(self, xml_dom_fragment: ET.Element):
+    def __init__(self, xml_dom_fragment: ET.Element) -> None:
         self.track_type = xml_dom_fragment.attrib["type"]
         repeated_attributes = []
         for elem in xml_dom_fragment:
@@ -104,10 +85,28 @@ class Track:
                     except ValueError:
                         pass
 
-    def __repr__(self):  # type: ignore
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Track):
+            return False
+        return self.__dict__ == other.__dict__
+
+    def __getattribute__(self, name: str) -> Any:
+        try:
+            return object.__getattribute__(self, name)
+        except AttributeError:
+            pass
+        return None
+
+    def __getstate__(self) -> dict[str, Any]:
+        return self.__dict__
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        self.__dict__ = state
+
+    def __repr__(self) -> str:
         return "<Track track_id='{}', track_type='{}'>".format(self.track_id, self.track_type)
 
-    def to_data(self) -> Dict[str, Any]:
+    def to_data(self) -> dict[str, Any]:
         """
         Returns a dict representation of the track attributes.
 
@@ -157,10 +156,7 @@ class MediaInfo:
         <Track track_id='1', track_type='Text'>
     """
 
-    def __eq__(self, other):  # type: ignore
-        return self.tracks == other.tracks
-
-    def __init__(self, xml: str, encoding_errors: str = "strict"):
+    def __init__(self, xml: str, encoding_errors: str = "strict") -> None:
         xml_dom = ET.fromstring(xml.encode("utf-8", encoding_errors))
         self.tracks = []
         # This is the case for libmediainfo < 18.03
@@ -173,11 +169,16 @@ class MediaInfo:
         for xml_track in xml_dom.iterfind(xpath):
             self.tracks.append(Track(xml_track))
 
-    def _tracks(self, track_type: str) -> List[Track]:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, MediaInfo):
+            return False
+        return self.tracks == other.tracks
+
+    def _tracks(self, track_type: str) -> list[Track]:
         return [track for track in self.tracks if track.track_type == track_type]
 
     @property
-    def general_tracks(self) -> List[Track]:
+    def general_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``General``.
         :rtype: list of :class:`Track`\\s
@@ -185,7 +186,7 @@ class MediaInfo:
         return self._tracks("General")
 
     @property
-    def video_tracks(self) -> List[Track]:
+    def video_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``Video``.
         :rtype: list of :class:`Track`\\s
@@ -193,7 +194,7 @@ class MediaInfo:
         return self._tracks("Video")
 
     @property
-    def audio_tracks(self) -> List[Track]:
+    def audio_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``Audio``.
         :rtype: list of :class:`Track`\\s
@@ -201,7 +202,7 @@ class MediaInfo:
         return self._tracks("Audio")
 
     @property
-    def text_tracks(self) -> List[Track]:
+    def text_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``Text``.
         :rtype: list of :class:`Track`\\s
@@ -209,7 +210,7 @@ class MediaInfo:
         return self._tracks("Text")
 
     @property
-    def other_tracks(self) -> List[Track]:
+    def other_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``Other``.
         :rtype: list of :class:`Track`\\s
@@ -217,7 +218,7 @@ class MediaInfo:
         return self._tracks("Other")
 
     @property
-    def image_tracks(self) -> List[Track]:
+    def image_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``Image``.
         :rtype: list of :class:`Track`\\s
@@ -225,7 +226,7 @@ class MediaInfo:
         return self._tracks("Image")
 
     @property
-    def menu_tracks(self) -> List[Track]:
+    def menu_tracks(self) -> list[Track]:
         """
         :return: All :class:`Track`\\s of type ``Menu``.
         :rtype: list of :class:`Track`\\s
@@ -277,8 +278,8 @@ class MediaInfo:
         lib.MediaInfo_Close.restype = None
 
     @staticmethod
-    def _get_library_paths(os_is_nt: bool) -> Tuple[str, ...]:
-        library_paths: Tuple[str, ...]
+    def _get_library_paths(os_is_nt: bool) -> tuple[str, ...]:
+        library_paths: tuple[str, ...]
         if os_is_nt:
             library_paths = ("MediaInfo.dll",)
         elif sys.platform == "darwin":
@@ -298,13 +299,10 @@ class MediaInfo:
     @classmethod
     def _get_library(
         cls,
-        library_file: Optional[str] = None,
-    ) -> Tuple[Any, Any, str, Tuple[int, ...]]:
+        library_file: str | None = None,
+    ) -> tuple[Any, Any, str, tuple[int, ...]]:
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
-        if os_is_nt:
-            lib_type = ctypes.WinDLL  # type: ignore
-        else:
-            lib_type = ctypes.CDLL
+        lib_type = ctypes.WinDLL if os_is_nt else ctypes.CDLL  # type: ignore[attr-defined]
         if library_file is None:
             library_paths = cls._get_library_paths(os_is_nt)
         else:
@@ -334,7 +332,7 @@ class MediaInfo:
         )
 
     @classmethod
-    def can_parse(cls, library_file: Optional[str] = None) -> bool:
+    def can_parse(cls, library_file: str | None = None) -> bool:
         """
         Checks whether media files can be analyzed using libmediainfo.
 
@@ -350,22 +348,60 @@ class MediaInfo:
         except Exception:  # pylint: disable=broad-except
             return False
 
+    @overload
     @classmethod
     def parse(
-        # pylint: disable=too-many-statements
-        # pylint: disable=too-many-branches, too-many-locals, too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
         cls,
         filename: Any,
-        library_file: Optional[str] = None,
+        *,
+        library_file: str | None = None,
         cover_data: bool = False,
         encoding_errors: str = "strict",
         parse_speed: float = 0.5,
         full: bool = True,
         legacy_stream_display: bool = False,
-        mediainfo_options: Optional[Dict[str, str]] = None,
-        output: Optional[str] = None,
-        buffer_size: Optional[int] = 64 * 1024,
-    ) -> Union[str, "MediaInfo"]:
+        mediainfo_options: dict[str, str] | None = None,
+        output: str,
+        buffer_size: int | None = 64 * 1024,
+    ) -> str:
+        ...
+
+    @overload
+    @classmethod
+    def parse(
+        # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+        cls,
+        filename: Any,
+        *,
+        library_file: str | None = None,
+        cover_data: bool = False,
+        encoding_errors: str = "strict",
+        parse_speed: float = 0.5,
+        full: bool = True,
+        legacy_stream_display: bool = False,
+        mediainfo_options: dict[str, str] | None = None,
+        output: None = None,
+        buffer_size: int | None = 64 * 1024,
+    ) -> MediaInfo:
+        ...
+
+    @classmethod
+    def parse(
+        # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+        cls,
+        filename: Any,
+        *,
+        library_file: str | None = None,
+        cover_data: bool = False,
+        encoding_errors: str = "strict",
+        parse_speed: float = 0.5,
+        full: bool = True,
+        legacy_stream_display: bool = False,
+        mediainfo_options: dict[str, str] | None = None,
+        output: str | None = None,
+        buffer_size: int | None = 64 * 1024,
+    ) -> MediaInfo | str:
         """
         Analyze a media file using libmediainfo.
 
@@ -515,7 +551,7 @@ class MediaInfo:
             return cls(info, encoding_errors)
         return info
 
-    def to_data(self) -> Dict[str, Any]:
+    def to_data(self) -> dict[str, Any]:
         """
         Returns a dict representation of the object's :py:class:`Tracks <Track>`.
 
