@@ -1,0 +1,199 @@
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/
+[build-system]
+requires = ["pdm-backend", "wheel>=0.42"]
+build-backend = "pdm.backend"
+
+[project]
+name = "pymediainfo"
+description = "A Python wrapper for the mediainfo library."
+authors = [
+    {name = "Louis Sautier", email = "sautier.louis@gmail.com"},
+]
+readme = "README.rst"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+requires-python = ">=3.9"
+dependencies = [
+]
+
+[project.optional-dependencies]
+tests = [
+    "pytest>=6",
+    "pytest-cov",
+    "pytest-xdist",
+    "coverage[toml]>=7.2",
+]
+docs = [
+    "alabaster",
+    "setuptools_scm",
+    "sphinx",
+]
+dev = [
+    "ipython",
+    "mypy>=1.0",
+    "black",
+    "isort",
+    "flake8",
+    "pylint",
+]
+
+[project.urls]
+Homepage = "https://github.com/sbraz/pymediainfo"
+Documentation = "https://pymediainfo.readthedocs.io/"
+Bugs = "https://github.com/sbraz/pymediainfo/issues"
+
+
+# https://pdm-project.org/latest/
+[tool.pdm.version]
+source = "scm"
+
+[tool.pdm.build]
+source-includes = ["scripts/", "tests/"]
+
+#[tool.pdm.scripts.lint]
+#help = "Lint code"
+#cmd = "pre-commit run --all-files"
+
+[tool.pdm.scripts.types]
+help = "Check type hints"
+cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:src tests}"
+
+[tool.pdm.scripts.docs]
+help = "Build and test documentation"
+composite = [
+  "sphinx-build -W --keep-going --color -b html docs docs/_build",
+  "sphinx-build -W --keep-going --color -b linkcheck docs docs/_build",
+#  "sphinx-build -W --keep-going --color -b doctest docs docs/_build",
+]
+
+[tool.pdm.scripts.test-nocov]
+help = "Run tests without coverage"
+cmd = "pytest {args:-n auto}"
+
+[tool.pdm.scripts.test]
+help = "Run tests with coverage"
+cmd = "pytest --cov --cov-report=term-missing --cov-config=pyproject.toml {args:-n auto}"
+
+
+# https://coverage.readthedocs.io/en/stable/
+[tool.coverage.run]
+source_pkgs = ["pymediainfo", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/pymediainfo/_version.py",
+]
+
+[tool.coverage.paths]
+pymediainfo = ["src/pymediainfo", "*/pymediainfo/src/pymediainfo"]
+tests = ["tests", "*/pymediainfo/tests"]
+
+[tool.coverage.report]
+exclude_also = [
+  "# pragma: no.cover",
+  "# pragma: no.branch",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+
+# https://docs.astral.sh/ruff/
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+exclude = [
+    "tests/data/*",
+    "_version.py",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ISC001",  # conflict with `ruff format`
+    "D203",    # pydocstyle
+    "D105",
+    "D107",
+    "N802",    # pep8-naming
+    "N803",
+    "N806",
+    "ANN101",  # flake8-annotations
+    "ANN102",
+    "ANN401",
+    "ERA001",  # eradicate
+    "G004",    # flake8-logging-format
+    "TD",      # flake8-todos
+    "COM812",  # flake8-commas
+    "PTH123",  # flake8-use-pathlib
+    "SIM103",  # flake8-simplify
+    "PLR0913", # pylint
+    "PLR2004",
+    "PLR0912", # refactor
+    "PLR0915",
+    "PERF203", # Perflint
+    "PD901",   # pandas-vet
+    ### to be removed
+    "C901",    # mccabe
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "D104"]
+"**/tests/*" = [
+    "D",
+    "S",
+    "RUF012",
+    "N999",
+    "E402",
+    "INP001",
+    "PTH",
+    "T201",
+    "ANN",
+    "SLF",
+    "FBT",
+]
+"**/scripts/*" = ["INP001"]
+"**/docs/*" = [
+    "A001",
+    "D100",
+    "INP001",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+# https://docs.astral.sh/ruff/formatter/
+[tool.ruff.format]
+docstring-code-format = true
+
+
+# https://mypy.readthedocs.io/en/stable/config_file.html
+[tool.mypy]
+# global-only flags
+pretty = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["pymediainfo.*"]
+strict = true
+
+
+# https://github.com/crate-ci/typos/blob/master/docs/reference.md
+[tool.typos.default]
+extend-ignore-re = [
+    "(?Rm)^.*#\\s*spellchecker:\\s*disable-line$",
+    "#\\s*spellchecker:off\\s*\\n.*\\n\\s*#\\s*spellchecker:on"
+]
