@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: T201
 """
 a demo that shows how to call pymediainfo
 """

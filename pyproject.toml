@@ -1,0 +1,84 @@
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/
+[build-system]
+requires = ["pdm-backend", "wheel>=0.42"]
+build-backend = "pdm.backend"
+
+[project]
+name = "pymediainfo"
+description = "A Python wrapper for the MediaInfo library."
+authors = [
+    {name = "Louis Sautier", email = "sautier.louis@gmail.com"},
+]
+readme = "README.rst"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+requires-python = ">=3.9"
+dependencies = [
+]
+
+[project.optional-dependencies]
+tests = [
+    "pytest>=6",
+    "pytest-cov",
+    "pytest-xdist",
+]
+docs = [
+    "alabaster",
+    "setuptools_scm",
+    "sphinx",
+]
+dev = [
+    "ipython",
+    "mypy>=1.0",
+    "black",
+    "isort",
+    "flake8",
+    "pylint",
+]
+
+[project.urls]
+Homepage = "https://github.com/sbraz/pymediainfo"
+Documentation = "https://pymediainfo.readthedocs.io/"
+Bugs = "https://github.com/sbraz/pymediainfo/issues"
+
+
+# https://pdm-project.org/latest/
+[tool.pdm.version]
+source = "scm"
+
+[tool.pdm.build]
+source-includes = ["docs/", "scripts/demo.py", "tests/"]
+
+[tool.pdm.scripts.types]
+help = "Check type hints"
+cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:src tests}"
+
+
+# https://mypy.readthedocs.io/en/stable/config_file.html
+[tool.mypy]
+# global-only flags
+pretty = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["pymediainfo.*"]
+strict = true
+
+
+[tool.pytest.ini_options]
+addopts = "-vv -r a"

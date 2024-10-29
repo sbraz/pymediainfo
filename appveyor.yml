@@ -1,14 +1,12 @@
 environment:
   LINUX_IMAGE: &linux_image Ubuntu2204
-  MACOS_IMAGE: &macos_image macos-catalina
+  MACOS_IMAGE: &macos_image macos-monterey
   WINDOWS_IMAGE: &windows_image Visual Studio 2022
-  LIBZEN_VERSION: 0.4.41
   MEDIAINFO_VERSION: 23.10
-  UBUNTU_VERSION: 22.04
   QA_PYTHON_VERSION: 3.12
-  # Python 3.12 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3879
-  # Because of this, we can only deploy on 3.11
-  DEPLOY_TOXENV: py311
+  # Python 3.13 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3927
+  # Because of this, we can only deploy on 3.12
+  DEPLOY_TOXENV: py312
   PYPY_URL: https://downloads.python.org/pypy/pypy3.10-v7.3.13-linux64.tar.bz2
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
@@ -20,10 +18,6 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: pypy3
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py37
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py38
-      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: py39
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: py310
@@ -32,26 +26,16 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: py312
       APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
-    - TOXENV: py38
-      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
+    - TOXENV: py313
+      APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
     - TOXENV: py39
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py310
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py311
       APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
-    - TOXENV: py37
-      PYTHON: "C:/Python37"
-      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
-    - TOXENV: py37
-      PYTHON: "C:/Python37-x64"
-      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
-    - TOXENV: py38
-      PYTHON: "C:/Python38"
-      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
-    - TOXENV: py38
-      PYTHON: "C:/Python38-x64"
-      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py312
+      APPVEYOR_BUILD_WORKER_IMAGE: *macos_image
     - TOXENV: py39
       PYTHON: "C:/Python39"
       APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
@@ -76,6 +60,12 @@ environment:
     - TOXENV: py312
       PYTHON: "C:/Python312-x64"
       APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py313
+      PYTHON: "C:/Python313"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+    - TOXENV: py313
+      PYTHON: "C:/Python313-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
 for:
 -
   matrix:
@@ -85,6 +75,7 @@ for:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
     - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
+    - "IF %PYTHON:~-4% == -x64 (SET PLATFORM_WHEEL=win_amd64) ELSE (SET PLATFORM_WHEEL=win32)"
     - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/${Env:MEDIAINFO_VERSION}/MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip"
     - ps: "unzip -o MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip LIBCURL.DLL"
     - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/${Env:MEDIAINFO_VERSION}/MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z"
@@ -100,8 +91,9 @@ for:
   deploy_script:
     - ps: |
         If (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:TOXENV -eq $env:DEPLOY_TOXENV)) {
-          pip install twine wheel
-          python setup.py bdist_wheel
+          pip install twine wheel pdm
+          pdm build --no-sdist
+          wheel tags --remove --platform-tag=${Env:PLATFORM_WHEEL} dist/*-py3-none-any.whl
           Invoke-Expression "twine upload --skip-existing dist/*.whl"
         }
 -
@@ -125,8 +117,9 @@ for:
     if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
       mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
       mv MediaInfoLib/License.html docs
-      pip install twine wheel
-      python setup.py bdist_wheel
+      pip install twine wheel pdm
+      pdm build --no-sdist
+      wheel tags --remove --platform-tag=macosx-10.10-x86_64-macosx-11-universal2 dist/*-py3-none-any.whl
       twine upload --skip-existing dist/*.whl
     fi
 -
@@ -151,20 +144,18 @@ for:
       fi
       # "python -m pip" will work with the unpacked PyPy too, "pip" won't
       python -m pip install tox
-      pushd /tmp
-      libzen_deb=libzen0v5_${LIBZEN_VERSION}-1_amd64.xUbuntu_${UBUNTU_VERSION}.deb
-      mediainfo_deb=libmediainfo0v5_${MEDIAINFO_VERSION}-1_amd64.xUbuntu_${UBUNTU_VERSION}.deb
-      curl -O "https://mediaarea.net/download/binary/libzen0/${LIBZEN_VERSION}/${libzen_deb}"
-      curl -O "https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/${mediainfo_deb}"
-      sudo apt-get -y install libmms0
-      sudo dpkg -i "${libzen_deb}" "${mediainfo_deb}"
-      popd
+      curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_x86_64.zip
+      unzip MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_x86_64.zip -d x86_64
+      curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_arm64.zip
+      unzip MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_arm64.zip -d arm64
     fi
   build: off
   test_script: |
     if [[ $TOXENV =~ doc.* ]]; then
       TOX_PARALLEL_NO_SPINNER=1 tox -p
     else
+      # Use the previously downloaded library
+      export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:x86_64/lib/"
       # We want to see the progression of the tests so we can't run
       # tox environments in parallel
       tox
@@ -172,7 +163,21 @@ for:
   deploy_script: |
     set -eo pipefail
     if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
-      pip install twine
-      python setup.py sdist
-      twine upload --skip-existing dist/*.gz
+      pip install twine wheel pdm
+      # source distribution
+      pdm build --no-wheel
+
+      # wheels
+      mv x86_64/LICENSE docs
+      # wheel x86_64
+      cp x86_64/lib/libmediainfo.so.0 pymediainfo/libmediainfo.so.0
+      pdm build --no-sdist
+      wheel tags --remove --platform-tag=manylinux_2_34-x86_64 dist/*-py3-none-any.whl
+      # wheel arm64
+      mv -f arm64/lib/libmediainfo.so.0 pymediainfo/libmediainfo.so.0
+      pdm build --no-sdist
+      wheel tags --remove --platform-tag=manylinux_2_34-arm64 dist/*-py3-none-any.whl
+
+      # upload
+      twine upload --skip-existing dist/*.gz dist/*.whl
     fi

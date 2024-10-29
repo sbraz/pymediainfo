@@ -1,5 +1,0 @@
-exclude .* MANIFEST.in
-graft tests
-graft docs
-global-exclude __pycache__
-global-exclude *.py[cod]
