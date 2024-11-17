@@ -12,7 +12,6 @@ environment:
   PYPY_URL: https://downloads.python.org/pypy/pypy3.10-v7.3.13-linux64.tar.bz2
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
-  TOX_PARALLEL_NO_SPINNER: 1
   TWINE_USERNAME: "__token__"
   TWINE_PASSWORD:
     secure: Jp2QpmAii1mmAXmotdXmPx5q679oMcRolziuu9m2pawkvOnRJtWMsI4uWiTiSbiw+HMbyyWwVpy+FiaPsHZxtM863PNNJidW1WDam4kn8EM+rznjgZfO9NSCcwZJU5jcTYCwuXo3+FnVNK5rvQ8QJ+Zu6WzH1Ysb+uJSz8e6xt7d7hoZbb9VH5bJC7tYrw+bH+TfA9juVpIYfCavozLLTDLqTcvPfJ+LXMPbiZO+oOztNsLRsviH2QAPXaLspXvCr6qUVH3A84KCdfSXCOZG0g/eYUZ6ilMLESe7DrYZrRc=
@@ -164,7 +163,7 @@ for:
   build: off
   test_script: |
     if [[ $TOXENV =~ doc.* ]]; then
-      tox -p
+      TOX_PARALLEL_NO_SPINNER=1 tox -p
     else
       # We want to see the progression of the tests so we can't run
       # tox environments in parallel
