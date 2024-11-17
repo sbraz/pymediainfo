@@ -3,7 +3,7 @@ environment:
   MACOS_IMAGE: &macos_image macos-catalina
   WINDOWS_IMAGE: &windows_image Visual Studio 2022
   LIBZEN_VERSION: 0.4.41
-  MEDIAINFO_VERSION: 23.10
+  MEDIAINFO_VERSION: 24.11
   UBUNTU_VERSION: 22.04
   QA_PYTHON_VERSION: 3.12
   # Python 3.12 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3879
