@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # ruff: noqa: T201
-"""
-a demo that shows how to call pymediainfo
-"""
+"""A demo that shows how to call pymediainfo."""
 
 import sys
 from pprint import pprint

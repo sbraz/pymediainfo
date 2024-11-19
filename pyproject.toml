@@ -61,12 +61,96 @@ Bugs = "https://github.com/sbraz/pymediainfo/issues"
 [tool.pdm.version]
 source = "scm"
 
+[tool.pdm.dev-dependencies]
+download_library = ["wheel>=0.44", "requests", "tqdm"]
+
 [tool.pdm.build]
 source-includes = ["scripts/", "tests/"]
 
 [tool.pdm.scripts.types]
 help = "Check type hints"
 cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:src tests}"
+
+[tool.pdm.scripts.docs]
+help = "Build and test documentation"
+composite = [
+  "sphinx-build -W --keep-going --color -b html docs docs/_build",
+  "sphinx-build -W --keep-going --color -b linkcheck docs docs/_build",
+#  "sphinx-build -W --keep-going --color -b doctest docs docs/_build",
+]
+
+[tool.pdm.scripts.test-nocov]
+help = "Run tests without coverage"
+cmd = "pytest {args:-n auto}"
+
+[tool.pdm.scripts.test]
+help = "Run tests with coverage"
+cmd = "pytest --cov --cov-report=term-missing --cov-config=pyproject.toml {args:-n auto}"
+
+[tool.pdm.scripts.download_library]
+help = "Download mediainfo library"
+cmd = "python scripts/download_library.py {args:-c --auto}"
+
+[tool.pdm.scripts.clean_library]
+help = "Clean mediainfo library"
+cmd = "python scripts/download_library.py -c"
+
+[tool.pdm.scripts.tag_wheel]
+help = "Tag the wheel for a specific platform"
+shell = "python -m wheel tags --remove --platform-tag={args} dist/*-py3-none-any.whl 2> /dev/null"
+
+[tool.pdm.scripts.build_linux_x86_64]
+help = "Build wheel with bundled library for Linux x86_64"
+composite = [
+  "download_library -c -p linux -a x86_64",
+  "pdm build --no-sdist",
+  "tag_wheel manylinux_2_34-x86_64",
+]
+
+[tool.pdm.scripts.build_linux_arm64]
+help = "Build wheel with bundled library for Linux arm64"
+composite = [
+  "download_library -c -p linux -a arm64",
+  "pdm build --no-sdist",
+  "tag_wheel manylinux_2_34-arm64",
+]
+
+[tool.pdm.scripts.build_win32_x86_64]
+help = "Build wheel with bundled library for Windows x64"
+composite = [
+  "download_library -c -p win32 -a x86_64",
+  "pdm build --no-sdist",
+  "tag_wheel win_amd64",
+]
+
+[tool.pdm.scripts.build_win32_i386]
+help = "Build wheel with bundled library for Windows x32"
+composite = [
+  "download_library -c -p win32 -a i386",
+  "pdm build --no-sdist",
+  "tag_wheel win32",
+]
+
+[tool.pdm.scripts.build_darwin]
+help = "Build wheel with bundled library for MacOS x86_64 and arm64"
+composite = [
+  "download_library -c -p darwin -a x86_64",
+  "pdm build --no-sdist",
+  "tag_wheel macosx-10.10-x86_64-macosx-11-universal2",
+]
+
+[tool.pdm.scripts.build_all]
+help = "Build all the wheels with bundled library and the sdist and wheel without library"
+composite = [
+  "build_linux_arm64",
+  "build_linux_x86_64",
+  "build_linux_win32_x86_64",
+  "build_linux_win32_i386",
+  "build_linux_darwin",
+  # remove any library before building sdist and barebone wheel
+  "clean_library",
+  "pdm build",
+]
 
 
 # https://mypy.readthedocs.io/en/stable/config_file.html

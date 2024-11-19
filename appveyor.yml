@@ -70,30 +70,22 @@ for:
 -
   matrix:
     only:
-    - APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
+      - APPVEYOR_BUILD_WORKER_IMAGE: *windows_image
   install:
     - "SET PATH=%PYTHON%;%PYTHON%/Scripts;%PATH%"
     - "python --version"
-    - "IF %PYTHON:~-4% == -x64 (SET ARCH=x64) ELSE (SET ARCH=i386)"
-    - "IF %PYTHON:~-4% == -x64 (SET PLATFORM_WHEEL=win_amd64) ELSE (SET PLATFORM_WHEEL=win32)"
-    - ps: "Start-FileDownload https://mediaarea.net/download/binary/mediainfo/${Env:MEDIAINFO_VERSION}/MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip"
-    - ps: "unzip -o MediaInfo_CLI_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}.zip LIBCURL.DLL"
-    - ps: "Start-FileDownload https://mediaarea.net/download/binary/libmediainfo0/${Env:MEDIAINFO_VERSION}/MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z"
-    - ps: "7z -y x MediaInfo_DLL_${Env:MEDIAINFO_VERSION}_Windows_${Env:ARCH}_WithoutInstaller.7z MediaInfo.dll Developers/License.html"
-    # Required for tests to pass with tox, Windows looks for DLLs in PATH
-    - ps: "Copy-Item -Path MediaInfo.dll -Destination ${Env:PYTHON}"
-    - "move MediaInfo.dll pymediainfo"
-    - "move Developers\\License.html docs"
-    - "pip install tox"
-  build: off
+    - "pip install pdm tox"
+    - "pdm install --no-self"
+  build_script:
+    - ps: |
+        IF %PYTHON:~-4% == -x64 (SET ARCH=x86_64) ELSE (SET ARCH=i386)
+        pdm run build_win32_${Env:ARCH}
   test_script:
     - "tox"
   deploy_script:
     - ps: |
         If (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:TOXENV -eq $env:DEPLOY_TOXENV)) {
-          pip install twine wheel pdm
-          pdm build --no-sdist
-          wheel tags --remove --platform-tag=${Env:PLATFORM_WHEEL} dist/*-py3-none-any.whl
+          pip install twine wheel
           Invoke-Expression "twine upload --skip-existing dist/*.whl"
         }
 -
@@ -104,80 +96,68 @@ for:
     set -eo pipefail
     PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
     source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
-    pip install tox
-    curl https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x86_64+arm64.tar.bz2 \
-      | tar xj MediaInfoLib/libmediainfo.0.dylib MediaInfoLib/License.html
+    pip install pdm tox
+    pdm install --no-self
+  build_script: |
+    pdm run build_darwin
     # Required for tests to pass with tox
-    cp MediaInfoLib/libmediainfo.0.dylib /usr/local/lib/
-  build: off
+    cp src/pymediainfo/libmediainfo.0.dylib /usr/local/lib/
   test_script:
     - "tox"
   deploy_script: |
     set -eo pipefail
     if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
-      mv MediaInfoLib/libmediainfo.0.dylib pymediainfo
-      mv MediaInfoLib/License.html docs
-      pip install twine wheel pdm
-      pdm build --no-sdist
-      wheel tags --remove --platform-tag=macosx-10.10-x86_64-macosx-11-universal2 dist/*-py3-none-any.whl
+      pip install twine wheel
       twine upload --skip-existing dist/*.whl
     fi
 -
   matrix:
     only:
       - APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+      - TOXENV: /^py.*/
   install: |
-    set -eo pipefail
-    if [[ $TOXENV =~ doc.* ]]; then
-      source "${HOME}/venv${QA_PYTHON_VERSION}/bin/activate"
-      pip install tox
+    if [[ $TOXENV == pypy3 ]]; then
+      pushd /tmp
+      curl -sS "$PYPY_URL" | tar xj
+      PATH="$(pwd)/$(basename "$PYPY_URL" | sed -E 's/\.tar\.[^.]+$//')/bin/:$PATH"
+      python -m ensurepip
+      popd
     else
-      if [[ $TOXENV == pypy3 ]]; then
-        pushd /tmp
-        curl -sS "$PYPY_URL" | tar xj
-        PATH="$(pwd)/$(basename "$PYPY_URL" | sed -E 's/\.tar\.[^.]+$//')/bin/:$PATH"
-        python -m ensurepip
-        popd
-      else
-        PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
-        source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
-      fi
-      # "python -m pip" will work with the unpacked PyPy too, "pip" won't
-      python -m pip install tox
-      curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_x86_64.zip
-      unzip MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_x86_64.zip -d x86_64
-      curl -O https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_arm64.zip
-      unzip MediaInfo_DLL_${MEDIAINFO_VERSION}_Lambda_arm64.zip -d arm64
+      PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
+      source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
     fi
-  build: off
+    # "python -m pip" will work with the unpacked PyPy too, "pip" won't
+    python -m pip install pdm tox
+    pdm install --no-self
+  build_script: |
+    # wheel for arm64
+    pdm run build_linux_arm64
+    # wheel for x86_64
+    pdm run build_linux_x86_64
+
   test_script: |
-    if [[ $TOXENV =~ doc.* ]]; then
-      TOX_PARALLEL_NO_SPINNER=1 tox -p
-    else
-      # Use the previously downloaded library
-      export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:x86_64/lib/"
-      # We want to see the progression of the tests so we can't run
-      # tox environments in parallel
-      tox
-    fi
+    # Use the previously downloaded library
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:x86_64/lib/"
+    # We want to see the progression of the tests so we can't run
+    # tox environments in parallel
+    tox
   deploy_script: |
     set -eo pipefail
     if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
-      pip install twine wheel pdm
-      # source distribution
-      pdm build --no-wheel
-
-      # wheels
-      mv x86_64/LICENSE docs
-      # wheel x86_64
-      cp x86_64/lib/libmediainfo.so.0 pymediainfo/libmediainfo.so.0
-      pdm build --no-sdist
-      wheel tags --remove --platform-tag=manylinux_2_34-x86_64 dist/*-py3-none-any.whl
-      # wheel arm64
-      mv -f arm64/lib/libmediainfo.so.0 pymediainfo/libmediainfo.so.0
-      pdm build --no-sdist
-      wheel tags --remove --platform-tag=manylinux_2_34-arm64 dist/*-py3-none-any.whl
-
-      # upload
+      pip install twine
+      pdm run clean_library
+      pdm build
       twine upload --skip-existing dist/*.gz dist/*.whl
     fi
+-
+  matrix:
+    only:
+      - APPVEYOR_BUILD_WORKER_IMAGE: *linux_image
+      - TOXENV: /docs.*/
+  install: |
+    set -eo pipefail
+    source "${HOME}/venv${QA_PYTHON_VERSION}/bin/activate"
+    pip install tox
+  build: off
+  test_script: |
+    TOX_PARALLEL_NO_SPINNER=1 tox -p
