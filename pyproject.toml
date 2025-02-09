@@ -103,7 +103,7 @@ help = "Build wheel with bundled library for Linux x86_64"
 composite = [
   "download_library -c -p linux -a x86_64",
   "pdm build -v --no-sdist",
-  "tag_wheel manylinux_2_34-x86_64",
+  "tag_wheel manylinux_2_27_x86_64",
 ]
 
 [tool.pdm.scripts.build_linux_arm64]
@@ -111,7 +111,7 @@ help = "Build wheel with bundled library for Linux arm64"
 composite = [
   "download_library -c -p linux -a arm64",
   "pdm build -v --no-sdist",
-  "tag_wheel manylinux_2_34-arm64",
+  "tag_wheel manylinux_2_27-arm64",
 ]
 
 [tool.pdm.scripts.build_win32_x86_64]
