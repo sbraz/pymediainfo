@@ -95,8 +95,8 @@ help = "Clean mediainfo library"
 cmd = "python scripts/download_library.py -c"
 
 [tool.pdm.scripts.tag_wheel]
-help = "Tag the wheel for a specific platform"
-shell = "python -m wheel tags --remove --platform-tag={args} dist/*-py3-none-any.whl 2> /dev/null"
+help = "Tag the wheels for a specific platform"
+cmd = "python scripts/tag_pure_wheels.py"
 
 [tool.pdm.scripts.build_linux_x86_64]
 help = "Build wheel with bundled library for Linux x86_64"
