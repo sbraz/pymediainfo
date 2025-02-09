@@ -23,7 +23,7 @@ at https://mediaarea.net/en/MediaInfo.
 
   * Binary wheels containing a bundled library version are provided for Windows and Mac OS X.
 
-  * Packages are available for `most major Linux distributions <https://repology.org/metapackage/python:pymediainfo>`_.
+  * Packages are available for `most major Linux distributions <https://repology.org/project/python%3Apymediainfo/versions>`_.
     They depend on the library most of the time and are the preferred way to use pymediainfo
     on Linux unless a specific version of the package is required.
 
