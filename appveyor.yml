@@ -7,7 +7,7 @@ environment:
   # Python 3.13 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3927
   # Because of this, we can only deploy on 3.12
   DEPLOY_TOXENV: py312
-  PYPY_URL: https://downloads.python.org/pypy/pypy3.10-v7.3.13-linux64.tar.bz2
+  PYPY_URL: https://downloads.python.org/pypy/pypy3.11-v7.3.18-linux64.tar.bz2
   # Work around https://github.com/tox-dev/tox/issues/1550
   PYTHONIOENCODING: utf-8
   TWINE_USERNAME: "__token__"
