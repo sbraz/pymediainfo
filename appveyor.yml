@@ -106,6 +106,8 @@ for:
         }
         unzip -o "${file}" LIBCURL.DLL
         pdm run "build_win32_${pdm_arch}"
+        # Install the wheel we created
+        Get-ChildItem dist/*.whl | ForEach-Object { pip install $_.FullName }
   test_script:
     - "tox"
   deploy_script:
@@ -127,8 +129,8 @@ for:
   build_script: |
     set -eo pipefail
     pdm run build_darwin
-    # Required for tests to pass with tox
-    cp src/pymediainfo/libmediainfo.0.dylib /usr/local/lib/
+    # Install the wheel we created
+    pip install dist/*.whl
   test_script:
     - "tox"
   deploy_script: |
@@ -158,13 +160,23 @@ for:
     pdm install --no-self
   build_script: |
     set -eo pipefail
+    # Build the source distribution (sdist) first, this way we make sure it
+    # won't contain libmediainfo.so.0 which we download later
+    pdm build -v --no-wheel
+    # Each pdm build clears the "dist" folder and we need to keep all the
+    # created files to upload them at a later stage
+    mkdir dist_files
+    mv -v dist/*.gz dist_files/
     # wheel for arm64
     pdm run build_linux_arm64
+    mv -v dist/*.whl dist_files/
     # wheel for x86_64
     pdm run build_linux_x86_64
+    # Install the wheel we created
+    pip install dist/*.whl
+    # Move back the arm64 and source distributions to "dist"
+    mv -v dist_files/* dist/
   test_script: |
-    # Use the previously downloaded library (x86_64 was downloaded last)
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:x86_64/lib/"
     # We want to see the progression of the tests so we can't run
     # tox environments in parallel
     tox
@@ -172,8 +184,6 @@ for:
     set -eo pipefail
     if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
       pip install twine
-      pdm run clean_library
-      pdm build
       twine upload --skip-existing dist/*.gz dist/*.whl
     fi
 -
