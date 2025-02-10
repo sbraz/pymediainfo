@@ -113,8 +113,8 @@ for:
   deploy_script:
     - ps: |
         If (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:TOXENV -eq $env:DEPLOY_TOXENV)) {
-          pip install twine wheel
-          Invoke-Expression "twine upload --skip-existing dist/*.whl"
+          pip install twine
+          twine upload --skip-existing dist/*.whl
         }
 -
   matrix:
@@ -136,7 +136,7 @@ for:
   deploy_script: |
     set -eo pipefail
     if [[ $APPVEYOR_REPO_TAG == "true" && $TOXENV == $DEPLOY_TOXENV ]]; then
-      pip install twine wheel
+      pip install twine
       twine upload --skip-existing dist/*.whl
     fi
 -
