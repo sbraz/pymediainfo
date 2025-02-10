@@ -21,7 +21,7 @@ at https://mediaarea.net/en/MediaInfo.
   * Without the library, this package **cannot parse media files**,
     which severely limits its functionality.
 
-  * Binary wheels containing a bundled library version are provided for Windows and Mac OS X.
+  * Binary wheels containing a bundled library version are provided for Windows, Linux and macOS.
 
   * Packages are available for `most major Linux distributions <https://repology.org/project/python%3Apymediainfo/versions>`_.
     They depend on the library most of the time and are the preferred way to use pymediainfo
