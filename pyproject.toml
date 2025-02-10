@@ -136,7 +136,7 @@ composite = [
   # -a doesn't matter as the file works with both x86_64 and arm64 (Mac_x86_64+arm64.tar.bz2)
   "download_library -c -p darwin -a arm64",
   "pdm build -v --no-sdist",
-  "tag_wheel macosx-10.10-x86_64-macosx-11-universal2",
+  "tag_wheel macosx_10_10_universal2",
 ]
 
 [tool.pdm.scripts.build_all]
