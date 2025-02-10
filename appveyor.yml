@@ -2,6 +2,8 @@ environment:
   LINUX_IMAGE: &linux_image Ubuntu2204
   MACOS_IMAGE: &macos_image macos-monterey
   WINDOWS_IMAGE: &windows_image Visual Studio 2022
+  # Some of the QA fails on 3.12, see https://github.com/psf/black/issues/4544
+  # and https://github.com/appveyor/ci/issues/3927#issuecomment-2649582770
   QA_PYTHON_VERSION: 3.12
   # Python 3.13 is not available everywhere yet, see https://github.com/appveyor/ci/issues/3927
   # Because of this, we can only deploy on 3.12
