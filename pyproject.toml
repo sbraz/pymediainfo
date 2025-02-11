@@ -65,7 +65,7 @@ source = "scm"
 download_library = ["wheel>=0.44", "requests"]
 
 [tool.pdm.build]
-source-includes = ["docs/", "scripts/demo.py", "tests/"]
+source-includes = ["docs/", "scripts/", "tests/"]
 
 [tool.pdm.scripts.types]
 help = "Check type hints"
