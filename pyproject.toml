@@ -40,7 +40,6 @@ tests = [
 docs = [
     "alabaster",
     "myst-parser",
-    "setuptools_scm",
     "sphinx",
 ]
 dev = [
