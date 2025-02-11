@@ -1,5 +1,5 @@
 """
-This module is a wrapper around the MediaInfo library.
+This module is a wrapper for the MediaInfo library.
 """
 
 from __future__ import annotations

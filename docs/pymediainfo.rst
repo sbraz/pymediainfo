@@ -1,8 +1,5 @@
-pymediainfo package
-===================
-
-Module contents
----------------
+API reference
+=============
 
 .. automodule:: pymediainfo
     :members:

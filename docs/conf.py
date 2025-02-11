@@ -35,7 +35,10 @@ except ImportError:
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [ 'sphinx.ext.autodoc' ]
+extensions = [
+    'myst_parser',
+    'sphinx.ext.autodoc',
+]
 
 # Type hints aren't very readable in the doc at the moment
 autodoc_typehints = "none"
@@ -286,3 +289,6 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# See https://github.com/executablebooks/MyST-Parser/discussions/898
+suppress_warnings = ["myst.header"]

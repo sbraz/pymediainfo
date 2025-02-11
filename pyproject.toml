@@ -9,7 +9,7 @@ description = "A Python wrapper for the MediaInfo library."
 authors = [
     {name = "Louis Sautier", email = "sautier.louis@gmail.com"},
 ]
-readme = "README.rst"
+readme = "README.md"
 license = {text = "MIT"}
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -39,6 +39,7 @@ tests = [
 ]
 docs = [
     "alabaster",
+    "myst-parser",
     "setuptools_scm",
     "sphinx",
 ]
