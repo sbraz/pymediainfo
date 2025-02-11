@@ -167,3 +167,56 @@ strict = true
 
 [tool.pytest.ini_options]
 addopts = "-vv -r a"
+
+
+# https://docs.astral.sh/ruff/
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["ALL"]
+# The pep257 convention below enforces no position for the summary line of
+# multi-line docstrings, so select D213 to keep it on the line after the
+# opening quotes
+extend-select = ["D213"]
+ignore = [
+    "CPY001",  # flake8-copyright
+    "D105",    # pydocstyle
+    "D107",
+    "N806",    # pep8-naming
+    "ANN401",  # flake8-annotations
+    "COM812",  # flake8-commas, conflicts with `ruff format`
+    "PLR0912", # pylint
+    "PLR0913",
+    "PLR0915",
+    "PLR2004",
+    "PERF203", # Perflint
+    "C901",    # mccabe
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = [
+    "D",
+    "S",
+    "PTH",
+    "SLF",
+    "INP001",
+]
+"scripts/download_library.py" = [
+    "E501",    # long hashes
+    "ERA001",
+    "PTH123",
+]
+"**/docs/*" = [
+    "A001",
+    "D100",
+    "ERA001",
+    "INP001",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+# https://docs.astral.sh/ruff/formatter/
+[tool.ruff.format]
+docstring-code-format = true
