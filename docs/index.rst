@@ -1,5 +1,3 @@
-.. pymediainfo documentation master file, created by
-
 Welcome to pymediainfo's documentation!
 =======================================
 
@@ -27,12 +25,11 @@ at https://mediaarea.net/en/MediaInfo.
     They depend on the library most of the time and are the preferred way to use pymediainfo
     on Linux unless a specific version of the package is required.
 
-===============
-Using MediaInfo
-===============
+=================
+Using pymediainfo
+=================
 
-There isn't much to this library so instead of a lot of documentation it is
-probably best to just demonstrate how it works:
+Here are a few examples demonstrating how the library can be used.
 
 Getting information from an image
 ---------------------------------
@@ -113,8 +110,8 @@ using :py:meth:`pymediainfo.MediaInfo.to_data` and
 :py:meth:`pymediainfo.Track.to_data` respectively. The previous
 example demonstrates that.
 
-Parsing existing MediaInfo output
----------------------------------
+Parsing existing output from MediaInfo
+--------------------------------------
 
 If you already have the XML data in a string in memory (e.g. you have previously
 parsed the file or were sent the dump from ``mediainfo --output=OLDXML`` by someone
@@ -128,9 +125,9 @@ else), you can call the constructor directly:
 Accessing Track attributes
 --------------------------
 
-Since the attributes on the :class:`pymediainfo.Track` objects are being dynamically added as the
+Since the attributes from :class:`pymediainfo.Track` objects are being dynamically added as the
 XML output from MediaInfo is being parsed, there isn't a firm definition of what
-will be available at runtime.  In order to make consuming the objects easier so
+will be available at runtime. In order to make consuming the objects easier so
 that you can avoid having to use `hasattr` or `try/except` blocks, the
 `__getattribute__` method has been overriden and will just return `None` when
 and if an attribute is referenced but doesn't exist.

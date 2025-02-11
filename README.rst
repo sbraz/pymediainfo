@@ -17,7 +17,8 @@ pymediainfo
   :target: https://ci.appveyor.com/project/sbraz/pymediainfo
 
 
-This small package is a wrapper around the MediaInfo library.
+pymediainfo is a wrapper for `the MediaInfo library <https://mediaarea.net/en/MediaInfo>`_.
+It makes it easier to extract detailed information from multimedia files.
 
 It works on Linux, macOS and Windows and is tested with Python 3.9 to 3.13 and PyPy3.
 
