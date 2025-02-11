@@ -124,6 +124,7 @@ for:
     set -eo pipefail
     PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
     source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
+    python --version
     pip install pdm tox
     pdm install --no-self
   build_script: |
@@ -155,6 +156,7 @@ for:
       PYTHON_VERSION="$(sed -E 's/^py(3)(.*)$/\1.\2/' <<< "$TOXENV")"
       source "${HOME}/venv${PYTHON_VERSION}/bin/activate"
     fi
+    python --version
     # "python -m pip" will work with the unpacked PyPy too, "pip" won't
     python -m pip install pdm tox
     pdm install --no-self
@@ -193,6 +195,7 @@ for:
   install: |
     set -eo pipefail
     source "${HOME}/venv${QA_PYTHON_VERSION}/bin/activate"
+    python --version
     pip install tox
   build: off
   test_script: |
