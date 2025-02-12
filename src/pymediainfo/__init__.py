@@ -411,7 +411,7 @@ class MediaInfo:
 
         .. note::
             Because of the way the underlying library works, this method should not
-            be called simultaneously from multiple threads *with different arguments*.
+            be called simultaneously from multiple threads *with different parameters*.
             Doing so will cause inconsistencies or failures by changing
             library options that are shared across threads.
 
