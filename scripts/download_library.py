@@ -28,6 +28,7 @@ BASE_URL: str = "https://mediaarea.net/download/binary/libmediainfo0"
 #: Version of the bundled MediaInfo library
 MEDIAINFO_VERSION: str = "24.12"
 
+# fmt: off
 #: BLAKE2b hashes for the specific MediaInfo version, given the (platform, arch)
 MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
     ("linux", "x86_64"): "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1",
@@ -38,6 +39,7 @@ MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
     ("win32", "x86_64"): "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8",
     ("win32", "i386"): "0f0e14c103eac858fe683ec7d51634d62e5e0af658940fd26608249f1048846a92a334438204fe5ecfceb70cb00e5550bfb717a77f10816a2583b5041bb61790",
 }
+# fmt: on
 
 
 def get_file_blake2b(file_path: os.PathLike | str, chunksize: int = 1 << 20) -> str:
@@ -269,7 +271,10 @@ if __name__ == "__main__":
 
     default_folder = Path(__file__).resolve().parent.parent / "src" / "pymediainfo"
 
-    parser = argparse.ArgumentParser(description="download MediaInfo files from upstream.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description="download MediaInfo files from upstream.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         "-p",
         "--platform",
