@@ -119,7 +119,10 @@ html_theme = 'alabaster'
 # documentation.
 html_theme_options = {
     "page_width": "auto",
-    "fixed_sidebar": True
+    "fixed_sidebar": True,
+    "github_user": "sbraz",
+    "github_repo": "pymediainfo",
+    "github_type": "star",
 }
 
 # Add any paths that contain custom themes here, relative to this directory.

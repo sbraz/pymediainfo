@@ -3,6 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pymediainfo.svg)](https://pypi.org/project/pymediainfo)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/pymediainfo.svg)](https://pypi.org/project/pymediainfo)
 [![Repology info](https://repology.org/badge/tiny-repos/python%3Apymediainfo.svg)](https://repology.org/project/python%3Apymediainfo/versions)
+[![GitHub](https://img.shields.io/github/stars/sbraz/pymediainfo)](https://github.com/sbraz/pymediainfo)
 [![Build status](https://ci.appveyor.com/api/projects/status/g15a2daem1oub57n/branch/master?svg=true)](https://ci.appveyor.com/project/sbraz/pymediainfo)
 
 pymediainfo is a wrapper for [the MediaInfo library](https://mediaarea.net/en/MediaInfo). It makes it easy to
