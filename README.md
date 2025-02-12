@@ -19,7 +19,8 @@ pymediainfo is compatible with the following:
 ## Installation
 
 Please note that, without [the MediaInfo library](https://mediaarea.net/en/MediaInfo), pymediainfo
-**cannot parse media files**, which severely limits its functionality.
+**cannot parse media files**. This severely limits its functionality, allowing it to process
+only pre-generated XML output from MediaInfo.
 
 ### Linux distribution Packages
 
@@ -41,7 +42,7 @@ python -m pip install pymediainfo
 * macOS x86-64 and ARM64.
 * Windows x86-64 and x86.
 
-If you _do not want to use the wheels_ (for instance if you want to use the system-wide
+If you do not want to use the wheels (for instance if you want to use the system-wide
 MediaInfo library instead of the bundled one):
 ```
 python -m pip install pymediainfo --no-binary pymediainfo
@@ -153,8 +154,8 @@ Menu tracks do not have a bit rate associated with them
 ```
 
 
-### Parsing existing MediaInfo XML output
-pymediainfo relies on MediaInfo's `OLDXML` output to parse media files.
+### Parsing pre-generated MediaInfo XML output
+pymediainfo relies on MediaInfo's `OLDXML` output to create `MediaInfo` objects.
 
 It is possible to create a `MediaInfo` object from an existing XML string. For
 instance if someone sent you the output of `mediainfo --output=OLDXML`, you can
