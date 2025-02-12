@@ -338,7 +338,8 @@ class MediaInfo:
         Checks whether media files can be analyzed using libmediainfo.
 
         :param str library_file: path to the libmediainfo library, this should only be used if
-            the library cannot be auto-detected.
+            the library cannot be auto-detected. See also :ref:`library_autodetection` which
+            explains how the library file is detected when this parameter is unset.
         :rtype: bool
         """
         try:
@@ -419,7 +420,8 @@ class MediaInfo:
             A URL can also be used if libmediainfo was compiled
             with CURL support.
         :param str library_file: path to the libmediainfo library, this should only be used if
-            the library cannot be auto-detected.
+            the library cannot be auto-detected. See also :ref:`library_autodetection` which
+            explains how the library file is detected when this parameter is unset.
         :param bool cover_data: whether to retrieve cover data as base64.
         :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
             parameter before parsing MediaInfo's XML output.
