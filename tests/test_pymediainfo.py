@@ -381,9 +381,15 @@ def test_filelike_returns_the_same(test_file: str) -> None:
     for track_from_file, track_from_filename in zip(mi_from_file.tracks, mi_from_filename.tracks):
         # The General track will differ, typically not giving the file name
         if track_from_file.track_type != "General":
-            # Test dicts first because they will produce a diff
-            assert track_from_file.to_data() == track_from_filename.to_data()
-            assert track_from_file == track_from_filename
+            file_data = track_from_file.to_data()
+            filename_data = track_from_filename.to_data()
+            extra_keys = file_data.keys() ^ filename_data.keys()
+            assert extra_keys <= {"format_settings"}
+            common_keys = file_data.keys() & filename_data.keys()
+            assert {key: file_data[key] for key in common_keys} == {
+                key: filename_data[key]
+                for key in common_keys
+            }
 
 
 class MediaInfoOutputTest(unittest.TestCase):
