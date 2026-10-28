@@ -164,6 +164,12 @@ strict = true
 addopts = "-vv -r a"
 
 
+# https://coverage.readthedocs.io/en/stable/
+[tool.coverage.run]
+source_pkgs = ["pymediainfo"]
+branch = true
+
+
 # https://docs.astral.sh/ruff/
 [tool.ruff]
 line-length = 100
