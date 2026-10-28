@@ -5,7 +5,6 @@ import os
 import pathlib
 import pickle
 import re
-import sys
 import tempfile
 import threading
 import unittest
@@ -161,10 +160,6 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
         assert len(self.media_info.tracks) == 1
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 7),
-    reason="SimpleHTTPRequestHandler's 'directory' argument was added in Python 3.7",
-)
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self) -> None:
         HandlerClass = functools.partial(
@@ -362,7 +357,9 @@ def test_filelike_returns_the_same(test_file: str) -> None:
     with open(filename, "rb") as f:
         mi_from_file = MediaInfo.parse(f)
     assert len(mi_from_file.tracks) == len(mi_from_filename.tracks)
-    for track_from_file, track_from_filename in zip(mi_from_file.tracks, mi_from_filename.tracks):
+    for track_from_file, track_from_filename in zip(
+        mi_from_file.tracks, mi_from_filename.tracks, strict=True
+    ):
         # The General track will differ, typically not giving the file name
         if track_from_file.track_type != "General":
             # Test dicts first because they will produce a diff
