@@ -64,8 +64,8 @@ media_info = MediaInfo.parse("/home/user/image.jpg")
 general_track = media_info.general_tracks[0]
 image_track = media_info.image_tracks[0]
 print(
-  f"{image_track.format} of {image_track.width}×{image_track.height} pixels"
-  f" and {general_track.file_size} bytes."
+    f"{image_track.format} of {image_track.width}×{image_track.height} pixels"
+    f" and {general_track.file_size} bytes."
 )
 ```
 
@@ -141,7 +141,9 @@ for track in media_info.tracks:
     if track.bit_rate is None:
         print(f"{track.track_type} tracks do not have a bit rate associated with them")
     else:
-        print(f"Track {track.track_id} of type {track.track_type} has a bit rate of {track.bit_rate} b/s")
+        print(
+            f"Track {track.track_id} of type {track.track_type} has a bit rate of {track.bit_rate} b/s"
+        )
 ```
 
 #### Example output

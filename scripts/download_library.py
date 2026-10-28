@@ -33,7 +33,7 @@ MEDIAINFO_VERSION: str = "24.12"
 MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
     ("linux", "x86_64"): "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1",
     ("linux", "arm64"): "4e5a9826fa987f4bde46a6586894d45f3d5381f25d8886dfef67f5db3a9f4377ecafc12acc6e2d71e43b062b686c2db2523052a1f3dd7505a41091847788d114",
-    # The same file is used for darwin x86_64 and arm64 (suffixed Mac_x86_64+arm64.tar.bz2)
+    # The same file is used for darwin x86_64 and arm64 (suffixed Mac_x86_64+arm64.tar.bz2)
     ("darwin", "x86_64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",
     ("darwin", "arm64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",
     ("win32", "x86_64"): "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8",
@@ -66,14 +66,16 @@ class Downloader:
         elif self.platform == "win32":
             allowed_arch = ["x86_64", "i386"]
         else:
-            raise ValueError(f"platform not recognized: {self.platform}")
+            msg = f"platform not recognized: {self.platform}"
+            raise ValueError(msg)
 
         # Check the platform and arch is a valid combination
         if allowed_arch is not None and self.arch not in allowed_arch:
-            raise ValueError(
+            msg = (
                 f"arch {self.arch} is not allowed for platform {self.platform}; "
                 f"must be one of {allowed_arch}"
             )
+            raise ValueError(msg)
 
     def get_compressed_file_name(self) -> str:
         """Get the compressed file name."""
@@ -85,7 +87,8 @@ class Downloader:
             win_arch = "x64" if self.arch == "x86_64" else self.arch
             suffix = f"Windows_{win_arch}_WithoutInstaller.zip"
         else:
-            raise ValueError(f"platform not recognized: {self.platform}")
+            msg = f"platform not recognized: {self.platform}"
+            raise ValueError(msg)
 
         return f"MediaInfo_DLL_{MEDIAINFO_VERSION}_{suffix}"
 
@@ -100,11 +103,13 @@ class Downloader:
         expected = MEDIAINFO_HASHES.get(key)
         # Check expected hash exists
         if expected is None:
-            raise ValueError(f"{key}, expected hash not found.")
+            msg = f"{key}, expected hash not found."
+            raise ValueError(msg)
 
         # Check hashes match
         if expected != h:
-            raise ValueError(f"hash mismatch for {key}: expected {expected}, got {h}")
+            msg = f"hash mismatch for {key}: expected {expected}, got {h}"
+            raise ValueError(msg)
 
         return True
 
@@ -114,14 +119,12 @@ class Downloader:
         outpath: os.PathLike,
         *,
         timeout: int = 20,
-        verbose: bool = True,
     ) -> None:
         """Download the compressed file from upstream URL."""
         response = requests.get(url, stream=True, timeout=timeout)
         response.raise_for_status()
         with open(outpath, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
+            f.writelines(response.iter_content(chunk_size=8192))
 
         downloaded_hash = get_file_blake2b(outpath)
         self.compare_hash(downloaded_hash)
@@ -137,7 +140,8 @@ class Downloader:
         compressed_file = self.get_compressed_file_name()
 
         if not file.is_file():
-            raise ValueError(f"compressed file not found: {file.name!r}")
+            msg = f"compressed file not found: {file.name!r}"
+            raise ValueError(msg)
         tmp_dir = file.parent
 
         license_file: Path | None = None
@@ -213,7 +217,7 @@ class Downloader:
             outpath = Path(tmp_dir) / compressed_file
             if verbose:
                 print(f"Downloading MediaInfo library from {url}")
-            self.download_upstream(url, outpath, timeout=timeout, verbose=verbose)
+            self.download_upstream(url, outpath, timeout=timeout)
 
             if verbose:
                 print(f"Extracting {compressed_file}")
