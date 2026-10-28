@@ -347,15 +347,13 @@ class MediaInfo:
             lib.MediaInfo_Close(handle)
             lib.MediaInfo_Delete(handle)
             return True
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
     # The method may be called with output=<str>, in which case it returns a str
     @overload
     @classmethod
     def parse(
-        # pylint: disable=too-many-arguments, too-many-locals
-        # pylint: disable=too-many-branches, too-many-statements
         cls,
         filename: Any,
         *,
@@ -374,8 +372,6 @@ class MediaInfo:
     @overload
     @classmethod
     def parse(
-        # pylint: disable=too-many-arguments, too-many-locals
-        # pylint: disable=too-many-branches, too-many-statements
         cls,
         filename: Any,
         *,
@@ -392,8 +388,6 @@ class MediaInfo:
 
     @classmethod
     def parse(
-        # pylint: disable=too-many-arguments, too-many-locals
-        # pylint: disable=too-many-branches, too-many-statements
         cls,
         filename: Any,
         *,

@@ -45,10 +45,7 @@ docs = [
 dev = [
     "ipython",
     "mypy>=1.0",
-    "black",
-    "isort",
-    "flake8",
-    "pylint",
+    "pre-commit",
 ]
 
 [project.urls]

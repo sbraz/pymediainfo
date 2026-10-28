@@ -1,6 +1,3 @@
-# pylint: disable=missing-module-docstring, missing-class-docstring, missing-function-docstring,
-# pylint: disable=protected-access
-
 import functools
 import http.server
 import json
@@ -168,7 +165,7 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
 )
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self) -> None:
-        HandlerClass = functools.partial(  # pylint: disable=invalid-name
+        HandlerClass = functools.partial(
             http.server.SimpleHTTPRequestHandler,
             directory=data_dir,
         )
@@ -211,7 +208,6 @@ class MediaInfoFilenameTypesTest(unittest.TestCase):
 
     def test_normalize_filename_pathlike(self) -> None:
         class PathLikeObject(os.PathLike[str]):
-            # pylint: disable=too-few-public-methods
             def __fspath__(self) -> str:
                 return os.path.join(data_dir, "test.txt")
 
@@ -351,7 +347,7 @@ def test_thread_safety(test_file: str) -> None:
             result = MediaInfo.parse(os.path.join(data_dir, test_file))
             with lock:
                 results.append(result)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             pass
 
     threads = []
