@@ -5,6 +5,7 @@ import os
 import pathlib
 import pickle
 import re
+import sys
 import tempfile
 import threading
 import unittest
@@ -160,6 +161,10 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
         assert len(self.media_info.tracks) == 1
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="The bundled Windows library needs a separate libcurl DLL to open URLs",
+)
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self) -> None:
         HandlerClass = functools.partial(
