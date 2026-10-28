@@ -131,12 +131,12 @@ class MediaInfoFileLikeTest(unittest.TestCase):
     def test_raises_on_text_mode_even_with_text(self) -> None:
         path = os.path.join(data_dir, "sample.xml")
         with open(path, encoding="utf-8") as f, pytest.raises(ValueError):  # noqa: PT011
-            MediaInfo.parse(f)
+            MediaInfo.parse(f)  # type: ignore[call-overload]
 
     def test_raises_on_text_mode(self) -> None:
         path = os.path.join(data_dir, "sample.mkv")
         with open(path, encoding="utf-8") as f, pytest.raises(ValueError):  # noqa: PT011
-            MediaInfo.parse(f)
+            MediaInfo.parse(f)  # type: ignore[call-overload]
 
 
 class MediaInfoUnicodeXMLTest(unittest.TestCase):

@@ -11,7 +11,10 @@ import warnings
 import xml.etree.ElementTree as ET
 from importlib import metadata
 from pathlib import Path
-from typing import Any, overload
+from typing import Any, BinaryIO, TypeAlias, cast, overload
+
+#: Types accepted by :meth:`MediaInfo.parse`: a path or a file opened in binary mode
+FileLike: TypeAlias = str | os.PathLike[str] | BinaryIO
 
 try:
     __version__ = metadata.version("pymediainfo")
@@ -356,7 +359,7 @@ class MediaInfo:  # noqa: PLW1641
     @classmethod
     def parse(
         cls,
-        filename: Any,
+        filename: FileLike,
         *,
         library_file: str | None = None,
         cover_data: bool = False,
@@ -374,7 +377,7 @@ class MediaInfo:  # noqa: PLW1641
     @classmethod
     def parse(
         cls,
-        filename: Any,
+        filename: FileLike,
         *,
         library_file: str | None = None,
         cover_data: bool = False,
@@ -390,7 +393,7 @@ class MediaInfo:  # noqa: PLW1641
     @classmethod
     def parse(
         cls,
-        filename: Any,
+        filename: FileLike,
         *,
         library_file: str | None = None,
         cover_data: bool = False,
@@ -447,7 +450,7 @@ class MediaInfo:  # noqa: PLW1641
                 * ``%``-delimited templates (see ``mediainfo --Info-Parameters``)
         :param int buffer_size: size of the buffer used to read the file, in bytes. This is only
             used when `filename` is a file-like object.
-        :type filename: str or pathlib.Path or os.PathLike or file-like object.
+        :type filename: str, os.PathLike or a file opened in binary mode, see :data:`FileLike`
         :rtype: str if `output` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file.
@@ -492,6 +495,9 @@ class MediaInfo:  # noqa: PLW1641
             for option_name, option_value in mediainfo_options.items():
                 lib.MediaInfo_Option(handle, option_name, option_value)
         try:
+            # filename is detected as a file by duck typing below, which mypy
+            # can't follow, so cast() tells it which branch has which type
+            filename = cast("BinaryIO", filename)
             filename.seek(0, 2)
             file_size = filename.tell()
             filename.seek(0)
@@ -499,10 +505,15 @@ class MediaInfo:  # noqa: PLW1641
             file_size = None
 
         if file_size is not None:  # We have a file-like object, use the buffer protocol:
+            filename = cast("BinaryIO", filename)
             # Some file-like objects do not have a mode
             if "b" not in getattr(filename, "mode", "b"):
                 msg = "File should be opened in binary mode"
                 raise ValueError(msg)
+            if buffer_size is None:
+                # BinaryIO.read() is typed to take an int, so use its default, -1,
+                # which reads until EOF
+                buffer_size = -1
             lib.MediaInfo_Open_Buffer_Init(handle, file_size, 0)
             while True:
                 buffer = filename.read(buffer_size)
@@ -522,7 +533,7 @@ class MediaInfo:  # noqa: PLW1641
                     break
             lib.MediaInfo_Open_Buffer_Finalize(handle)
         else:  # We have a filename, simply pass it:
-            filename = os.fspath(filename)
+            filename = os.fspath(cast("str | os.PathLike[str]", filename))
             # If an error occurred
             if lib.MediaInfo_Open(handle, filename) == 0:
                 lib.MediaInfo_Close(handle)
