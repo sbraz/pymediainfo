@@ -14,7 +14,7 @@ extract detailed information from multimedia files.
 pymediainfo is compatible with the following:
 
 * **Platforms**: **Linux**, **macOS** and **Windows**.
-* **Python Versions**: Tested with Python **3.10** (the minimum required version) to **3.13**, as well as **PyPy3**.
+* **Python Versions**: Tested with Python **3.10** (the minimum required version) to **3.15**, as well as **PyPy3**.
 
 ## Installation
 
