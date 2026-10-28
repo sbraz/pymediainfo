@@ -1,0 +1,183 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: python -m pip install tox
+      - run: tox -e pre-commit
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: python -m pip install tox
+      - run: tox -e mypy
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full clone instead of the default shallow one, since the version
+          # is computed from the latest git tag
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          # Keep in sync with .readthedocs.yaml
+          python-version: "3.12"
+      - run: python -m pip install tox
+      - run: tox -e docs
+
+  build:
+    name: Build sdist and wheels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full clone instead of the default shallow one, since the version
+          # is computed from the latest git tag
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install PDM and the build dependencies
+        run: |
+          python -m pip install pdm
+          pdm install --no-self
+      - name: Build the sdist and the wheels with the bundled library
+        run: |
+          set -eo pipefail
+          mkdir dist_files
+          # Build the sdist first so that it doesn't contain any library
+          pdm build -v --no-wheel
+          mv -v dist/*.tar.gz dist_files/
+          # Each build clears the dist folder, so move the wheels out of it
+          for target in linux_x86_64 linux_arm64 win32_x86_64 win32_i386 darwin; do
+            pdm run "build_${target}"
+            mv -v dist/*.whl dist_files/
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist_files/
+          if-no-files-found: error
+
+  test:
+    name: test ${{ matrix.python }} on ${{ matrix.os }}${{ matrix.arch != 'default' && format(' ({0})', matrix.arch) || '' }}
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+        arch: [default]
+        include:
+          - os: ubuntu-latest
+            python: pypy3.12
+            arch: default
+          # macOS x86_64
+          - os: macos-15-intel
+            python: "3.10"
+            arch: default
+          - os: macos-15-intel
+            python: "3.13"
+            arch: default
+          # Windows x86
+          - os: windows-latest
+            python: "3.10"
+            arch: x86
+          - os: windows-latest
+            python: "3.13"
+            arch: x86
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          architecture: ${{ matrix.arch != 'default' && matrix.arch || '' }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - name: Install the wheel matching this platform
+        # --only-binary makes the installation fail if no wheel matches instead
+        # of building the sdist, --no-index ensures that the local wheel is used
+        run: python -m pip install --only-binary pymediainfo --no-index --find-links dist pymediainfo
+      - name: Check that the installed wheel and its bundled library are used
+        shell: python
+        run: |
+          from pathlib import Path
+
+          import pymediainfo
+
+          package_dir = Path(pymediainfo.__file__).parent
+          lib, _, version, _ = pymediainfo.MediaInfo._get_library()
+          print(f"pymediainfo from {package_dir}, libmediainfo {version} from {lib._name}")
+          assert "site-packages" in package_dir.parts, "not testing the installed wheel"
+          assert Path(lib._name).parent == package_dir, "not using the bundled library"
+      - run: python -m pip install pytest pytest-xdist
+      - run: python -m pytest -n auto
+
+  # Single job to require in branch protection rules. It must run even when
+  # a job it needs fails, since a skipped required check counts as passing.
+  all-jobs-passed:
+    name: All jobs passed
+    if: always()
+    needs: [pre-commit, mypy, docs, build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+
+  publish:
+    name: Publish to PyPI
+    # Only tag pushes publish: not manual runs on a tag, which could race with
+    # the run of the push, and not tags on forks
+    if: >-
+      github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      && github.repository == 'sbraz/pymediainfo'
+    needs: all-jobs-passed
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # Needed for trusted publishing
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
