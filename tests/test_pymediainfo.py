@@ -194,30 +194,13 @@ class MediaInfoPathlibTest(unittest.TestCase):
         path = pathlib.Path(data_dir) / "this file does not exist"
         self.assertRaises(FileNotFoundError, MediaInfo.parse, path)
 
-
-class MediaInfoFilenameTypesTest(unittest.TestCase):
-    def test_normalize_filename_str(self) -> None:
-        path = os.path.join(data_dir, "test.txt")
-        filename = MediaInfo._normalize_filename(path)
-        self.assertEqual(filename, path)
-
-    def test_normalize_filename_pathlib(self) -> None:
-        path = pathlib.Path(data_dir, "test.txt")
-        filename = MediaInfo._normalize_filename(path)
-        self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
-
-    def test_normalize_filename_pathlike(self) -> None:
+    def test_parse_pathlike(self) -> None:
         class PathLikeObject(os.PathLike[str]):
             def __fspath__(self) -> str:
-                return os.path.join(data_dir, "test.txt")
+                return os.path.join(data_dir, "sample.mp4")
 
-        path = PathLikeObject()
-        filename = MediaInfo._normalize_filename(path)
-        self.assertEqual(filename, os.path.join(data_dir, "test.txt"))
-
-    def test_normalize_filename_url(self) -> None:
-        filename = MediaInfo._normalize_filename("https://localhost")
-        self.assertEqual(filename, "https://localhost")
+        media_info = MediaInfo.parse(PathLikeObject())
+        self.assertEqual(len(media_info.tracks), 3)
 
 
 class MediaInfoTestParseNonExistentFile(unittest.TestCase):

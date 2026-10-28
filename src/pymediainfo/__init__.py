@@ -7,7 +7,6 @@ from __future__ import annotations
 import ctypes
 import json
 import os
-import pathlib
 import re
 import sys
 import warnings
@@ -233,14 +232,6 @@ class MediaInfo:
         :rtype: list of :class:`Track`\\s
         """
         return self._tracks("Menu")
-
-    @staticmethod
-    def _normalize_filename(filename: Any) -> Any:
-        if hasattr(os, "PathLike") and isinstance(filename, os.PathLike):
-            return os.fspath(filename)
-        if pathlib is not None and isinstance(filename, pathlib.PurePath):
-            return str(filename)
-        return filename
 
     @classmethod
     def _define_library_prototypes(cls, lib: Any) -> Any:
@@ -524,7 +515,7 @@ class MediaInfo:
                     break
             lib.MediaInfo_Open_Buffer_Finalize(handle)
         else:  # We have a filename, simply pass it:
-            filename = cls._normalize_filename(filename)
+            filename = os.fspath(filename)
             # If an error occured
             if lib.MediaInfo_Open(handle, filename) == 0:
                 lib.MediaInfo_Close(handle)
