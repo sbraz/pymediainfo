@@ -5,8 +5,8 @@
 
 import argparse
 import pathlib
-
-from wheel.cli.tags import tags
+import subprocess
+import sys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -14,5 +14,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for wheel_path in pathlib.Path("dist").glob("*-py3-none-any.whl"):
-        new_wheel = tags(wheel_path, platform_tags=args.platform_tag, remove=True)
-        print(f"Tagged {wheel_path.name} -> {new_wheel}")
+        # wheel has no public Python API, use its command line interface
+        result = subprocess.run(  # noqa: S603
+            [
+                sys.executable,
+                "-m",
+                "wheel",
+                "tags",
+                "--remove",
+                "--platform-tag",
+                args.platform_tag,
+                str(wheel_path),
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        print(f"Tagged {wheel_path.name} -> {result.stdout.strip()}")
