@@ -25,6 +25,9 @@ if TYPE_CHECKING:
 #: Base URL for downloading MediaInfo library
 BASE_URL: str = "https://mediaarea.net/download/binary/libmediainfo0"
 
+#: Timeout of the download requests, in seconds
+TIMEOUT: int = 20
+
 #: Version of the bundled MediaInfo library
 MEDIAINFO_VERSION: str = "24.12"
 
@@ -117,11 +120,9 @@ class Downloader:
         self,
         url: str,
         outpath: os.PathLike[str],
-        *,
-        timeout: int = 20,
     ) -> None:
         """Download the compressed file from upstream URL."""
-        response = requests.get(url, stream=True, timeout=timeout)
+        response = requests.get(url, stream=True, timeout=TIMEOUT)
         response.raise_for_status()
         with Path(outpath).open("wb") as f:
             f.writelines(response.iter_content(chunk_size=8192))
@@ -202,9 +203,6 @@ class Downloader:
     def download(
         self,
         folder: os.PathLike[str] | str,
-        *,
-        timeout: int = 20,
-        verbose: bool = True,
     ) -> dict[str, str]:
         """Download the library and license files."""
         folder = Path(folder)
@@ -215,16 +213,13 @@ class Downloader:
         extracted_files = {}
         with TemporaryDirectory() as tmp_dir:
             outpath = Path(tmp_dir) / compressed_file
-            if verbose:
-                print(f"Downloading MediaInfo library from {url}")
-            self.download_upstream(url, outpath, timeout=timeout)
+            print(f"Downloading MediaInfo library from {url}")
+            self.download_upstream(url, outpath)
 
-            if verbose:
-                print(f"Extracting {compressed_file}")
+            print(f"Extracting {compressed_file}")
             extracted_files = self.unpack(outpath, folder)
 
-            if verbose:
-                print(f"Extracted files: {extracted_files}")
+            print(f"Extracted files: {extracted_files}")
         return extracted_files
 
 
@@ -232,25 +227,17 @@ def download_files(
     folder: os.PathLike[str] | str,
     platform: Literal["linux", "darwin", "win32"],
     arch: Literal["x86_64", "arm64", "i386"],
-    *,
-    timeout: int = 20,
-    verbose: bool = True,
 ) -> dict[str, str]:
     """Download the library and license files to the output folder."""
     downloader = Downloader(platform=platform, arch=arch)
-    return downloader.download(folder, timeout=timeout, verbose=verbose)
+    return downloader.download(folder)
 
 
-def clean_files(
-    folder: os.PathLike[str] | str,
-    *,
-    verbose: bool = True,
-) -> bool:
+def clean_files(folder: os.PathLike[str] | str) -> bool:
     """Remove downloaded files in the output folder."""
     folder = Path(folder)
     if not folder.is_dir():
-        if verbose:
-            print(f"folder does not exist: {os.fspath(folder)!r}")
+        print(f"folder does not exist: {os.fspath(folder)!r}")
         return False
 
     glob_patterns = ["License.html", "LICENSE", "MediaInfo.dll", "libmediainfo.*"]
@@ -261,8 +248,7 @@ def clean_files(
         to_delete.extend(folder.glob(pattern))
 
     # delete files
-    if verbose:
-        print(f"will delete files: {to_delete}")
+    print(f"will delete files: {to_delete}")
     for relative_path in to_delete:
         (folder / relative_path).unlink()
 
@@ -271,7 +257,6 @@ def clean_files(
 
 if __name__ == "__main__":
     import argparse
-    import platform
 
     default_folder = Path(__file__).resolve().parent.parent / "src" / "pymediainfo"
 
@@ -292,24 +277,6 @@ if __name__ == "__main__":
         help="architecture of the library",
     )
     parser.add_argument(
-        "-A",
-        "--auto",
-        action="store_true",
-        help="use the current platform and architecture",
-    )
-    parser.add_argument(
-        "-q",
-        "--quiet",
-        help="hide progress messages",
-        action="store_true",
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        help="URL request timeout in seconds",
-        default=20,
-    )
-    parser.add_argument(
         "-o",
         "--folder",
         type=Path,
@@ -325,19 +292,15 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if not any((args.auto, args.clean, args.platform and args.arch)):
-        parser.error("either -A/--auto, -c/--clean or -a/--arch with -p/--platform must be used")
+    if not any((args.clean, args.platform and args.arch)):
+        parser.error("either -c/--clean or -a/--arch with -p/--platform must be used")
 
     if not args.folder.is_dir():
         parser.error(f"{args.folder} does not exist or is not a folder")
 
-    if args.auto:
-        args.platform = platform.system().lower()
-        args.arch = platform.machine().lower()
-
     # Clean folder
     if args.clean:
-        clean_files(args.folder, verbose=not args.quiet)
+        clean_files(args.folder)
 
     # Download files
     if args.platform is not None and args.arch is not None:
@@ -345,8 +308,6 @@ if __name__ == "__main__":
             args.folder,
             args.platform,
             args.arch,
-            verbose=not args.quiet,
-            timeout=args.timeout,
         )
 
     sys.exit(0)

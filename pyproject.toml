@@ -86,7 +86,7 @@ cmd = "pytest --cov --cov-report=term-missing --cov-config=pyproject.toml {args:
 
 [tool.pdm.scripts.download_library]
 help = "Download mediainfo library"
-cmd = "python scripts/download_library.py {args:-c --auto}"
+cmd = "python scripts/download_library.py {args}"
 
 [tool.pdm.scripts.clean_library]
 help = "Clean mediainfo library"
