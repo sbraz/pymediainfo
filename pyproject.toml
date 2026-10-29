@@ -186,24 +186,18 @@ ignore = [
     "CPY001",  # flake8-copyright
     "D105",    # pydocstyle
     "D107",
-    "N806",    # pep8-naming
     "ANN401",  # flake8-annotations
     "COM812",  # flake8-commas, conflicts with `ruff format`
-    "PLR0912", # pylint
-    "PLR0913",
-    "PLR0915",
-    "PLR2004",
     "PERF203", # Perflint
-    "C901",    # mccabe
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = [
     "D",
-    "S",
+    "S101",
     "PTH",
-    "SLF",
     "INP001",
+    "PLR2004",
 ]
 "scripts/download_library.py" = [
     "E501",    # long hashes

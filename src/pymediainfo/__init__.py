@@ -391,7 +391,7 @@ class MediaInfo:  # noqa: PLW1641
     ) -> MediaInfo: ...
 
     @classmethod
-    def parse(
+    def parse(  # noqa: C901, PLR0912, PLR0913, PLR0915
         cls,
         filename: FileLike,
         *,

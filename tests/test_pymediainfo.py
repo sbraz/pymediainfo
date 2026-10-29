@@ -27,7 +27,7 @@ test_media_files = [
 
 
 def _get_library_version() -> tuple[str, tuple[int, ...]]:
-    lib, handle, lib_version_str, lib_version = MediaInfo._get_library()
+    lib, handle, lib_version_str, lib_version = MediaInfo._get_library()  # noqa: SLF001
     lib.MediaInfo_Close(handle)
     lib.MediaInfo_Delete(handle)
     return lib_version_str, lib_version
@@ -167,12 +167,12 @@ class MediaInfoUnicodeFileNameTest(unittest.TestCase):
 )
 class MediaInfoURLTest(unittest.TestCase):
     def setUp(self) -> None:
-        HandlerClass = functools.partial(
+        handler_class = functools.partial(
             http.server.SimpleHTTPRequestHandler,
             directory=data_dir,
         )
         # Pick a random port so that parallel tests (e.g. via 'tox -p') do not clash
-        self.httpd = http.server.HTTPServer(("", 0), HandlerClass)
+        self.httpd = http.server.HTTPServer(("", 0), handler_class)
         port = self.httpd.socket.getsockname()[1]
         self.url = f"http://127.0.0.1:{port}/sample.mkv"
         threading.Thread(target=self.httpd.serve_forever).start()
@@ -275,9 +275,9 @@ class MediaInfoEqTest(unittest.TestCase):
 
     def test_pickle_unpickle(self) -> None:
         pickled_track = pickle.dumps(self.mp4_mi.tracks[0])
-        assert self.mp4_mi.tracks[0] == pickle.loads(pickled_track)
+        assert self.mp4_mi.tracks[0] == pickle.loads(pickled_track)  # noqa: S301
         pickled_mi = pickle.dumps(self.mp4_mi)
-        assert self.mp4_mi == pickle.loads(pickled_mi)
+        assert self.mp4_mi == pickle.loads(pickled_mi)  # noqa: S301
 
 
 class MediaInfoLegacyStreamDisplayTest(unittest.TestCase):
@@ -335,7 +335,7 @@ def test_thread_safety(test_file: str) -> None:
             result = MediaInfo.parse(os.path.join(data_dir, test_file))
             with lock:
                 results.append(result)
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001, S110
             pass
 
     threads = []
