@@ -31,13 +31,13 @@ MEDIAINFO_VERSION: str = "24.12"
 # fmt: off
 #: BLAKE2b hashes for the specific MediaInfo version, given the (platform, arch)
 MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
-    ("linux", "x86_64"): "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1",
-    ("linux", "arm64"): "4e5a9826fa987f4bde46a6586894d45f3d5381f25d8886dfef67f5db3a9f4377ecafc12acc6e2d71e43b062b686c2db2523052a1f3dd7505a41091847788d114",
+    ("linux", "x86_64"): "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1",  # noqa: E501
+    ("linux", "arm64"): "4e5a9826fa987f4bde46a6586894d45f3d5381f25d8886dfef67f5db3a9f4377ecafc12acc6e2d71e43b062b686c2db2523052a1f3dd7505a41091847788d114",  # noqa: E501
     # The same file is used for darwin x86_64 and arm64 (suffixed Mac_x86_64+arm64.tar.bz2)
-    ("darwin", "x86_64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",
-    ("darwin", "arm64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",
-    ("win32", "x86_64"): "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8",
-    ("win32", "i386"): "0f0e14c103eac858fe683ec7d51634d62e5e0af658940fd26608249f1048846a92a334438204fe5ecfceb70cb00e5550bfb717a77f10816a2583b5041bb61790",
+    ("darwin", "x86_64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",  # noqa: E501
+    ("darwin", "arm64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",  # noqa: E501
+    ("win32", "x86_64"): "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8",  # noqa: E501
+    ("win32", "i386"): "0f0e14c103eac858fe683ec7d51634d62e5e0af658940fd26608249f1048846a92a334438204fe5ecfceb70cb00e5550bfb717a77f10816a2583b5041bb61790",  # noqa: E501
 }
 # fmt: on
 
@@ -45,7 +45,7 @@ MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
 def get_file_blake2b(file_path: os.PathLike | str, chunksize: int = 1 << 20) -> str:
     """Get the BLAKE2b hash of a file."""
     blake2b = hashlib.blake2b()
-    with open(file_path, "rb") as f:
+    with Path(file_path).open("rb") as f:
         while chunk := f.read(chunksize):
             blake2b.update(chunk)
     return blake2b.hexdigest()
@@ -123,7 +123,7 @@ class Downloader:
         """Download the compressed file from upstream URL."""
         response = requests.get(url, stream=True, timeout=timeout)
         response.raise_for_status()
-        with open(outpath, "wb") as f:
+        with Path(outpath).open("wb") as f:
             f.writelines(response.iter_content(chunk_size=8192))
 
         downloaded_hash = get_file_blake2b(outpath)
@@ -157,7 +157,7 @@ class Downloader:
                 fd.extract("lib/libmediainfo.so.0.0.0", tmp_dir)
                 shutil.move(os.fspath(tmp_dir / "lib/libmediainfo.so.0.0.0"), os.fspath(lib_file))
 
-        # macOS (darwin)
+        # macOS
         elif compressed_file.endswith(".tar.bz2") and self.platform == "darwin":
             with tarfile.open(file) as fd:
                 kwargs: dict[str, Any] = {}
@@ -180,7 +180,7 @@ class Downloader:
                     os.fspath(lib_file),
                 )
 
-        # Windows (win32)
+        # Windows
         elif compressed_file.endswith(".zip") and self.platform == "win32":
             with ZipFile(file) as fd:
                 license_file = folder / "License.html"

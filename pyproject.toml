@@ -198,11 +198,6 @@ ignore = [
     "INP001",
     "PLR2004",
 ]
-"scripts/download_library.py" = [
-    "E501",    # long hashes
-    "ERA001",
-    "PTH123",
-]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
