@@ -1,3 +1,4 @@
+import ctypes
 import functools
 import http.server
 import json
@@ -9,6 +10,7 @@ import tempfile
 import threading
 import unittest
 from pathlib import Path
+from typing import Any
 from xml.etree import ElementTree as ET
 
 import pytest
@@ -305,6 +307,25 @@ class MediaInfoOptionsTest(unittest.TestCase):
     def test_mediainfo_options(self) -> None:
         assert self.normal_mi.tracks[1].other_language[0] == "English"
         assert self.raw_language_mi.tracks[1].language == "en"
+
+
+def test_old_library_warning_location(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Pretend that the library is too old to reset options, which makes parse() warn
+    get_library = MediaInfo._get_library  # noqa: SLF001
+
+    def get_old_library(
+        library_file: str | None = None,
+    ) -> tuple[ctypes.CDLL, Any, str, tuple[int, ...]]:
+        lib, handle, _, _ = get_library(library_file)
+        return lib, handle, "19.08", (19, 8)
+
+    monkeypatch.setattr(MediaInfo, "_get_library", staticmethod(get_old_library))
+    with pytest.warns(RuntimeWarning, match="does not support resetting") as record:
+        # The fake version stops parse() from resetting the options afterwards, but every
+        # parse() call sets ParseSpeed, so this can't affect later parses in the same process
+        MediaInfo.parse(data_dir / "sample.mkv", mediainfo_options={"ParseSpeed": "0.5"})
+    # The warning must point at the code calling parse(), not at pymediainfo
+    assert record[0].filename == __file__
 
 
 # Unittests can't be parametrized

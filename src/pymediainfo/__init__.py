@@ -490,6 +490,9 @@ class MediaInfo:  # noqa: PLW1641
                     "recommended and may result in unpredictable behavior, see "
                     "https://github.com/MediaArea/MediaInfoLib/issues/1128",
                     RuntimeWarning,
+                    # Report the warning at the caller of parse(), which only works as long as
+                    # it is raised here, see test_old_library_warning_location(). Once Python
+                    # 3.12 is the oldest supported version, use skip_file_prefixes instead.
                     stacklevel=2,
                 )
             for option_name, option_value in mediainfo_options.items():
