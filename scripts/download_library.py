@@ -17,9 +17,13 @@ from typing import TYPE_CHECKING, Any
 from zipfile import ZipFile
 
 import requests
+import tomlkit
 
 if TYPE_CHECKING:
-    from typing import Literal
+    from typing import Literal, TypeAlias
+
+    Platform: TypeAlias = Literal["linux", "darwin", "win32"]
+    Arch: TypeAlias = Literal["x86_64", "arm64", "i386"]
 
 
 #: Base URL for downloading MediaInfo library
@@ -28,21 +32,22 @@ BASE_URL: str = "https://mediaarea.net/download/binary/libmediainfo0"
 #: Timeout of the download requests, in seconds
 TIMEOUT: int = 20
 
-#: Version of the bundled MediaInfo library
-MEDIAINFO_VERSION: str = "24.12"
+#: pyproject.toml, which contains the version and hashes of the bundled library
+PYPROJECT_FILE: Path = Path(__file__).resolve().parent.parent / "pyproject.toml"
 
-# fmt: off
-#: BLAKE2b hashes for the specific MediaInfo version, given the (platform, arch)
-MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
-    ("linux", "x86_64"): "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1",  # noqa: E501
-    ("linux", "arm64"): "4e5a9826fa987f4bde46a6586894d45f3d5381f25d8886dfef67f5db3a9f4377ecafc12acc6e2d71e43b062b686c2db2523052a1f3dd7505a41091847788d114",  # noqa: E501
-    # The same file is used for darwin x86_64 and arm64 (suffixed Mac_x86_64+arm64.tar.bz2)
-    ("darwin", "x86_64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",  # noqa: E501
-    ("darwin", "arm64"): "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae",  # noqa: E501
-    ("win32", "x86_64"): "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8",  # noqa: E501
-    ("win32", "i386"): "0f0e14c103eac858fe683ec7d51634d62e5e0af658940fd26608249f1048846a92a334438204fe5ecfceb70cb00e5550bfb717a77f10816a2583b5041bb61790",  # noqa: E501
+#: Architectures for which MediaArea provides a library, for each platform
+ALLOWED_ARCHS: dict[Platform, tuple[Arch, ...]] = {
+    "linux": ("x86_64", "arm64"),
+    "darwin": ("x86_64", "arm64"),
+    "win32": ("x86_64", "i386"),
 }
-# fmt: on
+
+
+def read_bundled_library_config() -> tuple[str, dict[str, str]]:
+    """Get the version of the bundled library and the hashes of its files from pyproject.toml."""
+    config = tomlkit.parse(PYPROJECT_FILE.read_text(encoding="utf-8")).unwrap()
+    bundled_library = config["tool"]["pymediainfo"]["bundled-library"]
+    return bundled_library["version"], bundled_library["blake2b"]
 
 
 def get_file_blake2b(file_path: os.PathLike[str] | str, chunksize: int = 1 << 20) -> str:
@@ -58,30 +63,27 @@ def get_file_blake2b(file_path: os.PathLike[str] | str, chunksize: int = 1 << 20
 class Downloader:
     """Downloader for the MediaInfo library files."""
 
-    platform: Literal["linux", "darwin", "win32"]
-    arch: Literal["x86_64", "arm64", "i386"]
+    platform: Platform
+    arch: Arch
+    version: str
 
     def __post_init__(self) -> None:
         """Check that the combination of platform and arch is allowed."""
-        allowed_arch = None
-        if self.platform in ("linux", "darwin"):
-            allowed_arch = ["x86_64", "arm64"]
-        elif self.platform == "win32":
-            allowed_arch = ["x86_64", "i386"]
-        else:
+        allowed_arch = ALLOWED_ARCHS.get(self.platform)
+        if allowed_arch is None:
             msg = f"platform not recognized: {self.platform}"
             raise ValueError(msg)
 
         # Check the platform and arch is a valid combination
-        if allowed_arch is not None and self.arch not in allowed_arch:
+        if self.arch not in allowed_arch:
             msg = (
                 f"arch {self.arch} is not allowed for platform {self.platform}; "
                 f"must be one of {allowed_arch}"
             )
             raise ValueError(msg)
 
-    def get_compressed_file_name(self) -> str:
-        """Get the compressed file name."""
+    def get_compressed_file_suffix(self) -> str:
+        """Get the end of the compressed file name, which doesn't depend on the version."""
         if self.platform == "linux":
             suffix = f"Lambda_{self.arch}.zip"
         elif self.platform == "darwin":
@@ -92,43 +94,29 @@ class Downloader:
         else:
             msg = f"platform not recognized: {self.platform}"
             raise ValueError(msg)
+        return suffix
 
-        return f"MediaInfo_DLL_{MEDIAINFO_VERSION}_{suffix}"
+    def get_compressed_file_name(self) -> str:
+        """Get the compressed file name."""
+        return f"MediaInfo_DLL_{self.version}_{self.get_compressed_file_suffix()}"
 
     def get_url(self) -> str:
         """Get the URL to download the MediaInfo library."""
         compressed_file = self.get_compressed_file_name()
-        return f"{BASE_URL}/{MEDIAINFO_VERSION}/{compressed_file}"
-
-    def compare_hash(self, h: str) -> bool:
-        """Compare downloaded hash with expected."""
-        key = (self.platform, self.arch)
-        expected = MEDIAINFO_HASHES.get(key)
-        # Check expected hash exists
-        if expected is None:
-            msg = f"{key}, expected hash not found."
-            raise ValueError(msg)
-
-        # Check hashes match
-        if expected != h:
-            msg = f"hash mismatch for {key}: expected {expected}, got {h}"
-            raise ValueError(msg)
-
-        return True
+        return f"{BASE_URL}/{self.version}/{compressed_file}"
 
     def download_upstream(
         self,
         url: str,
         outpath: os.PathLike[str],
-    ) -> None:
-        """Download the compressed file from upstream URL."""
+    ) -> str:
+        """Download the compressed file from upstream URL and return its BLAKE2b hash."""
         response = requests.get(url, stream=True, timeout=TIMEOUT)
         response.raise_for_status()
         with Path(outpath).open("wb") as f:
             f.writelines(response.iter_content(chunk_size=8192))
 
-        downloaded_hash = get_file_blake2b(outpath)
-        self.compare_hash(downloaded_hash)
+        return get_file_blake2b(outpath)
 
     def unpack(
         self,
@@ -203,8 +191,9 @@ class Downloader:
     def download(
         self,
         folder: os.PathLike[str] | str,
+        expected_hash: str,
     ) -> dict[str, str]:
-        """Download the library and license files."""
+        """Download the library and license files, checking the BLAKE2b hash of the archive."""
         folder = Path(folder)
 
         url = self.get_url()
@@ -214,7 +203,13 @@ class Downloader:
         with TemporaryDirectory() as tmp_dir:
             outpath = Path(tmp_dir) / compressed_file
             print(f"Downloading MediaInfo library from {url}")
-            self.download_upstream(url, outpath)
+            downloaded_hash = self.download_upstream(url, outpath)
+            if downloaded_hash != expected_hash:
+                msg = (
+                    f"hash mismatch for {compressed_file}: "
+                    f"expected {expected_hash}, got {downloaded_hash}"
+                )
+                raise ValueError(msg)
 
             print(f"Extracting {compressed_file}")
             extracted_files = self.unpack(outpath, folder)
@@ -225,12 +220,14 @@ class Downloader:
 
 def download_files(
     folder: os.PathLike[str] | str,
-    platform: Literal["linux", "darwin", "win32"],
-    arch: Literal["x86_64", "arm64", "i386"],
+    platform: Platform,
+    arch: Arch,
 ) -> dict[str, str]:
     """Download the library and license files to the output folder."""
-    downloader = Downloader(platform=platform, arch=arch)
-    return downloader.download(folder)
+    version, hashes = read_bundled_library_config()
+    downloader = Downloader(platform=platform, arch=arch, version=version)
+    expected_hash = hashes[downloader.get_compressed_file_suffix()]
+    return downloader.download(folder, expected_hash)
 
 
 def clean_files(folder: os.PathLike[str] | str) -> bool:

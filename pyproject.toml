@@ -55,12 +55,26 @@ Documentation = "https://pymediainfo.readthedocs.io/"
 Bugs = "https://github.com/sbraz/pymediainfo/issues"
 
 
+# Version of the MediaInfo library bundled in the wheels and BLAKE2b hashes
+# of the files downloaded from MediaArea, indexed by what follows
+# MediaInfo_DLL_<version>_ in their names. Updated by
+# scripts/update_bundled_library.py.
+[tool.pymediainfo.bundled-library]
+version = "24.12"
+
+[tool.pymediainfo.bundled-library.blake2b]
+"Lambda_arm64.zip" = "4e5a9826fa987f4bde46a6586894d45f3d5381f25d8886dfef67f5db3a9f4377ecafc12acc6e2d71e43b062b686c2db2523052a1f3dd7505a41091847788d114"
+"Lambda_x86_64.zip" = "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1"
+"Mac_x86_64+arm64.tar.bz2" = "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae"
+"Windows_i386_WithoutInstaller.zip" = "0f0e14c103eac858fe683ec7d51634d62e5e0af658940fd26608249f1048846a92a334438204fe5ecfceb70cb00e5550bfb717a77f10816a2583b5041bb61790"
+"Windows_x64_WithoutInstaller.zip" = "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8"
+
 # https://pdm-project.org/latest/
 [tool.pdm.version]
 source = "scm"
 
 [tool.pdm.dev-dependencies]
-download_library = ["wheel>=0.44", "requests"]
+download_library = ["wheel>=0.44", "requests", "tomlkit"]
 
 [tool.pdm.build]
 source-includes = ["docs/", "scripts/", "tests/"]
@@ -91,6 +105,10 @@ cmd = "python scripts/download_library.py {args}"
 [tool.pdm.scripts.clean_library]
 help = "Clean mediainfo library"
 cmd = "python scripts/download_library.py -c"
+
+[tool.pdm.scripts.update_bundled_library]
+help = "Update the bundled MediaInfo version (the latest by default) and its hashes"
+cmd = "python scripts/update_bundled_library.py {args}"
 
 [tool.pdm.scripts.tag_wheel]
 help = "Tag the wheels for a specific platform"
