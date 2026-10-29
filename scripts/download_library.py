@@ -42,7 +42,7 @@ MEDIAINFO_HASHES: dict[tuple[str, str], str] = {
 # fmt: on
 
 
-def get_file_blake2b(file_path: os.PathLike | str, chunksize: int = 1 << 20) -> str:
+def get_file_blake2b(file_path: os.PathLike[str] | str, chunksize: int = 1 << 20) -> str:
     """Get the BLAKE2b hash of a file."""
     blake2b = hashlib.blake2b()
     with Path(file_path).open("rb") as f:
@@ -116,7 +116,7 @@ class Downloader:
     def download_upstream(
         self,
         url: str,
-        outpath: os.PathLike,
+        outpath: os.PathLike[str],
         *,
         timeout: int = 20,
     ) -> None:
@@ -131,8 +131,8 @@ class Downloader:
 
     def unpack(
         self,
-        file: os.PathLike | str,
-        folder: os.PathLike | str,
+        file: os.PathLike[str] | str,
+        folder: os.PathLike[str] | str,
     ) -> dict[str, str]:
         """Extract compressed files."""
         file = Path(file)
@@ -201,7 +201,7 @@ class Downloader:
 
     def download(
         self,
-        folder: os.PathLike | str,
+        folder: os.PathLike[str] | str,
         *,
         timeout: int = 20,
         verbose: bool = True,
@@ -229,7 +229,7 @@ class Downloader:
 
 
 def download_files(
-    folder: os.PathLike | str,
+    folder: os.PathLike[str] | str,
     platform: Literal["linux", "darwin", "win32"],
     arch: Literal["x86_64", "arm64", "i386"],
     *,
@@ -242,7 +242,7 @@ def download_files(
 
 
 def clean_files(
-    folder: os.PathLike | str,
+    folder: os.PathLike[str] | str,
     *,
     verbose: bool = True,
 ) -> bool:
@@ -256,7 +256,7 @@ def clean_files(
     glob_patterns = ["License.html", "LICENSE", "MediaInfo.dll", "libmediainfo.*"]
 
     # list files to delete
-    to_delete: list[os.PathLike] = []
+    to_delete: list[Path] = []
     for pattern in glob_patterns:
         to_delete.extend(folder.glob(pattern))
 

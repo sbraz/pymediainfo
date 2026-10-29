@@ -67,7 +67,7 @@ source-includes = ["docs/", "scripts/", "tests/"]
 
 [tool.pdm.scripts.types]
 help = "Check type hints"
-cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:src tests}"
+cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:src tests scripts}"
 
 [tool.pdm.scripts.docs]
 help = "Build and test documentation"
