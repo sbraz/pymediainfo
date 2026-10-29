@@ -8,6 +8,12 @@ build:
   os: ubuntu-26.04
   tools:
     python: "3.14"
+  jobs:
+    # Read the Docs makes a shallow clone without tags, but the version is
+    # computed from the latest git tag, see
+    # https://docs.readthedocs.com/platform/stable/build-customization.html#unshallow-git-clone
+    post_checkout:
+      - git fetch --unshallow --tags || true
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
