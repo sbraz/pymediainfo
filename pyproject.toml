@@ -186,7 +186,6 @@ ignore = [
     "CPY001",  # flake8-copyright
     "D105",    # pydocstyle
     "D107",
-    "ANN401",  # flake8-annotations
     "COM812",  # flake8-commas, conflicts with `ruff format`
     "PERF203", # Perflint
 ]

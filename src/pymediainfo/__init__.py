@@ -54,7 +54,7 @@ class Track:  # noqa: PLW1641
             return False
         return self.__dict__ == other.__dict__
 
-    def __getattribute__(self, name: str) -> Any:
+    def __getattribute__(self, name: str) -> Any:  # noqa: ANN401
         try:
             return object.__getattribute__(self, name)
         except AttributeError:
@@ -245,7 +245,7 @@ class MediaInfo:  # noqa: PLW1641
         return self._tracks("Menu")
 
     @classmethod
-    def _define_library_prototypes(cls, lib: Any) -> Any:
+    def _define_library_prototypes(cls, lib: ctypes.CDLL) -> None:
         lib.MediaInfo_Inform.restype = ctypes.c_wchar_p
         lib.MediaInfo_New.argtypes = []
         lib.MediaInfo_New.restype = ctypes.c_void_p
@@ -303,7 +303,7 @@ class MediaInfo:  # noqa: PLW1641
     def _get_library(
         cls,
         library_file: str | None = None,
-    ) -> tuple[Any, Any, str, tuple[int, ...]]:
+    ) -> tuple[ctypes.CDLL, Any, str, tuple[int, ...]]:
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         lib_type = ctypes.WinDLL if os_is_nt else ctypes.CDLL  # type: ignore[attr-defined]
         if library_file is None:
