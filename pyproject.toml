@@ -203,12 +203,6 @@ ignore = [
     "ERA001",
     "PTH123",
 ]
-"**/docs/*" = [
-    "A001",
-    "D100",
-    "ERA001",
-    "INP001",
-]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
