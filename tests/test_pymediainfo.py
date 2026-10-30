@@ -218,6 +218,12 @@ class MediaInfoCoverDataTest(unittest.TestCase):
         self.no_cover_mi = MediaInfo.parse(data_dir / "sample_with_cover.mp3")
 
     def test_parse_cover_data(self) -> None:
+        lib_version_str, lib_version = _get_library_version()
+        if lib_version >= (26, 10):
+            pytest.skip(
+                f"MediaInfo v{lib_version_str} doesn't recognize this file, see "
+                "https://github.com/MediaArea/MediaInfoLib/pull/2744"
+            )
         expected = (
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAAAAA"
             "AAAQCEeRdzAAAADUlEQVR4nGP4x8DwHwAE/AH+QSRCQgAAAABJRU5ErkJggg=="

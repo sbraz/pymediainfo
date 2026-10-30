@@ -60,14 +60,14 @@ Bugs = "https://github.com/sbraz/pymediainfo/issues"
 # MediaInfo_DLL_<version>_ in their names. Updated by
 # scripts/update_bundled_library.py.
 [tool.pymediainfo.bundled-library]
-version = "24.12"
+version = "26.10"
 
 [tool.pymediainfo.bundled-library.blake2b]
-"Lambda_arm64.zip" = "4e5a9826fa987f4bde46a6586894d45f3d5381f25d8886dfef67f5db3a9f4377ecafc12acc6e2d71e43b062b686c2db2523052a1f3dd7505a41091847788d114"
-"Lambda_x86_64.zip" = "13c4afb2948187cc06f13b1cd7d7a49f8618b8d1e3a440d9e96ef7b486a653d5e2567aae97dc253e3d3f484a7837e4b5a972abab4803223300a79c601c0bcce1"
-"Mac_x86_64+arm64.tar.bz2" = "65b8195f0859369fa0ab1870cbde1535bb57f16bde451b22585d849c870f1ca92972328c11edd15b6f8187445dd58efff7107cfce39d2be7a88e8c434589b4ae"
-"Windows_i386_WithoutInstaller.zip" = "0f0e14c103eac858fe683ec7d51634d62e5e0af658940fd26608249f1048846a92a334438204fe5ecfceb70cb00e5550bfb717a77f10816a2583b5041bb61790"
-"Windows_x64_WithoutInstaller.zip" = "f831c588e9eaf51201b4cc7995dce66852591764fc5ef05effd3a8a2037ff5d37ec039eef5d1f990f05bd7452c1cad720e95b77a095f9f1a690689e351fc00b8"
+"Lambda_arm64.zip" = "4e7a6fce5d82a7a9b45edf4b5a0831581821a82f0a1a90b54acd71728130fc938e747a32595cf3fa0f7155e8cafa1d8d0e9ab0491156e483256f8a204a1d1cc2"
+"Lambda_x86_64.zip" = "4d8dbd57c6c703c35650225319ebb9889ecf6d9c400566c12d9ffd4ae9f168d6ab3a2928649b656b014d9b3e1cd6c7980a7293c3529307ecc6092d084814c80b"
+"Mac_x86_64+arm64.tar.bz2" = "1382b2d4b21af86384b9959294c2f9fa11be814dba676c56d4643779fb32ef04fb1077334fa03062d2fa1c53cb9432abe113156ce6a1e1edaa654aa8e1b08897"
+"Windows_i386_WithoutInstaller.zip" = "2275b1f420e8fc793f14e58a299a45db9b238e3cd463f59024f10f6380ce85f961faa0551e9a51e296944ff7815cf85c357a35fb9964e56b182279f1f8364bd8"
+"Windows_x64_WithoutInstaller.zip" = "497ecde0a31be1df5cbb2c4022ac0218b355306cc671b27134ad87ea49dbfa837941dc4b267ae88811e0a409039ebd12b288650ce383435ba2dff87e9e155fe6"
 
 # https://pdm-project.org/latest/
 [tool.pdm.version]
