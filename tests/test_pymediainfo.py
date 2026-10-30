@@ -29,10 +29,8 @@ test_media_files = [
 
 
 def _get_library_version() -> tuple[str, tuple[int, ...]]:
-    lib, handle, lib_version_str, lib_version = MediaInfo._get_library()  # noqa: SLF001
-    lib.MediaInfo_Close(handle)
-    lib.MediaInfo_Delete(handle)
-    return lib_version_str, lib_version
+    lib_version_str = MediaInfo.get_library_version()
+    return lib_version_str, tuple(int(_) for _ in lib_version_str.split("."))
 
 
 class MediaInfoTest(unittest.TestCase):
@@ -97,6 +95,9 @@ class MediaInfoLibraryTest(unittest.TestCase):
 
     def test_can_parse_true(self) -> None:
         assert MediaInfo.can_parse()
+
+    def test_get_library_version(self) -> None:
+        assert re.fullmatch(r"\d+(\.\d+)+", MediaInfo.get_library_version())
 
     def test_track_count(self) -> None:
         assert len(self.media_info.tracks) == 3
