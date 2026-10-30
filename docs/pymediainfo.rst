@@ -32,3 +32,5 @@ Last, if no matching file could be loaded from the previous location, the code a
 load the previously determined filename(s) from standard system paths, using
 :class:`ctypes.CDLL` for Linux and macOS, or :class:`ctypes.WinDLL` for
 Windows.
+
+:meth:`MediaInfo.get_library_path` tells which library was loaded.

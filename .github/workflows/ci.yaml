@@ -144,10 +144,11 @@ jobs:
           import pymediainfo
 
           package_dir = Path(pymediainfo.__file__).parent
-          lib, _, version, _ = pymediainfo.MediaInfo._get_library()
-          print(f"pymediainfo from {package_dir}, libmediainfo {version} from {lib._name}")
+          version = pymediainfo.MediaInfo.get_library_version()
+          library_path = pymediainfo.MediaInfo.get_library_path()
+          print(f"pymediainfo from {package_dir}, libmediainfo {version} from {library_path}")
           assert "site-packages" in package_dir.parts, "not testing the installed wheel"
-          assert Path(lib._name).parent == package_dir, "not using the bundled library"
+          assert Path(library_path).parent == package_dir, "not using the bundled library"
       - run: python -m pip install pytest pytest-xdist
       - run: python -m pytest -n auto
 
