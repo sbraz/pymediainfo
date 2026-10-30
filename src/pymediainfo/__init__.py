@@ -377,6 +377,34 @@ class MediaInfo:  # noqa: PLW1641
         lib.MediaInfo_Delete(handle)
         return lib_version_str
 
+    @classmethod
+    def get_library_path(cls, library_file: str | None = None) -> str:
+        """
+        Get the path of libmediainfo, as passed to :mod:`ctypes`.
+
+        For the library bundled in the wheels, this is an absolute path. If `library_file`
+        is set, this is that value. For a system library, this is only the file name, since
+        the dynamic loader searches the standard paths for it.
+
+        :param str library_file: path to the libmediainfo library, this should only be used if
+            the library cannot be auto-detected. See also :ref:`library_autodetection` which
+            explains how the library file is detected when this parameter is unset.
+        :rtype: str
+        :raises OSError: if the library file could not be loaded.
+
+        Examples:
+            >>> pymediainfo.MediaInfo.get_library_path()  # bundled library
+            '/home/user/.venv/lib/python3.14/site-packages/pymediainfo/libmediainfo.so.0'
+
+            >>> pymediainfo.MediaInfo.get_library_path()  # system library
+            'libmediainfo.so.0'
+
+        """
+        lib, handle = cls._get_library(library_file)[:2]
+        lib.MediaInfo_Close(handle)
+        lib.MediaInfo_Delete(handle)
+        return lib._name  # noqa: SLF001
+
     # The method may be called with output=<str>, in which case it returns a str
     @overload
     @classmethod

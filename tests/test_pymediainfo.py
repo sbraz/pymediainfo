@@ -15,6 +15,7 @@ from xml.etree import ElementTree as ET
 
 import pytest
 
+import pymediainfo
 from pymediainfo import MediaInfo
 
 data_dir = Path(__file__).parent / "data"
@@ -98,6 +99,14 @@ class MediaInfoLibraryTest(unittest.TestCase):
 
     def test_get_library_version(self) -> None:
         assert re.fullmatch(r"\d+(\.\d+)+", MediaInfo.get_library_version())
+
+    def test_get_library_path(self) -> None:
+        library_path = Path(MediaInfo.get_library_path())
+        bundled_library = Path(pymediainfo.__file__).parent / library_path.name
+        if bundled_library.is_file():
+            assert library_path == bundled_library
+        else:
+            assert library_path == Path(library_path.name)
 
     def test_track_count(self) -> None:
         assert len(self.media_info.tracks) == 3
