@@ -356,6 +356,27 @@ class MediaInfo:  # noqa: PLW1641
             return False
         return True
 
+    @classmethod
+    def get_library_version(cls, library_file: str | None = None) -> str:
+        """
+        Get the version of libmediainfo.
+
+        :param str library_file: path to the libmediainfo library, this should only be used if
+            the library cannot be auto-detected. See also :ref:`library_autodetection` which
+            explains how the library file is detected when this parameter is unset.
+        :rtype: str
+        :raises OSError: if the library file could not be loaded.
+
+        Examples:
+            >>> pymediainfo.MediaInfo.get_library_version()
+            '26.10'
+
+        """
+        lib, handle, lib_version_str = cls._get_library(library_file)[:3]
+        lib.MediaInfo_Close(handle)
+        lib.MediaInfo_Delete(handle)
+        return lib_version_str
+
     # The method may be called with output=<str>, in which case it returns a str
     @overload
     @classmethod
