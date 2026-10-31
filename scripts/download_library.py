@@ -39,7 +39,7 @@ PYPROJECT_FILE: Path = Path(__file__).resolve().parent.parent / "pyproject.toml"
 ALLOWED_ARCHS: dict[Platform, tuple[Arch, ...]] = {
     "linux": ("x86_64", "arm64"),
     "darwin": ("x86_64", "arm64"),
-    "win32": ("x86_64", "i386"),
+    "win32": ("x86_64", "arm64", "i386"),
 }
 
 
@@ -89,7 +89,7 @@ class Downloader:
         elif self.platform == "darwin":
             suffix = "Mac_x86_64+arm64.tar.bz2"
         elif self.platform == "win32":
-            win_arch = "x64" if self.arch == "x86_64" else self.arch
+            win_arch = {"x86_64": "x64", "arm64": "ARM64"}.get(self.arch, self.arch)
             suffix = f"Windows_{win_arch}_WithoutInstaller.zip"
         else:
             msg = f"platform not recognized: {self.platform}"

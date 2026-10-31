@@ -66,6 +66,7 @@ version = "26.10"
 "Lambda_arm64.zip" = "4e7a6fce5d82a7a9b45edf4b5a0831581821a82f0a1a90b54acd71728130fc938e747a32595cf3fa0f7155e8cafa1d8d0e9ab0491156e483256f8a204a1d1cc2"
 "Lambda_x86_64.zip" = "4d8dbd57c6c703c35650225319ebb9889ecf6d9c400566c12d9ffd4ae9f168d6ab3a2928649b656b014d9b3e1cd6c7980a7293c3529307ecc6092d084814c80b"
 "Mac_x86_64+arm64.tar.bz2" = "1382b2d4b21af86384b9959294c2f9fa11be814dba676c56d4643779fb32ef04fb1077334fa03062d2fa1c53cb9432abe113156ce6a1e1edaa654aa8e1b08897"
+"Windows_ARM64_WithoutInstaller.zip" = "3ad762a608a701fc9db035162fc342db201d2e3dd7a906d849ca2b55a7455bdbc7454eff0cdc3dfa2bc27447d22b4681cbc1ab84aa9ce71e7cdecc46db34e839"
 "Windows_i386_WithoutInstaller.zip" = "2275b1f420e8fc793f14e58a299a45db9b238e3cd463f59024f10f6380ce85f961faa0551e9a51e296944ff7815cf85c357a35fb9964e56b182279f1f8364bd8"
 "Windows_x64_WithoutInstaller.zip" = "497ecde0a31be1df5cbb2c4022ac0218b355306cc671b27134ad87ea49dbfa837941dc4b267ae88811e0a409039ebd12b288650ce383435ba2dff87e9e155fe6"
 
@@ -138,6 +139,14 @@ composite = [
   "tag_wheel win_amd64",
 ]
 
+[tool.pdm.scripts.build_win32_arm64]
+help = "Build wheel with bundled library for Windows arm64"
+composite = [
+  "download_library -c -p win32 -a arm64",
+  "pdm build -v --no-sdist",
+  "tag_wheel win_arm64",
+]
+
 [tool.pdm.scripts.build_win32_i386]
 help = "Build wheel with bundled library for Windows x32"
 composite = [
@@ -161,6 +170,7 @@ composite = [
   "build_linux_arm64",
   "build_linux_x86_64",
   "build_win32_x86_64",
+  "build_win32_arm64",
   "build_win32_i386",
   "build_darwin",
   # remove any library before building sdist and barebone wheel
