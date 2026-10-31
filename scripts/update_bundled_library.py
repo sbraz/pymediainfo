@@ -48,13 +48,17 @@ def update_pyproject(version: str, new_hashes: dict[str, str]) -> None:
     config = tomlkit.parse(PYPROJECT_FILE.read_text(encoding="utf-8"))
     bundled_library = config["tool"]["pymediainfo"]["bundled-library"]
     bundled_library["version"] = version
-    # Change the existing table in place: replacing it would lose the comments
-    # and blank lines that follow it
-    pyproject_hashes = bundled_library["blake2b"]
-    for suffix in set(pyproject_hashes) - new_hashes.keys():
-        del pyproject_hashes[suffix]
+    # Rebuild the table to keep the hashes sorted: tomlkit adds new keys after
+    # the comments and blank lines that follow the table, so move these to the
+    # end of the new table
+    old_hashes = bundled_library["blake2b"]
+    pyproject_hashes = tomlkit.table()
     for suffix, blake2b_hash in sorted(new_hashes.items()):
         pyproject_hashes[suffix] = blake2b_hash
+    for key, item in old_hashes.value.body:
+        if key is None:
+            pyproject_hashes.add(item)
+    bundled_library["blake2b"] = pyproject_hashes
     PYPROJECT_FILE.write_text(tomlkit.dumps(config), encoding="utf-8")
 
 
