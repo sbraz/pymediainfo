@@ -229,7 +229,7 @@ class MediaInfoCoverDataTest(unittest.TestCase):
 
     def test_parse_cover_data(self) -> None:
         lib_version_str, lib_version = _get_library_version()
-        if lib_version >= (26, 10):
+        if lib_version == (26, 10):
             pytest.skip(
                 f"MediaInfo v{lib_version_str} doesn't recognize this file, see "
                 "https://github.com/MediaArea/MediaInfoLib/pull/2744"
