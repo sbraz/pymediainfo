@@ -82,7 +82,7 @@ jobs:
           pdm build -v --no-wheel
           mv -v dist/*.tar.gz dist_files/
           # Each build clears the dist folder, so move the wheels out of it
-          for target in linux_x86_64 linux_arm64 win32_x86_64 win32_i386 darwin; do
+          for target in linux_x86_64 linux_arm64 win32_x86_64 win32_arm64 win32_i386 darwin; do
             pdm run "build_${target}"
             mv -v dist/*.whl dist_files/
           done
@@ -111,6 +111,13 @@ jobs:
             python: "3.10"
             arch: default
           - os: macos-15-intel
+            python: "3.15"
+            arch: default
+          # Windows arm64, which has no Python 3.10 build
+          - os: windows-11-arm
+            python: "3.11"
+            arch: default
+          - os: windows-11-arm
             python: "3.15"
             arch: default
           # Windows x86

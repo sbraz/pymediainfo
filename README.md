@@ -40,7 +40,7 @@ python -m pip install pymediainfo
 
 * Linux x86-64 and ARM64.
 * macOS x86-64 and ARM64.
-* Windows x86-64 and x86.
+* Windows x86-64, ARM64 and x86.
 
 If you do not want to use the wheels (for instance if you want to use the system-wide
 MediaInfo library instead of the bundled one):
