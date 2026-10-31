@@ -35,11 +35,13 @@ TIMEOUT: int = 20
 #: pyproject.toml, which contains the version and hashes of the bundled library
 PYPROJECT_FILE: Path = Path(__file__).resolve().parent.parent / "pyproject.toml"
 
-#: Architectures for which MediaArea provides a library, for each platform
-ALLOWED_ARCHS: dict[Platform, tuple[Arch, ...]] = {
-    "linux": ("x86_64", "arm64"),
-    "darwin": ("x86_64", "arm64"),
-    "win32": ("x86_64", "arm64", "i386"),
+#: Tag of the wheel bundling the library, for each platform and architecture
+#: for which MediaArea provides one
+WHEEL_TAGS: dict[Platform, dict[Arch, str]] = {
+    "linux": {"x86_64": "manylinux_2_27_x86_64", "arm64": "manylinux_2_27_aarch64"},
+    # The same file works with x86_64 and arm64 (Mac_x86_64+arm64.tar.bz2)
+    "darwin": {"x86_64": "macosx_10_10_universal2", "arm64": "macosx_10_10_universal2"},
+    "win32": {"x86_64": "win_amd64", "arm64": "win_arm64", "i386": "win32"},
 }
 
 
@@ -69,16 +71,16 @@ class Downloader:
 
     def __post_init__(self) -> None:
         """Check that the combination of platform and arch is allowed."""
-        allowed_arch = ALLOWED_ARCHS.get(self.platform)
-        if allowed_arch is None:
+        allowed_archs = WHEEL_TAGS.get(self.platform)
+        if allowed_archs is None:
             msg = f"platform not recognized: {self.platform}"
             raise ValueError(msg)
 
         # Check the platform and arch is a valid combination
-        if self.arch not in allowed_arch:
+        if self.arch not in allowed_archs:
             msg = (
                 f"arch {self.arch} is not allowed for platform {self.platform}; "
-                f"must be one of {allowed_arch}"
+                f"must be one of {tuple(allowed_archs)}"
             )
             raise ValueError(msg)
 

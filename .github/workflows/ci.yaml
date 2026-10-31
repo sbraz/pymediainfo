@@ -75,21 +75,11 @@ jobs:
           python -m pip install pdm
           pdm install --no-self
       - name: Build the sdist and the wheels with the bundled library
-        run: |
-          set -eo pipefail
-          mkdir dist_files
-          # Build the sdist first so that it doesn't contain any library
-          pdm build -v --no-wheel
-          mv -v dist/*.tar.gz dist_files/
-          # Each build clears the dist folder, so move the wheels out of it
-          for target in linux_x86_64 linux_arm64 win32_x86_64 win32_arm64 win32_i386 darwin; do
-            pdm run "build_${target}"
-            mv -v dist/*.whl dist_files/
-          done
+        run: pdm run build_all
       - uses: actions/upload-artifact@v7
         with:
           name: dist
-          path: dist_files/
+          path: dist/
           if-no-files-found: error
 
   test:

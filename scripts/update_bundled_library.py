@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 
 import requests
 import tomlkit
-from download_library import ALLOWED_ARCHS, PYPROJECT_FILE, TIMEOUT, Downloader
+from download_library import PYPROJECT_FILE, TIMEOUT, WHEEL_TAGS, Downloader
 
 #: GitHub API URL of the latest MediaInfoLib release
 LATEST_RELEASE_URL = "https://api.github.com/repos/MediaArea/MediaInfoLib/releases/latest"
@@ -28,7 +28,7 @@ def get_latest_version() -> str:
 def get_hashes(version: str) -> dict[str, str]:
     """Download the files of a MediaInfo version and get their BLAKE2b hashes."""
     hashes: dict[str, str] = {}
-    for platform, archs in ALLOWED_ARCHS.items():
+    for platform, archs in WHEEL_TAGS.items():
         for arch in archs:
             downloader = Downloader(platform=platform, arch=arch, version=version)
             suffix = downloader.get_compressed_file_suffix()

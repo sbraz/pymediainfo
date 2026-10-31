@@ -112,70 +112,31 @@ help = "Update the bundled MediaInfo version (the latest by default) and its has
 cmd = "python scripts/update_bundled_library.py {args}"
 
 [tool.pdm.scripts.tag_wheel]
-help = "Tag the wheels for a specific platform"
-cmd = "python scripts/tag_pure_wheels.py"
+help = "Tag the pure wheel for a platform and architecture"
+cmd = "python scripts/tag_pure_wheel.py"
 
-[tool.pdm.scripts.build_linux_x86_64]
-help = "Build wheel with bundled library for Linux x86_64"
+[tool.pdm.scripts.build_wheel]
+help = "Build the wheel with the bundled library for a platform and architecture"
 composite = [
-  "download_library -c -p linux -a x86_64",
-  "pdm build -v --no-sdist",
-  "tag_wheel manylinux_2_27_x86_64",
-]
-
-[tool.pdm.scripts.build_linux_arm64]
-help = "Build wheel with bundled library for Linux arm64"
-composite = [
-  "download_library -c -p linux -a arm64",
-  "pdm build -v --no-sdist",
-  "tag_wheel manylinux_2_27_aarch64",
-]
-
-[tool.pdm.scripts.build_win32_x86_64]
-help = "Build wheel with bundled library for Windows x64"
-composite = [
-  "download_library -c -p win32 -a x86_64",
-  "pdm build -v --no-sdist",
-  "tag_wheel win_amd64",
-]
-
-[tool.pdm.scripts.build_win32_arm64]
-help = "Build wheel with bundled library for Windows arm64"
-composite = [
-  "download_library -c -p win32 -a arm64",
-  "pdm build -v --no-sdist",
-  "tag_wheel win_arm64",
-]
-
-[tool.pdm.scripts.build_win32_i386]
-help = "Build wheel with bundled library for Windows x32"
-composite = [
-  "download_library -c -p win32 -a i386",
-  "pdm build -v --no-sdist",
-  "tag_wheel win32",
-]
-
-[tool.pdm.scripts.build_darwin]
-help = "Build wheel with bundled library for MacOS x86_64 and arm64"
-composite = [
-  # -a doesn't matter as the file works with both x86_64 and arm64 (Mac_x86_64+arm64.tar.bz2)
-  "download_library -c -p darwin -a arm64",
-  "pdm build -v --no-sdist",
-  "tag_wheel macosx_10_10_universal2",
+  "download_library -c {args}",
+  "pdm build -v --no-sdist --no-clean",
+  "tag_wheel {args}",
 ]
 
 [tool.pdm.scripts.build_all]
-help = "Build all the wheels with bundled library and the sdist and wheel without library"
+help = "Build the sdist and all the wheels with the bundled library"
 composite = [
-  "build_linux_arm64",
-  "build_linux_x86_64",
-  "build_win32_arm64",
-  "build_win32_x86_64",
-  "build_win32_i386",
-  "build_darwin",
-  # remove any library before building sdist and barebone wheel
+  # Build the sdist first, without any library, which also cleans the dist folder
   "clean_library",
-  "pdm build",
+  "pdm build -v --no-wheel",
+  "build_wheel -p linux -a arm64",
+  "build_wheel -p linux -a x86_64",
+  "build_wheel -p win32 -a arm64",
+  "build_wheel -p win32 -a x86_64",
+  "build_wheel -p win32 -a i386",
+  # The macOS wheel works with x86_64 and arm64
+  "build_wheel -p darwin -a arm64",
+  "clean_library",
 ]
 
 
