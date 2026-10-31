@@ -324,6 +324,8 @@ class MediaInfo:  # noqa: PLW1641
                     lib_version_str = match.group(1)
                     lib_version = tuple(int(_) for _ in lib_version_str.split("."))
                 else:
+                    lib.MediaInfo_Close(handle)
+                    lib.MediaInfo_Delete(handle)
                     msg = "Could not determine library version"
                     raise RuntimeError(msg)
             except OSError as exc:
