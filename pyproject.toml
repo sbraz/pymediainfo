@@ -1,6 +1,6 @@
 # https://packaging.python.org/en/latest/specifications/pyproject-toml/
 [build-system]
-requires = ["pdm-backend", "wheel>=0.42"]
+requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project]
