@@ -345,6 +345,12 @@ def test_old_library_warning_location(monkeypatch: pytest.MonkeyPatch) -> None:
     assert record[0].filename == __file__
 
 
+def test_android_library_paths(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys, "platform", "android")
+    library_paths = MediaInfo._get_library_paths(os_is_nt=False)  # noqa: SLF001
+    assert library_paths == ("libmediainfo.so",)
+
+
 # Unittests can't be parametrized
 # https://github.com/pytest-dev/pytest/issues/541
 @pytest.mark.parametrize("test_file", test_media_files)

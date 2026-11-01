@@ -18,6 +18,7 @@ Filename Determination
 First, the library filename is automatically determined based on the operating system:
 
 - On **Linux**, `libmediainfo.so.0` is used.
+- On **Android**, `libmediainfo.so` is used (Python 3.13 and later).
 - On **macOS**, the first available file among `libmediainfo.0.dylib` and `libmediainfo.dylib` is used, in that order.
 - On **Windows**, `MediaInfo.dll` is used.
 

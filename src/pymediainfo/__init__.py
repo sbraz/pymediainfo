@@ -287,6 +287,9 @@ class MediaInfo:  # noqa: PLW1641
             library_paths = ("MediaInfo.dll",)
         elif sys.platform == "darwin":
             library_paths = ("libmediainfo.0.dylib", "libmediainfo.dylib")
+        elif sys.platform == "android":
+            # Shared libraries have no version suffix on Android
+            library_paths = ("libmediainfo.so",)
         else:
             library_paths = ("libmediainfo.so.0",)
         script_dir = Path(__file__).parent
