@@ -28,9 +28,15 @@ class Track:  # noqa: PLW1641
     An object associated with a media file track.
 
     Each :class:`Track` attribute corresponds to attributes parsed from MediaInfo's output.
-    All attributes are lower case. Attributes that are present several times such as ``Duration``
-    yield a second attribute starting with ``other_`` which is a list of all alternative
-    attribute values.
+    All attributes are lower case. Repeated attributes yield a second attribute starting with
+    ``other_``, which is a list of all alternative attribute values. For example, ``duration``
+    comes with ``other_duration``.
+
+    When one of the values of a repeated attribute is an integer, pymediainfo makes it the main
+    attribute, as an :class:`int`. No other value is converted. Integers that appear once, such
+    as ``frame_count``, stay strings, as do decimal values such as ``frame_rate`` or a
+    ``duration`` of ``7040.000000``. With ``full=False``, attributes aren't repeated, so none are
+    converted.
 
     When a non-existing attribute is accessed, ``None`` is returned.
 
