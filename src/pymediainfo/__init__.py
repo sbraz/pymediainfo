@@ -477,7 +477,9 @@ class MediaInfo:  # noqa: PLW1641
 
         :param filename: path to the media file or file-like object which will be analyzed.
             A URL can also be used if libmediainfo was compiled
-            with CURL support.
+            with CURL support. File-like objects don't need to be seekable, so pipes work too,
+            but some information may be missing or wrong since MediaInfo can't seek or know
+            the size.
         :param str library_file: path to the libmediainfo library, this should only be used if
             the library cannot be auto-detected. See also :ref:`library_autodetection` which
             explains how the library file is detected when this parameter is unset.
@@ -558,22 +560,25 @@ class MediaInfo:  # noqa: PLW1641
                 )
             for option_name, option_value in mediainfo_options.items():
                 lib.MediaInfo_Option(handle, option_name, option_value)
-        try:
-            # filename is detected as a file by duck typing below, which mypy
-            # can't follow, so cast() tells it which branch has which type
-            filename = cast("BinaryIO", filename)
-            filename.seek(0, 2)
-            file_size = filename.tell()
-            filename.seek(0)
-        except AttributeError:  # filename is not a file-like object
-            file_size = None
-
-        if file_size is not None:  # We have a file-like object, use the buffer protocol:
+        if hasattr(filename, "read"):  # We have a file-like object, use the buffer protocol:
+            # mypy can't rule out a str or PathLike with a read() method, so tell it
             filename = cast("BinaryIO", filename)
             # Some file-like objects do not have a mode
             if "b" not in getattr(filename, "mode", "b"):
                 msg = "File should be opened in binary mode"
                 raise ValueError(msg)
+            try:
+                filename.seek(0, 2)
+                file_size = filename.tell()
+                filename.seek(0)
+                seekable = True
+            # Streams such as pipes raise io.UnsupportedOperation, an OSError
+            except (AttributeError, OSError):
+                # Tell MediaInfo that the size is unknown, like the default size it uses
+                # when it reads stdin
+                # https://github.com/MediaArea/MediaInfoLib/blob/v26.10/Source/MediaInfo/MediaInfo_Internal.h#L63
+                file_size = ctypes.c_uint64(-1).value
+                seekable = False
             if buffer_size is None:
                 # BinaryIO.read() is typed to take an int, so use its default, -1,
                 # which reads until EOF
@@ -586,6 +591,13 @@ class MediaInfo:  # noqa: PLW1641
                     # 4th bit = finished
                     if lib.MediaInfo_Open_Buffer_Continue(handle, buffer, len(buffer)) & 0x08:
                         break
+                    # Like MediaInfo when it reads stdin, ignore seek requests from
+                    # non-seekable streams: it skips data until the requested position, or
+                    # drops the rest after a backward seek request
+                    # https://github.com/MediaArea/MediaInfoLib/blob/v26.10/Source/MediaInfo/MediaInfo_Internal.cpp#L1473
+                    # https://github.com/MediaArea/MediaInfoLib/blob/v26.10/Source/MediaInfo/File__Analyze.cpp#L1070-L1079
+                    if not seekable:
+                        continue
                     # Ask MediaInfo if we need to seek
                     seek = lib.MediaInfo_Open_Buffer_Continue_GoTo_Get(handle)
                     # https://github.com/MediaArea/MediaInfoLib/blob/v20.09/Source/MediaInfoDLL/MediaInfoJNI.cpp#L127
@@ -597,7 +609,7 @@ class MediaInfo:  # noqa: PLW1641
                     break
             lib.MediaInfo_Open_Buffer_Finalize(handle)
         else:  # We have a filename, simply pass it:
-            filename = os.fspath(cast("str | os.PathLike[str]", filename))
+            filename = os.fspath(filename)
             # If an error occurred
             if lib.MediaInfo_Open(handle, filename) == 0:
                 lib.MediaInfo_Close(handle)

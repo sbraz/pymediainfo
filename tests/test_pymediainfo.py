@@ -1,6 +1,7 @@
 import ctypes
 import functools
 import http.server
+import io
 import json
 import os
 import pickle
@@ -26,6 +27,8 @@ test_media_files = [
     "mpeg4.mp4",
     "mp3.mp3",
     "mp4-with-audio.mp4",
+    # The header is after the data, which makes MediaInfo ask to seek to it
+    "moov_at_end.mp4",
 ]
 
 
@@ -405,6 +408,45 @@ def test_filelike_returns_the_same(test_file: str) -> None:
             # Test dicts first because they will produce a diff
             assert track_from_file.to_data() == track_from_filename.to_data()
             assert track_from_file == track_from_filename
+
+
+class NonSeekableFile(io.RawIOBase):
+    """A file that can't seek, like a pipe."""
+
+    def __init__(self, path: Path) -> None:
+        self._file = io.BytesIO(path.read_bytes())
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buffer: Any) -> int:  # noqa: ANN401
+        return self._file.readinto(buffer)
+
+
+# None reads the whole file at once. 4096 splits the larger files into
+# several chunks, which tests seek requests on non-seekable files.
+@pytest.mark.parametrize("buffer_size", [None, 4096])
+@pytest.mark.parametrize("test_file", test_media_files)
+def test_non_seekable_finds_the_same_tracks(
+    test_file: str, buffer_size: int | None, request: pytest.FixtureRequest
+) -> None:
+    path = data_dir / test_file
+    # Our MP3 files are a single frame each
+    if path.suffix == ".mp3":
+        request.applymarker(
+            pytest.mark.xfail(
+                reason="MediaInfo needs the size to detect a single MP3 frame",
+                raises=AssertionError,
+            )
+        )
+    mi_from_filename = MediaInfo.parse(path)
+    # Sizes and bit rates can differ without a known size, so only compare formats
+    mi_from_pipe = MediaInfo.parse(
+        io.BufferedReader(NonSeekableFile(path)), buffer_size=buffer_size
+    )
+    assert [(track.track_type, track.format) for track in mi_from_pipe.tracks] == [
+        (track.track_type, track.format) for track in mi_from_filename.tracks
+    ]
 
 
 class MediaInfoOutputTest(unittest.TestCase):
