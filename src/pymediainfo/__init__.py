@@ -88,7 +88,7 @@ class Track:  # noqa: PLW1641
         for primary_key, other_key in repeated_attributes:
             try:
                 # Attempt to convert the main value to int
-                # Usually, if an attribute is repeated, one of its value
+                # Usually, if an attribute is repeated, one of its values
                 # is an int and others are human-readable formats
                 setattr(self, primary_key, int(getattr(self, primary_key)))
             except ValueError:
