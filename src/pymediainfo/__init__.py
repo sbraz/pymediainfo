@@ -28,11 +28,11 @@ class Track:  # noqa: PLW1641
     An object associated with a media file track.
 
     Each :class:`Track` attribute corresponds to attributes parsed from MediaInfo's output.
-    All attributes are lower case. Attributes that are present several times such as `Duration`
-    yield a second attribute starting with `other_` which is a list of all alternative
+    All attributes are lower case. Attributes that are present several times such as ``Duration``
+    yield a second attribute starting with ``other_`` which is a list of all alternative
     attribute values.
 
-    When a non-existing attribute is accessed, `None` is returned.
+    When a non-existing attribute is accessed, ``None`` is returned.
 
     Example:
         >>> t = mi.tracks[0]
@@ -143,8 +143,8 @@ class MediaInfo:  # noqa: PLW1641
     ...     mi = pymediainfo.MediaInfo(f.read())
 
     :param str xml: XML output obtained from MediaInfo.
-    :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
-        parameter before parsing `xml`.
+    :param str encoding_errors: option to pass to :func:`str.encode`'s ``errors``
+        parameter before parsing ``xml``.
     :raises xml.etree.ElementTree.ParseError: if passed invalid XML.
     :var tracks: A list of :py:class:`Track` objects which the media file contains.
         For instance:
@@ -385,7 +385,7 @@ class MediaInfo:  # noqa: PLW1641
         """
         Get the path of libmediainfo, as passed to :mod:`ctypes`.
 
-        For the library bundled in the wheels, this is an absolute path. If `library_file`
+        For the library bundled in the wheels, this is an absolute path. If ``library_file``
         is set, this is that value. For a system library, this is only the file name, since
         the dynamic loader searches the standard paths for it.
 
@@ -476,9 +476,9 @@ class MediaInfo:  # noqa: PLW1641
             the library cannot be auto-detected. See also :ref:`library_autodetection` which
             explains how the library file is detected when this parameter is unset.
         :param bool cover_data: whether to retrieve cover data as base64.
-        :param str encoding_errors: option to pass to :func:`str.encode`'s `errors`
+        :param str encoding_errors: option to pass to :func:`str.encode`'s ``errors``
             parameter before parsing MediaInfo's XML output.
-        :param float parse_speed: passed to the library as `ParseSpeed`,
+        :param float parse_speed: passed to the library as ``ParseSpeed``,
             this option takes values between 0 and 1.
             A higher value will yield more precise results in some cases
             but will also increase parsing time.
@@ -486,15 +486,15 @@ class MediaInfo:  # noqa: PLW1641
             for sizes and durations, corresponds to the CLI's ``--Full``/``-f`` parameter.
         :param bool legacy_stream_display: display additional information about streams.
         :param dict mediainfo_options: additional options that will be passed to the
-            `MediaInfo_Option` function, for example: ``{"Language": "raw"}``.
+            ``MediaInfo_Option`` function, for example: ``{"Language": "raw"}``.
             Do not use this parameter when running the method simultaneously from multiple threads,
             it will trigger a reset of all options which will cause inconsistencies or failures.
         :param str output: custom output format for MediaInfo, corresponds to the CLI's
             ``--Output`` parameter. Setting this causes the method to
-            return a `str` instead of a :class:`MediaInfo` object.
+            return a ``str`` instead of a :class:`MediaInfo` object.
 
             Useful values include:
-                * the empty `str` ``""`` (corresponds to the default
+                * the empty ``str`` ``""`` (corresponds to the default
                   text output, obtained when running ``mediainfo`` with no
                   additional parameters)
 
@@ -504,9 +504,9 @@ class MediaInfo:  # noqa: PLW1641
 
                 * ``%``-delimited templates (see ``mediainfo --Info-Parameters``)
         :param int buffer_size: size of the buffer used to read the file, in bytes. This is only
-            used when `filename` is a file-like object.
+            used when ``filename`` is a file-like object.
         :type filename: str, os.PathLike or a file opened in binary mode, see :data:`FileLike`
-        :rtype: str if `output` is set.
+        :rtype: str if ``output`` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file.
         :raises ValueError: if passed a file-like object opened in text mode.
