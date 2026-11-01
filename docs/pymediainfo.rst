@@ -29,9 +29,17 @@ Next, the code checks if a matching library file exists in the same directory
 as pymediainfo's ``__init__.py`` and attempts to load it.
 If pymediainfo was installed from a wheel, the bundled library is placed in this location.
 
-Last, if no matching file could be loaded from the previous location, the code attempts to
+Last, if no matching file exists in that directory, the code attempts to
 load the previously determined filename(s) from standard system paths, using
 :class:`ctypes.CDLL` for Linux and macOS, or :class:`ctypes.WinDLL` for
 Windows.
 
 :meth:`MediaInfo.get_library_path` tells which library was loaded.
+
+Choosing the Library
+--------------------
+
+To skip the bundled library and use the system one, pass ``library_file="system"``.
+To only use the bundled library, pass ``library_file="bundled"``. If pymediainfo wasn't
+installed from a wheel, this raises :exc:`FileNotFoundError`, and
+:meth:`MediaInfo.can_parse` returns ``False``.

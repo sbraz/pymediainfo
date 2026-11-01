@@ -354,6 +354,25 @@ def test_android_library_paths(monkeypatch: pytest.MonkeyPatch) -> None:
     assert library_paths == ("libmediainfo.so",)
 
 
+def test_library_file_keywords(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sys, "platform", "linux")
+    # Pretend that pymediainfo is installed in an empty directory
+    monkeypatch.setattr(pymediainfo, "__file__", os.fspath(tmp_path / "__init__.py"))
+    get_library_paths = MediaInfo._get_library_paths  # noqa: SLF001
+    # Without a bundled library, "bundled" raises instead of falling back to the system one
+    with pytest.raises(FileNotFoundError):
+        MediaInfo.get_library_path(library_file="bundled")
+    # Add a fake bundled library
+    bundled_library = tmp_path / "libmediainfo.so.0"
+    bundled_library.touch()
+    # "bundled" finds it
+    assert get_library_paths(os_is_nt=False, library_file="bundled") == (
+        os.fspath(bundled_library),
+    )
+    # "system" ignores it and lets the dynamic loader search the standard paths
+    assert get_library_paths(os_is_nt=False, library_file="system") == ("libmediainfo.so.0",)
+
+
 # Unittests can't be parametrized
 # https://github.com/pytest-dev/pytest/issues/541
 @pytest.mark.parametrize("test_file", test_media_files)

@@ -287,7 +287,7 @@ class MediaInfo:  # noqa: PLW1641
         lib.MediaInfo_Close.restype = None
 
     @staticmethod
-    def _get_library_paths(*, os_is_nt: bool) -> tuple[str, ...]:
+    def _get_library_paths(*, os_is_nt: bool, library_file: str | None = None) -> tuple[str, ...]:
         library_paths: tuple[str, ...]
         if os_is_nt:
             library_paths = ("MediaInfo.dll",)
@@ -298,14 +298,18 @@ class MediaInfo:  # noqa: PLW1641
             library_paths = ("libmediainfo.so",)
         else:
             library_paths = ("libmediainfo.so.0",)
+        if library_file == "system":
+            return library_paths
         script_dir = Path(__file__).parent
         # Look for the library file in the script folder
         for library in library_paths:
             absolute_library_path = script_dir / library
             if absolute_library_path.is_file():
                 # If we find it, don't try any other filename
-                library_paths = (os.fspath(absolute_library_path),)
-                break
+                return (os.fspath(absolute_library_path),)
+        if library_file == "bundled":
+            msg = f"No bundled library found in {script_dir}"
+            raise FileNotFoundError(msg)
         return library_paths
 
     @classmethod
@@ -315,8 +319,8 @@ class MediaInfo:  # noqa: PLW1641
     ) -> tuple[ctypes.CDLL, Any, str, tuple[int, ...]]:
         os_is_nt = os.name in ("nt", "dos", "os2", "ce")
         lib_type = ctypes.WinDLL if os_is_nt else ctypes.CDLL  # type: ignore[attr-defined]
-        if library_file is None:
-            library_paths = cls._get_library_paths(os_is_nt=os_is_nt)
+        if library_file in (None, "bundled", "system"):
+            library_paths = cls._get_library_paths(os_is_nt=os_is_nt, library_file=library_file)
         else:
             library_paths = (library_file,)
         exceptions = []
@@ -352,9 +356,9 @@ class MediaInfo:  # noqa: PLW1641
         """
         Check whether media files can be analyzed using libmediainfo.
 
-        :param str library_file: path to the libmediainfo library, this should only be used if
-            the library cannot be auto-detected. See also :ref:`library_autodetection` which
-            explains how the library file is detected when this parameter is unset.
+        :param str library_file: path to the libmediainfo library, ``"system"`` to only use
+            the system library or ``"bundled"`` to only use the one bundled in the wheels.
+            See :ref:`library_autodetection`.
         :rtype: bool
         """
         try:
@@ -370,9 +374,9 @@ class MediaInfo:  # noqa: PLW1641
         """
         Get the version of libmediainfo.
 
-        :param str library_file: path to the libmediainfo library, this should only be used if
-            the library cannot be auto-detected. See also :ref:`library_autodetection` which
-            explains how the library file is detected when this parameter is unset.
+        :param str library_file: path to the libmediainfo library, ``"system"`` to only use
+            the system library or ``"bundled"`` to only use the one bundled in the wheels.
+            See :ref:`library_autodetection`.
         :rtype: str
         :raises OSError: if the library file could not be loaded.
 
@@ -392,12 +396,12 @@ class MediaInfo:  # noqa: PLW1641
         Get the path of libmediainfo, as passed to :mod:`ctypes`.
 
         For the library bundled in the wheels, this is an absolute path. If ``library_file``
-        is set, this is that value. For a system library, this is only the file name, since
+        is a path, this is that value. For a system library, this is only the file name, since
         the dynamic loader searches the standard paths for it.
 
-        :param str library_file: path to the libmediainfo library, this should only be used if
-            the library cannot be auto-detected. See also :ref:`library_autodetection` which
-            explains how the library file is detected when this parameter is unset.
+        :param str library_file: path to the libmediainfo library, ``"system"`` to only use
+            the system library or ``"bundled"`` to only use the one bundled in the wheels.
+            See :ref:`library_autodetection`.
         :rtype: str
         :raises OSError: if the library file could not be loaded.
 
@@ -480,9 +484,9 @@ class MediaInfo:  # noqa: PLW1641
             with CURL support. File-like objects don't need to be seekable, so pipes work too,
             but some information may be missing or wrong since MediaInfo can't seek or know
             the size.
-        :param str library_file: path to the libmediainfo library, this should only be used if
-            the library cannot be auto-detected. See also :ref:`library_autodetection` which
-            explains how the library file is detected when this parameter is unset.
+        :param str library_file: path to the libmediainfo library, ``"system"`` to only use
+            the system library or ``"bundled"`` to only use the one bundled in the wheels.
+            See :ref:`library_autodetection`.
         :param bool cover_data: whether to retrieve cover data as base64.
         :param str encoding_errors: option to pass to :func:`str.encode`'s ``errors``
             parameter before parsing MediaInfo's XML output.
