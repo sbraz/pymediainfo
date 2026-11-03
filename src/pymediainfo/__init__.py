@@ -480,10 +480,12 @@ class MediaInfo:  # noqa: PLW1641
             library options that are shared across threads.
 
         :param filename: path to the media file or file-like object which will be analyzed.
-            A URL can also be used if libmediainfo was compiled
-            with CURL support. File-like objects don't need to be seekable, so pipes work too,
-            but some information may be missing or wrong since MediaInfo can't seek or know
-            the size.
+            A URL can also be used if libmediainfo was compiled with curl support. The library
+            bundled in the Windows wheels also needs a ``libcurl.dll`` (or ``libcurl-x64.dll``
+            with 64-bit Python) for the same architecture as Python, for example in a directory
+            listed in ``PATH``. File-like objects don't need to be seekable, so pipes work too,
+            but some information may be missing or wrong since MediaInfo can't seek or know the
+            size.
         :param str library_file: path to the libmediainfo library, ``"system"`` to only use
             the system library or ``"bundled"`` to only use the one bundled in the wheels.
             See :ref:`library_autodetection`.
