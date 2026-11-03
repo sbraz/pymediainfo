@@ -78,11 +78,11 @@ source = "scm"
 download_library = ["wheel>=0.44", "requests", "tomlkit"]
 
 [tool.pdm.build]
-source-includes = ["docs/", "scripts/", "tests/"]
+source-includes = ["docs/", "examples/", "scripts/", "tests/"]
 
 [tool.pdm.scripts.types]
 help = "Check type hints"
-cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:src tests scripts}"
+cmd = "mypy --install-types --non-interactive --config-file=pyproject.toml {args:examples src tests scripts}"
 
 [tool.pdm.scripts.docs]
 help = "Build and test documentation"
