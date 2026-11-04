@@ -193,3 +193,8 @@ convention = "pep257"
 # https://docs.astral.sh/ruff/formatter/
 [tool.ruff.format]
 docstring-code-format = true
+
+# https://github.com/crate-ci/typos
+[tool.typos.default.extend-identifiers]
+# Name from typeshed, used in examples/parse_url.py
+WriteableBuffer = "WriteableBuffer"
