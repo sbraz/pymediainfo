@@ -11,10 +11,24 @@ import warnings
 import xml.etree.ElementTree as ET
 from importlib import metadata
 from pathlib import Path
-from typing import Any, BinaryIO, TypeAlias, cast, overload
+from typing import Any, BinaryIO, Protocol, TypeAlias, cast, overload
 
-#: Types accepted by :meth:`MediaInfo.parse`: a path or a file opened in binary mode
-FileLike: TypeAlias = str | os.PathLike[str] | BinaryIO
+
+# Replace with io.Reader[bytes] once Python 3.14 is the minimum
+class SupportsRead(Protocol):
+    """
+    Protocol matched by any object with a ``read()`` method that returns bytes.
+
+    This includes files opened in binary mode.
+    """
+
+    def read(self, size: int, /) -> bytes:
+        """Read at most ``size`` bytes, or until EOF if ``size`` is -1."""
+        ...
+
+
+#: Types accepted by :meth:`MediaInfo.parse`: a path or a :class:`SupportsRead`
+FileLike: TypeAlias = str | os.PathLike[str] | SupportsRead
 
 try:
     __version__ = metadata.version("pymediainfo")
@@ -519,7 +533,7 @@ class MediaInfo:  # noqa: PLW1641
                 * ``%``-delimited templates (see ``mediainfo --Info-Parameters``)
         :param int buffer_size: size of the buffer used to read the file, in bytes. This is only
             used when ``filename`` is a file-like object.
-        :type filename: str, os.PathLike or a file opened in binary mode, see :data:`FileLike`
+        :type filename: str, os.PathLike or an object with a ``read()`` method, see :data:`FileLike`
         :rtype: str if ``output`` is set.
         :rtype: :class:`MediaInfo` otherwise.
         :raises FileNotFoundError: if passed a non-existent file.
@@ -567,7 +581,9 @@ class MediaInfo:  # noqa: PLW1641
             for option_name, option_value in mediainfo_options.items():
                 lib.MediaInfo_Option(handle, option_name, option_value)
         if hasattr(filename, "read"):  # We have a file-like object, use the buffer protocol:
-            # mypy can't rule out a str or PathLike with a read() method, so tell it
+            # mypy can't rule out a str or PathLike with a read() method, and we can't use
+            # SupportsRead because it has no seek() or tell(), which are tried below. This
+            # cast is only for mypy: FileLike doesn't actually require a BinaryIO.
             filename = cast("BinaryIO", filename)
             # Some file-like objects do not have a mode
             if "b" not in getattr(filename, "mode", "b"):
@@ -586,8 +602,7 @@ class MediaInfo:  # noqa: PLW1641
                 file_size = ctypes.c_uint64(-1).value
                 seekable = False
             if buffer_size is None:
-                # BinaryIO.read() is typed to take an int, so use its default, -1,
-                # which reads until EOF
+                # read() takes an int, and -1 reads until EOF
                 buffer_size = -1
             lib.MediaInfo_Open_Buffer_Init(handle, file_size, 0)
             while True:
