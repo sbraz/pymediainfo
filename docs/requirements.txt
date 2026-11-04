@@ -1,3 +1,3 @@
-alabaster
+furo
 myst-parser
 sphinx

@@ -43,9 +43,6 @@ language = "en"
 # directories to ignore when looking for source files.
 exclude_patterns = ["_build"]
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
-
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
@@ -54,17 +51,15 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "page_width": "auto",
-    "fixed_sidebar": True,
-    "github_user": "sbraz",
-    "github_repo": "pymediainfo",
-    "github_type": "star",
+    "source_repository": "https://github.com/sbraz/pymediainfo/",
+    "source_branch": "master",
+    "source_directory": "docs/",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

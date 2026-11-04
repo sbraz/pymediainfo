@@ -39,7 +39,7 @@ tests = [
     "pytest-xdist",
 ]
 docs = [
-    "alabaster",
+    "furo",
     "myst-parser",
     "sphinx",
 ]
